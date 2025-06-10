@@ -40,8 +40,6 @@ export default function LoginPage() {
   // context
   const { onLoggedIn } = useContext(AuthContext);
 
-  console.log(redirectUri);
-
   // state
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
 
