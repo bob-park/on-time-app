@@ -4,10 +4,11 @@ import { Animated, Pressable, Text, View } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs, useRouter } from 'expo-router';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
 
+import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import cx from 'classnames';
@@ -47,7 +48,12 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
 
 export default function TabLayout() {
   // context
+  const { isLoggedIn } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
+
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
+  }
 
   return (
     <View className="size-full">
@@ -74,7 +80,7 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="(home)/index"
+          name="(home)"
           options={{
             title: '오늘',
             tabBarIcon: ({ focused }) =>
