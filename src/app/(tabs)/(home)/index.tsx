@@ -1,9 +1,9 @@
 import { Text, View } from 'react-native';
 
-export default function TabOneScreen() {
+export default function HomeIndex() {
   return (
     <View className="">
-      <Text>index</Text>
+      <Text>home</Text>
     </View>
   );
 }
