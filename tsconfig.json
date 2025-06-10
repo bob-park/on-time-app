@@ -4,7 +4,13 @@
     "strict": true,
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "@/global.css": [
+        "./global.css"
+      ],
+      "@/assets/*": [
+        "./assets/*"
       ]
     }
   },
@@ -12,6 +18,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "nativewind-env.d.ts",
+    "image.d.ts"
   ]
 }

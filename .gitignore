@@ -35,3 +35,16 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+
+### project ###
+*.DS_Store
+
+### history ###
+.history
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "@bob-park/bobpark"
+  ],
+  "rules": {
+
+  }
+}
