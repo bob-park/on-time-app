@@ -1,12 +1,10 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Animated, Text, View } from 'react-native';
 
-import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
