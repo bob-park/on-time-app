@@ -2,6 +2,8 @@ import { useContext } from 'react';
 
 import { Image, ScrollView, Text, View } from 'react-native';
 
+import { useRouter } from 'expo-router';
+
 import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
@@ -12,6 +14,9 @@ const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 export default function MoreIndex() {
   // context
   const { userDetail: user, onLogout } = useContext(AuthContext);
+
+  // hooks
+  const router = useRouter();
 
   // handle
   const handleLogout = () => {
@@ -75,7 +80,12 @@ export default function MoreIndex() {
           {/* 설정 */}
           <View className="mt-6">
             <Menu title="설정">
-              <MenuItem move text="테마" icon={<Entypo name="light-up" size={24} color="#6b7280" />} />
+              <MenuItem
+                move
+                text="화면 테마"
+                icon={<Entypo name="light-up" size={24} color="#6b7280" />}
+                onPress={() => router.push('./theme')}
+              />
             </Menu>
           </View>
 
