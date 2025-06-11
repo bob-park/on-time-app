@@ -6,7 +6,6 @@ import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
 import { getUserDetail } from '@/domain/users/apis/users';
-import { useUser } from '@/domain/users/queries/users';
 
 import dayjs from 'dayjs';
 
@@ -60,7 +59,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       return;
     }
 
-    getUserDetail(user.uniqueId).then((user: UserDetail) => setUserDetail(user));
+    getUserDetail(user.uniqueId)
+      .then((data: UserDetail) => setUserDetail(data))
+      .catch((err) => console.error(err));
   }, [user]);
 
   // handle

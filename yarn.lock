@@ -2046,6 +2046,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lottiefiles/dotlottie-react@npm:^0.14.1":
+  version: 0.14.1
+  resolution: "@lottiefiles/dotlottie-react@npm:0.14.1"
+  dependencies:
+    "@lottiefiles/dotlottie-web": "npm:0.46.0"
+  peerDependencies:
+    react: ^17 || ^18 || ^19
+  checksum: 10c0/1607cf1c7dc56c8cc2a448086946362bffb726a1bb6f67ce2a405c117b02737e8ba9ef191fcaae80ad38660dc2a918feb0dab89abce13c871cd1691366564ba3
+  languageName: node
+  linkType: hard
+
+"@lottiefiles/dotlottie-web@npm:0.46.0":
+  version: 0.46.0
+  resolution: "@lottiefiles/dotlottie-web@npm:0.46.0"
+  checksum: 10c0/ffdbaf14d452884c781fedb123ca3f61733e65cc3e879056a8dc7bf89dfb2586565b47028654651691bb4b4b349dc17735f16a06453ad439a26a623a7dc482e5
+  languageName: node
+  linkType: hard
+
 "@microsoft/tsdoc-config@npm:0.16.2":
   version: 0.16.2
   resolution: "@microsoft/tsdoc-config@npm:0.16.2"
@@ -9515,6 +9533,7 @@ __metadata:
     "@bob-park/prettier-config-bobpark": "npm:0.2.2-RC2-2025-0608"
     "@expo/vector-icons": "npm:^14.1.0"
     "@faker-js/faker": "npm:^9.8.0"
+    "@lottiefiles/dotlottie-react": "npm:^0.14.1"
     "@react-native-async-storage/async-storage": "npm:2.1.2"
     "@react-navigation/material-top-tabs": "npm:^7.2.14"
     "@react-navigation/native": "npm:^7.1.6"

@@ -9,7 +9,7 @@ export default function Menu({ title, children }: Readonly<{ title: string; chil
       </View>
 
       {/* menu items */}
-      <View className="flex w-full flex-col gap-3">{children}</View>
+      <View className="flex w-full flex-col gap-5">{children}</View>
     </View>
   );
 }
@@ -26,7 +26,7 @@ export function MenuItem({
 
   return (
     <View className="w-full">
-      <TouchableOpacity className="flex flex-row items-center gap-2 px-5 py-2" onPress={handlePress}>
+      <TouchableOpacity className="flex flex-row items-center gap-2 px-5 py-3" onPress={handlePress}>
         {icon}
 
         <Text className="text-xl font-semibold text-gray-500">{text}</Text>
