@@ -7,7 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 
-const DEFAULT_USER_SERVICE_HOST = process.env.EXPO_PUBLIC_USER_SERVICE_HOST;
+const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
 export default function MoreIndex() {
   // context
@@ -27,7 +27,7 @@ export default function MoreIndex() {
           <View className="w-28 flex-none p-3">
             <Image
               className="size-24 rounded-2xl"
-              source={{ uri: `${DEFAULT_USER_SERVICE_HOST}/api/v1/users/${user?.uniqueId}/avatar` }}
+              source={{ uri: `${DEFAULT_API_HOST}/api/v1/users/${user?.uniqueId}/avatar` }}
               alt="user-avatar"
             />
           </View>
