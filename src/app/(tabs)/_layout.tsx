@@ -4,7 +4,7 @@ import { Animated, Pressable, Text, View } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
-import { Redirect, Tabs, useRouter } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
 
@@ -56,7 +56,7 @@ export default function TabLayout() {
   }
 
   return (
-    <View className="size-full">
+    <View className="size-full bg-white">
       {/* header */}
       <View className="mt-14 flex flex-col items-center justify-center gap-3"></View>
 
@@ -66,7 +66,11 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
-          tabBarStyle: { backgroundColor: 'none' },
+          tabBarStyle: {
+            borderColor: '#d1d5db',
+            borderStyle: 'solid',
+            borderWidth: 0.5,
+          },
           tabBarLabel: ({ focused, children }) => (
             <Text
               className={cx('text-xs', {
@@ -116,7 +120,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="more"
+          name="(more)"
           options={{
             title: '더보기',
             tabBarIcon: ({ focused }) =>

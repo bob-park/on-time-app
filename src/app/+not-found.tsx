@@ -7,12 +7,12 @@ export default function NotFound() {
   const router = useRouter();
 
   return (
-      <View className="flex size-full flex-col items-center justify-center">
-        <Text>Not Found</Text>
+    <View className="flex size-full flex-col items-center justify-center">
+      <Text>Not Found</Text>
 
-        <TouchableOpacity className="mt-20 w-32 rounded-2xl" onPress={() => router.back()}>
-          <Text className="text-2xl text-sky-600">Go to Back</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity className="mt-20 w-32 rounded-2xl" onPress={() => router.back()}>
+        <Text className="text-2xl text-sky-600">Go to Back</Text>
+      </TouchableOpacity>
+    </View>
   );
 }

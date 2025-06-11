@@ -5,6 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
+import { getUserDetail } from '@/domain/users/apis/users';
+import { useUser } from '@/domain/users/queries/users';
+
 import dayjs from 'dayjs';
 
 const KEY_ACCESS_TOKEN = 'accessToken';
@@ -15,6 +18,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContext {
   user?: User;
+  userDetail?: UserDetail;
   isLoggedIn: boolean;
   onLoggedIn: (user: User) => void;
   onLogout: () => void;
@@ -25,6 +29,7 @@ export const AuthContext = createContext<AuthContext>({ isLoggedIn: false, onLog
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
   const [user, setUser] = useState<User>();
+  const [userDetail, setUserDetail] = useState<UserDetail>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   // useEffect
@@ -50,6 +55,14 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     });
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    getUserDetail(user.uniqueId).then((user: UserDetail) => setUserDetail(user));
+  }, [user]);
+
   // handle
   const handleLogin = (user: User) => {
     setIsLoggedIn(true);
@@ -71,8 +84,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
   // memorize
   const memorizeValue = useMemo<AuthContext>(
-    () => ({ isLoggedIn, user, onLoggedIn: handleLogin, onLogout: handleLogout }),
-    [user, isLoggedIn],
+    () => ({ isLoggedIn, user, userDetail, onLoggedIn: handleLogin, onLogout: handleLogout }),
+    [user, userDetail, isLoggedIn],
   );
 
   return <AuthContext value={memorizeValue}>{children}</AuthContext>;
