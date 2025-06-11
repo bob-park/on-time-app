@@ -4,7 +4,7 @@ import { Slot } from 'expo-router';
 
 export default function HomeLayout() {
   return (
-    <View className="flex size-full p-3">
+    <View className="flex size-full bg-white p-3">
       <Slot />
     </View>
   );

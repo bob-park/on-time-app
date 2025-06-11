@@ -123,7 +123,7 @@ export default function LoginPage() {
           }}
         >
           {isLoggingIn ? (
-            <ActivityIndicator size="large" color="#d1d5db" />
+            <ActivityIndicator size="small" color="#d1d5db" />
           ) : (
             <MaterialIcons name="login" size={24} color="white" />
           )}
