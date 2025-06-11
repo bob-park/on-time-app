@@ -30,8 +30,8 @@ export function MenuItem({
   return (
     <View className="w-full">
       <TouchableOpacity className="flex flex-row items-center justify-between gap-2 px-5 py-3" onPress={handlePress}>
-        <View className="flex flex-row items-center gap-1">
-          {icon}
+        <View className="flex flex-row items-center gap-3">
+          <View className="w-8 flex-none">{icon}</View>
           <Text className="text-lg font-semibold text-gray-500">{text}</Text>
         </View>
 

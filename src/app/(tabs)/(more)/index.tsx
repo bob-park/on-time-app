@@ -2,7 +2,7 @@ import { useContext } from 'react';
 
 import { Image, Text, View } from 'react-native';
 
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -59,7 +59,7 @@ export default function MoreIndex() {
       </View>
 
       {/* menu */}
-      <View className="mt-4">
+      <View className="mt-4 px-4">
         {/* 계정 */}
         <View className="flex flex-col gap-10">
           <Menu title="계정">
@@ -68,6 +68,11 @@ export default function MoreIndex() {
               icon={<MaterialIcons name="logout" size={24} color="#6b7280" />}
               onPress={handleLogout}
             />
+          </Menu>
+
+          {/* 설정 */}
+          <Menu title="설정">
+            <MenuItem move text="테마" icon={<Entypo name="light-up" size={24} color="#6b7280" />} />
           </Menu>
 
           {/* 더보기 */}

@@ -1,6 +1,7 @@
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import * as Device from 'expo-device';
+import { useRouter } from 'expo-router';
 
 import { FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
@@ -26,6 +27,9 @@ export default function HomeIndex() {
   const record = records.length > 0 ? records[0] : null;
   const workDurations =
     record?.clockInTime && record?.clockOutTime && getDuration(record.clockInTime, record.clockOutTime);
+
+  // hooks
+  const router = useRouter();
 
   return (
     <View className="flex size-full flex-col items-center gap-4 p-4">
@@ -80,7 +84,10 @@ export default function HomeIndex() {
       {/* action button */}
       <View className="w-full">
         <ScrollView className="h-16" horizontal>
-          <TouchableOpacity className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3">
+          <TouchableOpacity
+            className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3"
+            onPress={() => router.push('/(tabs)/(home)/attendance')}
+          >
             <MaterialIcons name="timer" size={24} color="#34d399" />
             <Text className="text-base font-bold">근무 입력</Text>
           </TouchableOpacity>
@@ -121,7 +128,7 @@ export default function HomeIndex() {
                         {record?.clockInTime ? (
                           <>
                             {dayjs(record.clockInTime).hour() > 11 && (
-                              <Text className="text-sm font-semibold">오후</Text>
+                              <Text className="text-sm font-semibold text-gray-500">오후</Text>
                             )}
                             <Text className="text-base font-semibold">
                               {dayjs(record.clockInTime).format('hh시 MM분')}
@@ -145,7 +152,7 @@ export default function HomeIndex() {
                         {record?.leaveWorkAt && (
                           <>
                             {dayjs(record.leaveWorkAt).hour() > 11 && (
-                              <Text className="text-sm font-semibold">오후</Text>
+                              <Text className="text-sm font-semibold text-gray-500">오후</Text>
                             )}
                             <Text className="text-base font-semibold">
                               {dayjs(record.leaveWorkAt).format('hh시 MM분')}
@@ -167,7 +174,7 @@ export default function HomeIndex() {
                         {record?.clockOutTime && (
                           <>
                             {dayjs(record.clockOutTime).hour() > 11 && (
-                              <Text className="text-sm font-semibold">오후</Text>
+                              <Text className="text-sm font-semibold text-gray-500">오후</Text>
                             )}
                             <Text className="text-base font-semibold">
                               {dayjs(record.clockOutTime).format('hh시 MM분')}
