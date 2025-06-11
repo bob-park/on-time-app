@@ -18,6 +18,7 @@ WebBrowser.maybeCompleteAuthSession();
 interface AuthContext {
   user?: User;
   userDetail?: UserDetail;
+  accessToken?: string;
   isLoggedIn: boolean;
   onLoggedIn: (user: User) => void;
   onLogout: () => void;
@@ -29,6 +30,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   // state
   const [user, setUser] = useState<User>();
   const [userDetail, setUserDetail] = useState<UserDetail>();
+  const [accessToken, setAccessToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   // useEffect
@@ -41,7 +43,6 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       setUser(JSON.parse(data) as User);
     });
 
-    // TODO: access Token 체크
     SecureStore.getItemAsync(KEY_EXPIRED_AT).then((data) => {
       if (!data) {
         setIsLoggedIn(false);
@@ -52,12 +53,29 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
       setIsLoggedIn(dayjs.unix(expiredAt).isAfter(dayjs()));
     });
+
+    // TODO: access Token 체크
+    SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
+      if (!data) {
+        return;
+      }
+
+      setAccessToken(data);
+    });
   }, []);
 
   useEffect(() => {
     if (!user) {
       return;
     }
+
+    SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
+      if (!data) {
+        return;
+      }
+
+      setAccessToken(data);
+    });
 
     getUserDetail(user.uniqueId)
       .then((data: UserDetail) => setUserDetail(data))
@@ -81,12 +99,13 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     SecureStore.deleteItemAsync(KEY_EXPIRED_AT);
 
     setIsLoggedIn(false);
+    setAccessToken(undefined);
   };
 
   // memorize
   const memorizeValue = useMemo<AuthContext>(
-    () => ({ isLoggedIn, user, userDetail, onLoggedIn: handleLogin, onLogout: handleLogout }),
-    [user, userDetail, isLoggedIn],
+    () => ({ isLoggedIn, user, userDetail, accessToken, onLoggedIn: handleLogin, onLogout: handleLogout }),
+    [user, userDetail, accessToken, isLoggedIn],
   );
 
   return <AuthContext value={memorizeValue}>{children}</AuthContext>;

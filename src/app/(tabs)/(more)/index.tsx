@@ -37,17 +37,20 @@ export default function MoreIndex() {
             <View className="flex flex-col items-center gap-2">
               {/* name */}
               <View className="w-full">
-                <Text className="text-2xl font-bold dark:text-white">{user?.username}</Text>
-                <Text className="mt-1 font-semibold text-gray-500">{user?.position?.name}</Text>
+                <Text className="text-2xl font-bold">{user?.username}</Text>
+              </View>
+
+              <View className="flex w-full flex-row items-center gap-1">
+                <Text className="text-sm font-semibold text-gray-500">{user?.position?.name}</Text>
+                {user?.team?.teamUserDescription && (
+                  <Text className="text-sm font-semibold text-gray-500">({user?.team?.teamUserDescription})</Text>
+                )}
               </View>
 
               <View className="flex flex-row items-center gap-3">
                 {/* team - position */}
                 <View className="flex flex-row items-center gap-1">
                   <Text className="font-semibold text-gray-500">{user?.team?.name}</Text>
-                  {user?.team?.teamUserDescription && (
-                    <Text className="font-semibold text-gray-500">({user?.team?.teamUserDescription})</Text>
-                  )}
                 </View>
               </View>
             </View>
@@ -69,9 +72,17 @@ export default function MoreIndex() {
 
           {/* 더보기 */}
           <Menu title="더보기">
-            <MenuItem text="공지사항" icon={<MaterialIcons name="notifications-none" size={24} color="#6b7280" />} />
-            <MenuItem text="근무" icon={<MaterialCommunityIcons name="timer-outline" size={24} color="#6b7280" />} />
-            <MenuItem text="구성원" icon={<MaterialIcons name="people-outline" size={24} color="#6b7280" />} />
+            <MenuItem
+              move
+              text="공지사항"
+              icon={<MaterialIcons name="notifications-none" size={24} color="#6b7280" />}
+            />
+            <MenuItem
+              move
+              text="근무"
+              icon={<MaterialCommunityIcons name="timer-outline" size={24} color="#6b7280" />}
+            />
+            <MenuItem move text="구성원" icon={<MaterialIcons name="people-outline" size={24} color="#6b7280" />} />
           </Menu>
         </View>
       </View>

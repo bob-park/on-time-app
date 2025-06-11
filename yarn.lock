@@ -2804,6 +2804,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.17.17
+  resolution: "@types/lodash@npm:4.17.17"
+  checksum: 10c0/8e75df02a15f04d4322c5a503e4efd0e7a92470570ce80f17e9f11ce2b1f1a7c994009c9bcff39f07e0f9ffd8ccaff09b3598997c404b801abd5a7eee5a639dc
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 24.0.0
   resolution: "@types/node@npm:24.0.0"
@@ -9539,6 +9546,7 @@ __metadata:
     "@react-navigation/native": "npm:^7.1.6"
     "@shopify/flash-list": "npm:^2.0.0-rc.4"
     "@tanstack/react-query": "npm:^5.80.6"
+    "@types/lodash": "npm:^4"
     "@types/react": "npm:~19.0.10"
     classnames: "npm:^2.5.1"
     dayjs: "npm:^1.11.13"
@@ -9562,6 +9570,7 @@ __metadata:
     jest: "npm:^29.2.1"
     jest-expo: "npm:~53.0.5"
     ky: "npm:^1.8.1"
+    lodash: "npm:^4.17.21"
     lottie-react-native: "npm:^7.2.2"
     miragejs: "npm:^0.1.48"
     nativewind: "npm:^4.1.23"

@@ -1,18 +1,34 @@
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+import * as Device from 'expo-device';
+
 import { FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-import { getDaysOfWeek } from '@/utils/parse';
+import { useAttendanceRecords } from '@/domain/attendances/queries/attendanceRecord';
+import { isIncludeTime } from '@/utils/dataUtils';
+import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
 
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 
 const WEEKEND_DAYS = [0, 6];
+const ONE_HOUR = 3_600;
 
 export default function HomeIndex() {
+  // query
+  const { records } = useAttendanceRecords({
+    startDate: dayjs().format('YYYY-MM-DD'),
+    endDate: dayjs().format('YYYY-MM-DD'),
+  });
+
+  // state
+  const record = records.length > 0 ? records[0] : null;
+  const workDurations =
+    record?.clockInTime && record?.clockOutTime && getDuration(record.clockInTime, record.clockOutTime);
+
   return (
-    <View className="flex size-full flex-col items-center gap-8 p-4">
+    <View className="flex size-full flex-col items-center gap-4 p-4">
       {/* headers */}
       <View className="w-full px-2">
         <View className="flex flex-row items-center justify-between gap-3">
@@ -43,10 +59,17 @@ export default function HomeIndex() {
 
       {/* search */}
       <View className="w-full">
-        <View className="flex w-full flex-row items-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 py-2">
+        <View
+          className={cx(
+            'flex w-full flex-row items-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3',
+          )}
+        >
           <Ionicons name="search" size={24} color="gray" />
           <TextInput
-            className="my-2 text-lg"
+            className={cx('my-2 items-center text-base', {
+              'h-12': Device.osName === 'Android',
+              'h-8': Device.osName !== 'Android',
+            })}
             numberOfLines={1}
             placeholder="찾는게 있으신가요?"
             placeholderTextColor="gray"
@@ -59,17 +82,17 @@ export default function HomeIndex() {
         <ScrollView className="h-16" horizontal>
           <TouchableOpacity className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3">
             <MaterialIcons name="timer" size={24} color="#34d399" />
-            <Text className="text-lg font-bold">근무 입력</Text>
+            <Text className="text-base font-bold">근무 입력</Text>
           </TouchableOpacity>
 
           <TouchableOpacity className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3">
             <Fontisto name="parasol" size={20} color="#f0abfc" />
-            <Text className="text-lg font-bold">휴가 등록</Text>
+            <Text className="text-base font-bold">휴가 등록</Text>
           </TouchableOpacity>
 
           <TouchableOpacity className="flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3">
             <MaterialIcons name="work" size={24} color="#6b7280" />
-            <Text className="text-lg font-bold">근무 확인</Text>
+            <Text className="text-base font-bold">근무 확인</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -92,11 +115,21 @@ export default function HomeIndex() {
                   <View className="w-full border-b-[1px] border-b-white">
                     <View className="flex h-12 flex-row items-center justify-between gap-4">
                       <View className="">
-                        <Text className="text-base font-semibold text-gray-500">출근 시간</Text>
+                        <Text className="text-sm font-semibold text-gray-500">출근 시간</Text>
                       </View>
                       <View className="flex flex-row items-end gap-2">
-                        {dayjs().hour() > 11 && <Text className="text-lg font-semibold">오후</Text>}
-                        <Text className="text-lg font-semibold">{dayjs().format('hh시 MM분')}</Text>
+                        {record?.clockInTime ? (
+                          <>
+                            {dayjs(record.clockInTime).hour() > 11 && (
+                              <Text className="text-sm font-semibold">오후</Text>
+                            )}
+                            <Text className="text-base font-semibold">
+                              {dayjs(record.clockInTime).format('hh시 MM분')}
+                            </Text>
+                          </>
+                        ) : (
+                          <Text className="text-lg font-semibold">출근 전</Text>
+                        )}
                       </View>
                     </View>
                   </View>
@@ -104,13 +137,21 @@ export default function HomeIndex() {
                   {/* 목표 퇴근 시간 */}
                   <View className="w-full border-b-[1px] border-b-white">
                     <View className="flex h-12 flex-row items-center justify-between gap-4">
-                      <View className="flex flex-row gap-3">
-                        <Ionicons name="rocket" size={20} color="#10b981" />
-                        <Text className="text-base font-semibold text-gray-500">목표 퇴근 시간</Text>
+                      <View className="flex flex-row items-center gap-3">
+                        <Ionicons name="rocket" size={16} color="#10b981" />
+                        <Text className="text-sm font-semibold text-gray-500">목표 퇴근 시간</Text>
                       </View>
                       <View className="flex flex-row items-end gap-2">
-                        {dayjs().hour() > 11 && <Text className="text-lg font-semibold">오후</Text>}
-                        <Text className="text-lg font-semibold">{dayjs().format('hh시 MM분')}</Text>
+                        {record?.leaveWorkAt && (
+                          <>
+                            {dayjs(record.leaveWorkAt).hour() > 11 && (
+                              <Text className="text-sm font-semibold">오후</Text>
+                            )}
+                            <Text className="text-base font-semibold">
+                              {dayjs(record.leaveWorkAt).format('hh시 MM분')}
+                            </Text>
+                          </>
+                        )}
                       </View>
                     </View>
                   </View>
@@ -118,13 +159,49 @@ export default function HomeIndex() {
                   {/* 퇴근 시간 */}
                   <View className="w-full">
                     <View className="flex h-12 flex-row items-center justify-between gap-4">
-                      <View className="flex flex-row gap-3">
-                        <FontAwesome5 name="running" size={24} color="black" />
-                        <Text className="text-base font-semibold text-gray-500">퇴근 시간</Text>
+                      <View className="flex flex-row items-center gap-3">
+                        <FontAwesome5 name="running" size={16} color="black" />
+                        <Text className="text-sm font-semibold text-gray-500">퇴근 시간</Text>
                       </View>
                       <View className="flex flex-row items-end gap-2">
-                        {dayjs().hour() > 11 && <Text className="text-lg font-semibold">오후</Text>}
-                        <Text className="text-lg font-semibold">{dayjs().format('hh시 MM분')}</Text>
+                        {record?.clockOutTime && (
+                          <>
+                            {dayjs(record.clockOutTime).hour() > 11 && (
+                              <Text className="text-sm font-semibold">오후</Text>
+                            )}
+                            <Text className="text-base font-semibold">
+                              {dayjs(record.clockOutTime).format('hh시 MM분')}
+                            </Text>
+                          </>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* 총 근무 시간 */}
+                  <View className="w-full">
+                    <View className="flex h-12 flex-row items-center justify-between gap-4">
+                      <View className="flex flex-row items-center gap-3">
+                        <FontAwesome5 name="business-time" size={12} color="black" />
+                        <Text className="text-sm font-semibold text-gray-500">총 근무 시간</Text>
+                      </View>
+                      <View className="flex flex-row items-end gap-2">
+                        <Text className="text-base font-semibold">
+                          {workDurations &&
+                            parseTimeFormat(
+                              workDurations -
+                                (workDurations > ONE_HOUR * 8 ||
+                                isIncludeTime(
+                                  {
+                                    from: record?.clockInTime || dayjs(record?.workingDate).hour(0).toDate(),
+                                    to: record?.clockOutTime || dayjs(record?.workingDate).hour(0).toDate(),
+                                  },
+                                  dayjs(record?.workingDate).hour(12).toDate(),
+                                )
+                                  ? ONE_HOUR
+                                  : 0),
+                            )}
+                        </Text>
                       </View>
                     </View>
                   </View>
