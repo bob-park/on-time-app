@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Image, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 
 import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
@@ -60,36 +60,42 @@ export default function MoreIndex() {
 
       {/* menu */}
       <View className="mt-4 px-4">
-        {/* 계정 */}
-        <View className="flex flex-col gap-10">
-          <Menu title="계정">
-            <MenuItem
-              text="로그아웃"
-              icon={<MaterialIcons name="logout" size={24} color="#6b7280" />}
-              onPress={handleLogout}
-            />
-          </Menu>
+        <ScrollView className="">
+          {/* 계정 */}
+          <View className="">
+            <Menu title="계정">
+              <MenuItem
+                text="로그아웃"
+                icon={<MaterialIcons name="logout" size={24} color="#6b7280" />}
+                onPress={handleLogout}
+              />
+            </Menu>
+          </View>
 
           {/* 설정 */}
-          <Menu title="설정">
-            <MenuItem move text="테마" icon={<Entypo name="light-up" size={24} color="#6b7280" />} />
-          </Menu>
+          <View className="mt-6">
+            <Menu title="설정">
+              <MenuItem move text="테마" icon={<Entypo name="light-up" size={24} color="#6b7280" />} />
+            </Menu>
+          </View>
 
           {/* 더보기 */}
-          <Menu title="더보기">
-            <MenuItem
-              move
-              text="공지사항"
-              icon={<MaterialIcons name="notifications-none" size={24} color="#6b7280" />}
-            />
-            <MenuItem
-              move
-              text="근무"
-              icon={<MaterialCommunityIcons name="timer-outline" size={24} color="#6b7280" />}
-            />
-            <MenuItem move text="구성원" icon={<MaterialIcons name="people-outline" size={24} color="#6b7280" />} />
-          </Menu>
-        </View>
+          <View className="mt-6">
+            <Menu title="더보기">
+              <MenuItem
+                move
+                text="공지사항"
+                icon={<MaterialIcons name="notifications-none" size={24} color="#6b7280" />}
+              />
+              <MenuItem
+                move
+                text="근무"
+                icon={<MaterialCommunityIcons name="timer-outline" size={24} color="#6b7280" />}
+              />
+              <MenuItem move text="구성원" icon={<MaterialIcons name="people-outline" size={24} color="#6b7280" />} />
+            </Menu>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );

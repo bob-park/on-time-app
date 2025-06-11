@@ -4,7 +4,7 @@ import { Entypo } from '@expo/vector-icons';
 
 export default function Menu({ title, children }: Readonly<{ title: string; children?: React.ReactNode }>) {
   return (
-    <View className="flex flex-col items-center gap-3">
+    <View className="flex flex-col items-center gap-1">
       {/* menu title */}
       <View className="ml-8 w-full">
         <Text className="text-sm font-bold text-gray-400">{title}</Text>
