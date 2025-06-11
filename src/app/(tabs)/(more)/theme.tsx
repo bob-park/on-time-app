@@ -8,11 +8,9 @@ import { Entypo, FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@ex
 
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
-import cx from 'classnames';
-
 export default function Theme() {
   // context
-  const { preference, onUpdatePreference } = useContext(ThemeContext);
+  const { theme, preference, onUpdatePreference } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -23,11 +21,11 @@ export default function Theme() {
       <View className="relative flex w-full flex-row items-center justify-center gap-4">
         {/* backward */}
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Entypo name="chevron-left" size={30} color="black" />
+          <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
         </TouchableOpacity>
 
         <View className="flex flex-row items-end gap-1">
-          <Text className="text-xl font-bold">화면 테마</Text>
+          <Text className="text-xl font-bold dark:text-white">화면 테마</Text>
         </View>
       </View>
 
@@ -40,16 +38,16 @@ export default function Theme() {
           >
             <View className="flex flex-row items-center gap-1">
               <View className="w-12 flex-none">
-                <Entypo name="light-up" size={24} color="gray" />
+                <Entypo name="light-up" size={24} color={theme === 'light' ? 'black' : 'white'} />
               </View>
               <View className="">
-                <Text className="text-lg font-bold">밝은 모드</Text>
+                <Text className="text-lg font-bold dark:text-white">밝은 모드</Text>
               </View>
             </View>
 
             {preference === 'light' && (
               <View className="">
-                <FontAwesome6 name="check" size={24} color="black" />
+                <FontAwesome6 name="check" size={24} color={theme === 'light' ? 'black' : 'white'} />
               </View>
             )}
           </TouchableOpacity>
@@ -60,16 +58,16 @@ export default function Theme() {
           >
             <View className="flex flex-row items-center gap-1">
               <View className="w-12 flex-none">
-                <MaterialIcons name="dark-mode" size={24} color="black" />
+                <MaterialIcons name="dark-mode" size={24} color={theme === 'light' ? 'black' : 'white'} />
               </View>
               <View className="">
-                <Text className="text-lg font-bold">어두운 모드</Text>
+                <Text className="text-lg font-bold dark:text-white">어두운 모드</Text>
               </View>
             </View>
 
             {preference === 'dark' && (
               <View className="">
-                <FontAwesome6 name="check" size={24} color="black" />
+                <FontAwesome6 name="check" size={24} color={theme === 'light' ? 'black' : 'white'} />
               </View>
             )}
           </TouchableOpacity>
@@ -80,16 +78,20 @@ export default function Theme() {
           >
             <View className="flex flex-row items-center gap-1">
               <View className="w-12 flex-none">
-                <MaterialCommunityIcons name="circle-half-full" size={24} color="black" />
+                <MaterialCommunityIcons
+                  name="circle-half-full"
+                  size={24}
+                  color={theme === 'light' ? 'black' : 'white'}
+                />
               </View>
               <View className="">
-                <Text className="text-lg font-bold">시스템 설정과 같이</Text>
+                <Text className="text-lg font-bold dark:text-white">시스템 설정과 같이</Text>
               </View>
             </View>
 
             {preference === 'system' && (
               <View className="">
-                <FontAwesome6 name="check" size={24} color="black" />
+                <FontAwesome6 name="check" size={24} color={theme === 'light' ? 'black' : 'white'} />
               </View>
             )}
           </TouchableOpacity>

@@ -8,12 +8,14 @@ import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icon
 
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
 export default function MoreIndex() {
   // context
   const { userDetail: user, onLogout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -26,7 +28,7 @@ export default function MoreIndex() {
   return (
     <View className="flex size-full flex-col gap-3">
       {/* user */}
-      <View className="mt-5 w-full border-b-[1px] border-gray-200 pb-3">
+      <View className="w-full border-gray-200 pb-3 dark:border-gray-500" style={{ borderBottomWidth: 0.2 }}>
         <View className="flex w-full flex-row items-center gap-2">
           {/* avatar */}
           <View className="w-28 flex-none p-3">
@@ -42,20 +44,22 @@ export default function MoreIndex() {
             <View className="flex flex-col items-center gap-2">
               {/* name */}
               <View className="w-full">
-                <Text className="text-2xl font-bold">{user?.username}</Text>
+                <Text className="text-2xl font-bold dark:text-white">{user?.username}</Text>
               </View>
 
               <View className="flex w-full flex-row items-center gap-1">
-                <Text className="text-sm font-semibold text-gray-500">{user?.position?.name}</Text>
+                <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{user?.position?.name}</Text>
                 {user?.team?.teamUserDescription && (
-                  <Text className="text-sm font-semibold text-gray-500">({user?.team?.teamUserDescription})</Text>
+                  <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                    ({user?.team?.teamUserDescription})
+                  </Text>
                 )}
               </View>
 
               <View className="flex flex-row items-center gap-3">
                 {/* team - position */}
                 <View className="flex flex-row items-center gap-1">
-                  <Text className="font-semibold text-gray-500">{user?.team?.name}</Text>
+                  <Text className="font-semibold text-gray-500 dark:text-gray-400">{user?.team?.name}</Text>
                 </View>
               </View>
             </View>
@@ -71,7 +75,7 @@ export default function MoreIndex() {
             <Menu title="계정">
               <MenuItem
                 text="로그아웃"
-                icon={<MaterialIcons name="logout" size={24} color="#6b7280" />}
+                icon={<MaterialIcons name="logout" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={handleLogout}
               />
             </Menu>
@@ -83,7 +87,7 @@ export default function MoreIndex() {
               <MenuItem
                 move
                 text="화면 테마"
-                icon={<Entypo name="light-up" size={24} color="#6b7280" />}
+                icon={<Entypo name="light-up" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={() => router.push('./theme')}
               />
             </Menu>
@@ -95,14 +99,32 @@ export default function MoreIndex() {
               <MenuItem
                 move
                 text="공지사항"
-                icon={<MaterialIcons name="notifications-none" size={24} color="#6b7280" />}
+                icon={
+                  <MaterialIcons
+                    name="notifications-none"
+                    size={24}
+                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
+                  />
+                }
               />
               <MenuItem
                 move
                 text="근무"
-                icon={<MaterialCommunityIcons name="timer-outline" size={24} color="#6b7280" />}
+                icon={
+                  <MaterialCommunityIcons
+                    name="timer-outline"
+                    size={24}
+                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
+                  />
+                }
               />
-              <MenuItem move text="구성원" icon={<MaterialIcons name="people-outline" size={24} color="#6b7280" />} />
+              <MenuItem
+                move
+                text="구성원"
+                icon={
+                  <MaterialIcons name="people-outline" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />
+                }
+              />
             </Menu>
           </View>
         </ScrollView>

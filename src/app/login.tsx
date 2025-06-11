@@ -11,6 +11,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
@@ -39,6 +40,7 @@ const redirectUri = makeRedirectUri({
 export default function LoginPage() {
   // context
   const { onLoggedIn } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
 
   // state
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -103,19 +105,19 @@ export default function LoginPage() {
   }, [response]);
 
   return (
-    <View className="flex size-full flex-col items-center justify-center gap-10 p-10">
+    <View className="flex size-full flex-col items-center justify-center gap-10 bg-white p-10 dark:bg-black">
       <View className="flex flex-col items-center justify-center">
         <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
         <View className="">
-          <Text className="text-4xl font-bold text-blue-500">On Time</Text>
+          <Text className="text-4xl font-bold text-blue-500 dark:text-blue-300">On Time</Text>
         </View>
       </View>
       <View className="w-[80%]">
         <TouchableOpacity
           className={cx('flex flex-row items-center justify-center gap-2 rounded-2xl p-4', {
-            'bg-black': !isLoggingIn,
-            'bg-gray-500': isLoggingIn,
+            'bg-black dark:bg-white': !isLoggingIn,
+            'bg-gray-500 dark:bg-gray-400': isLoggingIn,
           })}
           disabled={isLoggingIn}
           onPress={() => {
@@ -123,11 +125,11 @@ export default function LoginPage() {
           }}
         >
           {isLoggingIn ? (
-            <ActivityIndicator size="small" color="#d1d5db" />
+            <ActivityIndicator size="small" color={theme === 'light' ? '#d1d5db' : '#4b5563'} />
           ) : (
-            <MaterialIcons name="login" size={24} color="white" />
+            <MaterialIcons name="login" size={24} color={theme === 'light' ? 'white' : 'black'} />
           )}
-          <Text className="text-xl font-semibold text-white">{isLoggingIn ? '로그인 중' : '로그인'}</Text>
+          <Text className="text-xl font-bold text-white dark:text-black">{isLoggingIn ? '로그인 중' : '로그인'}</Text>
         </TouchableOpacity>
       </View>
     </View>

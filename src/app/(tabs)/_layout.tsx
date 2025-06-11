@@ -56,7 +56,7 @@ export default function TabLayout() {
   }
 
   return (
-    <View className="size-full bg-white">
+    <View className="size-full bg-white dark:bg-black">
       {/* header */}
       <View className="mt-14 flex flex-col items-center justify-center gap-3"></View>
 
@@ -67,9 +67,10 @@ export default function TabLayout() {
           headerShown: false,
           tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
           tabBarStyle: {
-            borderColor: '#d1d5db',
+            borderTopColor: '#d1d5db',
             borderStyle: 'solid',
-            borderWidth: 0.5,
+            borderTopWidth: 0.2,
+            backgroundColor: theme === 'light' ? '#fff' : '#000',
           },
           tabBarLabel: ({ focused, children }) => (
             <Text
@@ -89,7 +90,7 @@ export default function TabLayout() {
             title: '오늘',
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <Ionicons name="calendar" size={24} color="black" />
+                <Ionicons name="calendar" size={24} color={theme === 'light' ? 'black' : 'white'} />
               ) : (
                 <Ionicons name="calendar-outline" size={24} color="gray" />
               ),
@@ -101,7 +102,7 @@ export default function TabLayout() {
             title: '일정',
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <Ionicons name="menu" size={24} color="black" />
+                <Ionicons name="menu" size={24} color={theme === 'light' ? 'black' : 'white'} />
               ) : (
                 <Ionicons name="menu-outline" size={24} color="gray" />
               ),
@@ -113,7 +114,7 @@ export default function TabLayout() {
             title: '할일',
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <Octicons name="check-circle-fill" size={24} color="black" />
+                <Octicons name="check-circle-fill" size={24} color={theme === 'light' ? 'black' : 'white'} />
               ) : (
                 <Octicons name="check-circle" size={24} color="gray" />
               ),
@@ -125,7 +126,7 @@ export default function TabLayout() {
             title: '더보기',
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <Ionicons name="grid" size={24} color="black" />
+                <Ionicons name="grid" size={24} color={theme === 'light' ? 'black' : 'white'} />
               ) : (
                 <Ionicons name="grid-outline" size={24} color="gray" />
               ),

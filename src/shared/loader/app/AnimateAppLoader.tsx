@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { Animated, Text, View } from 'react-native';
 
@@ -6,6 +6,7 @@ import Constants from 'expo-constants';
 import * as SplashScreen from 'expo-splash-screen';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
+import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
@@ -35,17 +36,14 @@ function AnimatedSplashScreen({ children }: Readonly<{ children: React.ReactNode
         children
       ) : (
         <Animated.View
-          className={cx(
-            'flex size-full flex-col items-center justify-center',
-            `bg-[${Constants.expoConfig?.splash?.backgroundColor || '#ffffff'}]`,
-          )}
+          className={cx('flex size-full flex-col items-center justify-center bg-white dark:bg-black')}
           style={{ opacity: animation }}
           pointerEvents="none"
         >
           <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
           <View className="">
-            <Text className="text-4xl font-bold text-blue-500">On Time</Text>
+            <Text className="text-4xl font-bold text-blue-500 dark:text-blue-300">On Time</Text>
           </View>
         </Animated.View>
       )}
