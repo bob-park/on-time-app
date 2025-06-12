@@ -68,8 +68,8 @@ export default function MoreIndex() {
       </View>
 
       {/* menu */}
-      <View className="mt-4 px-4">
-        <ScrollView className="">
+      <View className="sise-full mt-4 px-4">
+        <ScrollView className="size-full">
           {/* 계정 */}
           <View className="">
             <Menu title="계정">
