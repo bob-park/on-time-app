@@ -35,21 +35,26 @@ export const redirectUri = makeRedirectUri({
 interface AuthContext {
   user?: User;
   userDetail?: UserDetail;
-  accessToken?: string;
+  accessToken: string;
   refreshToken?: string;
   isLoggedIn: boolean;
   onLoggedIn: (user: User) => void;
   onLogout: () => void;
 }
 
-export const AuthContext = createContext<AuthContext>({ isLoggedIn: false, onLoggedIn: () => {}, onLogout: () => {} });
+export const AuthContext = createContext<AuthContext>({
+  accessToken: '',
+  isLoggedIn: false,
+  onLoggedIn: () => {},
+  onLogout: () => {},
+});
 
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
   const [user, setUser] = useState<User>();
   const [expiredAt, setExpiredAt] = useState<Date>();
   const [userDetail, setUserDetail] = useState<UserDetail>();
-  const [accessToken, setAccessToken] = useState<string>();
+  const [accessToken, setAccessToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
@@ -98,7 +103,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
     setUser(undefined);
     setIsLoggedIn(false);
-    setAccessToken(undefined);
+    setAccessToken('');
     setRefreshToken(undefined);
     setExpiredAt(undefined);
   };
