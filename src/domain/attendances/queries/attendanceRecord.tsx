@@ -68,16 +68,16 @@ export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
       latitude,
       longitude,
     }: {
-      attendanceRecordId: string;
+      attendanceRecordId: number;
       latitude: number;
       longitude: number;
     }) => clockOut(accessToken, { userUniqueId: user?.uniqueId || '', attendanceRecordId, latitude, longitude }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['clockIn', 'today'], data);
+      queryClient.setQueryData(['attendances', 'clockIn', data.workingDate], data);
 
       onSuccess && onSuccess(data);
     },
   });
 
-  return { clockIn: mutate, isLoading: isPending };
+  return { clockOut: mutate, isLoading: isPending };
 }

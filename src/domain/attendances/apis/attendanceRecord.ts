@@ -46,7 +46,7 @@ export async function clockOut(
     attendanceRecordId,
     latitude,
     longitude,
-  }: Readonly<{ userUniqueId: string; attendanceRecordId: string; latitude: number; longitude: number }>,
+  }: Readonly<{ userUniqueId: string; attendanceRecordId: number; latitude: number; longitude: number }>,
 ) {
   const result = await api
     .post('api/v2/attendance/records/clock/out', {
