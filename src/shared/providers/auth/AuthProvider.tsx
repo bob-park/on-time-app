@@ -2,11 +2,12 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { makeRedirectUri } from 'expo-auth-session';
+import { TokenResponse, makeRedirectUri, refreshAsync } from 'expo-auth-session';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
 import { getUserDetail } from '@/domain/users/apis/users';
+import delay from '@/utils/delay';
 
 import dayjs from 'dayjs';
 
@@ -54,7 +55,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
   // useEffect
   useEffect(() => {
-    loadAuthorization();
+    loadAuth();
   }, []);
 
   useEffect(() => {
@@ -72,16 +73,20 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       return;
     }
 
-    setIsLoggedIn(dayjs(expiredAt).isAfter(dayjs()));
+    const intervalId = setInterval(() => {
+      if (dayjs(expiredAt).subtract(10, 'minute').isBefore(dayjs())) {
+        refreshToken && handleRefreshAccessToken(refreshToken);
+      }
+    }, 1_000);
 
-    if (dayjs(expiredAt).subtract(10, 'minute').isBefore(dayjs())) {
-      refreshToken && handleRefreshAccessToken(refreshToken);
-    }
+    return () => {
+      intervalId && clearInterval(intervalId);
+    };
   }, [expiredAt, refreshToken]);
 
   // handle
   const handleLogin = (user: User) => {
-    loadAuthorization();
+    loadAuth();
     AsyncStorage.setItem(KEY_USER, JSON.stringify(user));
   };
 
@@ -98,9 +103,23 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     setExpiredAt(undefined);
   };
 
-  const handleRefreshAccessToken = (accessToken: string) => {};
+  const handleRefreshAccessToken = (refreshToken: string) => {
+    console.log('refresh token...');
 
-  const loadAuthorization = () => {
+    refreshAsync({ refreshToken, clientId, clientSecret }, discovery)
+      .then(async (data) => {
+        await saveAuth(data);
+
+        loadAuth();
+      })
+      .catch((err) => {
+        console.error(err);
+
+        setIsLoggedIn(false);
+      });
+  };
+
+  const loadAuth = () => {
     AsyncStorage.getItem(KEY_USER).then((data) => {
       if (!data) {
         return;
@@ -115,6 +134,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
         return;
       }
 
+      setIsLoggedIn(dayjs(data).isAfter(dayjs()));
       setExpiredAt(dayjs(data).toDate());
     });
 
@@ -133,6 +153,18 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       }
 
       setRefreshToken(data);
+    });
+  };
+
+  const saveAuth = (token: TokenResponse) => {
+    const unixtimestamp = (token.expiresIn || 0) + token.issuedAt;
+
+    Promise.all([
+      SecureStore.setItemAsync(KEY_ACCESS_TOKEN, token.accessToken),
+      SecureStore.setItemAsync(KEY_REFRESH_TOKEN, token.refreshToken || ''),
+      SecureStore.setItemAsync(KEY_EXPIRED_AT, dayjs.unix(unixtimestamp).toISOString()),
+    ]).then(async () => {
+      await delay(1_000);
     });
   };
 
