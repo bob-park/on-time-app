@@ -2,6 +2,7 @@ import { createContext, useEffect, useMemo, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { makeRedirectUri } from 'expo-auth-session';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -9,16 +10,32 @@ import { getUserDetail } from '@/domain/users/apis/users';
 
 import dayjs from 'dayjs';
 
+const KEY_USER = 'user';
 const KEY_ACCESS_TOKEN = 'accessToken';
 const KEY_REFRESH_TOKEN = 'refreshToken';
 const KEY_EXPIRED_AT = 'expiredAt';
 
 WebBrowser.maybeCompleteAuthSession();
 
+export const clientId = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_ID || '';
+export const clientSecret = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_SECRET || '';
+
+export const discovery = {
+  authorizationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/authorize`,
+  tokenEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/token`,
+  revocationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/revoke`,
+};
+
+export const redirectUri = makeRedirectUri({
+  scheme: 'ontime',
+  native: 'ontime://callback',
+});
+
 interface AuthContext {
   user?: User;
   userDetail?: UserDetail;
   accessToken?: string;
+  refreshToken?: string;
   isLoggedIn: boolean;
   onLoggedIn: (user: User) => void;
   onLogout: () => void;
@@ -29,13 +46,62 @@ export const AuthContext = createContext<AuthContext>({ isLoggedIn: false, onLog
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
   const [user, setUser] = useState<User>();
+  const [expiredAt, setExpiredAt] = useState<Date>();
   const [userDetail, setUserDetail] = useState<UserDetail>();
   const [accessToken, setAccessToken] = useState<string>();
+  const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   // useEffect
   useEffect(() => {
-    AsyncStorage.getItem('user').then((data) => {
+    loadAuthorization();
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    getUserDetail(user.uniqueId)
+      .then((data: UserDetail) => setUserDetail(data))
+      .catch((err) => console.error(err));
+  }, [user]);
+
+  useEffect(() => {
+    if (!expiredAt) {
+      return;
+    }
+
+    setIsLoggedIn(dayjs(expiredAt).isAfter(dayjs()));
+
+    if (dayjs(expiredAt).subtract(10, 'minute').isBefore(dayjs())) {
+      refreshToken && handleRefreshAccessToken(refreshToken);
+    }
+  }, [expiredAt, refreshToken]);
+
+  // handle
+  const handleLogin = (user: User) => {
+    loadAuthorization();
+    AsyncStorage.setItem(KEY_USER, JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    AsyncStorage.removeItem(KEY_USER);
+    SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN);
+    SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN);
+    SecureStore.deleteItemAsync(KEY_EXPIRED_AT);
+
+    setUser(undefined);
+    setIsLoggedIn(false);
+    setAccessToken(undefined);
+    setRefreshToken(undefined);
+    setExpiredAt(undefined);
+  };
+
+  const handleRefreshAccessToken = (accessToken: string) => {};
+
+  const loadAuthorization = () => {
+    AsyncStorage.getItem(KEY_USER).then((data) => {
       if (!data) {
         return;
       }
@@ -49,9 +115,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
         return;
       }
 
-      const expiredAt = parseInt(data, 0);
-
-      setIsLoggedIn(dayjs.unix(expiredAt).isAfter(dayjs()));
+      setExpiredAt(dayjs(data).toDate());
     });
 
     // TODO: access Token 체크
@@ -62,50 +126,28 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
       setAccessToken(data);
     });
-  }, []);
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
+    SecureStore.getItemAsync(KEY_REFRESH_TOKEN).then((data) => {
       if (!data) {
         return;
       }
 
-      setAccessToken(data);
+      setRefreshToken(data);
     });
-
-    getUserDetail(user.uniqueId)
-      .then((data: UserDetail) => setUserDetail(data))
-      .catch((err) => console.error(err));
-  }, [user]);
-
-  // handle
-  const handleLogin = (user: User) => {
-    setIsLoggedIn(true);
-    setUser(user);
-
-    AsyncStorage.setItem('user', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setUser(undefined);
-
-    AsyncStorage.removeItem('user');
-    SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN);
-    SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN);
-    SecureStore.deleteItemAsync(KEY_EXPIRED_AT);
-
-    setIsLoggedIn(false);
-    setAccessToken(undefined);
   };
 
   // memorize
   const memorizeValue = useMemo<AuthContext>(
-    () => ({ isLoggedIn, user, userDetail, accessToken, onLoggedIn: handleLogin, onLogout: handleLogout }),
-    [user, userDetail, accessToken, isLoggedIn],
+    () => ({
+      isLoggedIn,
+      user,
+      userDetail,
+      accessToken,
+      refreshToken,
+      onLoggedIn: handleLogin,
+      onLogout: handleLogout,
+    }),
+    [user, userDetail, accessToken, refreshToken, isLoggedIn],
   );
 
   return <AuthContext value={memorizeValue}>{children}</AuthContext>;

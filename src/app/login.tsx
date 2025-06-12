@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
-import { exchangeCodeAsync, fetchUserInfoAsync, makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { exchangeCodeAsync, fetchUserInfoAsync, useAuthRequest } from 'expo-auth-session';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
@@ -10,11 +10,12 @@ import * as WebBrowser from 'expo-web-browser';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
-import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { AuthContext, clientId, clientSecret, discovery, redirectUri } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
+import dayjs from 'dayjs';
 import LottieView from 'lottie-react-native';
 
 const KEY_ACCESS_TOKEN = 'accessToken';
@@ -22,20 +23,6 @@ const KEY_REFRESH_TOKEN = 'refreshToken';
 const KEY_EXPIRED_AT = 'expiredAt';
 
 WebBrowser.maybeCompleteAuthSession();
-
-const clientId = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_ID || '';
-const clientSecret = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_SECRET || '';
-
-const discovery = {
-  authorizationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/authorize`,
-  tokenEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/token`,
-  revocationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/revoke`,
-};
-
-const redirectUri = makeRedirectUri({
-  scheme: 'ontime',
-  native: 'ontime://callback',
-});
 
 export default function LoginPage() {
   // context
@@ -70,10 +57,12 @@ export default function LoginPage() {
         discovery,
       )
         .then((data) => {
+          const unixtimestamp = (data.expiresIn || 0) + data.issuedAt;
+
           Promise.all([
             SecureStore.setItemAsync(KEY_ACCESS_TOKEN, data.accessToken),
             SecureStore.setItemAsync(KEY_REFRESH_TOKEN, data.refreshToken || ''),
-            SecureStore.setItemAsync(KEY_EXPIRED_AT, (data.expiresIn || 0) + data.issuedAt + ''),
+            SecureStore.setItemAsync(KEY_EXPIRED_AT, dayjs.unix(unixtimestamp).toISOString()),
           ]);
 
           fetchUserInfoAsync(
