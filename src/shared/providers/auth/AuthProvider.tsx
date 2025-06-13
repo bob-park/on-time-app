@@ -29,7 +29,7 @@ export const discovery = {
 
 export const redirectUri = makeRedirectUri({
   scheme: 'ontime',
-  native: 'ontime://callback',
+  path: 'callback',
 });
 
 interface AuthContext {
@@ -57,6 +57,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const [accessToken, setAccessToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  console.log('redirectUri', redirectUri);
 
   // useEffect
   useEffect(() => {
