@@ -51,7 +51,7 @@ const InvalidLocationModal = ({
 
             {/* message */}
             <View className="mt-4 w-full">
-              <Text className="text-center text-base text-gray-400 dark:text-gray-200">사무실 아닌디?</Text>
+              <Text className="text-center text-base text-gray-500 dark:text-gray-200">사무실 아닌디??</Text>
             </View>
 
             <View className="m4 w-full">
@@ -62,7 +62,9 @@ const InvalidLocationModal = ({
                   </Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-base font-semibold text-gray-800 dark:text-gray-200">{address}</Text>
+                  <Text className="text-pretty break-keep font-semibold text-gray-800 dark:text-gray-200">
+                    {address}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -118,19 +120,6 @@ export default function Attendance() {
     }
 
     setWorkType('OUTSIDE');
-
-    async function getAddress() {
-      const address =
-        currentLocation &&
-        (await Location.reverseGeocodeAsync({
-          latitude: currentLocation.latitude,
-          longitude: currentLocation.longitude,
-        }));
-
-      address && address.length > 0 && address[0]?.formattedAddress && setCurrentAddress(address[0].formattedAddress);
-    }
-
-    getAddress();
   }, [currentLocation, locations]);
 
   useEffect(() => {
@@ -187,6 +176,13 @@ export default function Attendance() {
     }
 
     const location = await Location.getCurrentPositionAsync({});
+    Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude }).then(
+      (addresses) => {
+        for (const address of addresses) {
+          setCurrentAddress(`${address.region} ${address.district} ${address.street} ${address.streetNumber}`);
+        }
+      },
+    );
 
     setCurrentLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
