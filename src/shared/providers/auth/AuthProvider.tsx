@@ -58,8 +58,6 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  console.log('redirectUri', redirectUri);
-
   // useEffect
   useEffect(() => {
     loadAuth();
@@ -94,6 +92,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   // handle
   const handleLogin = (user: User) => {
     loadAuth();
+    setUser(user);
     AsyncStorage.setItem(KEY_USER, JSON.stringify(user));
   };
 
