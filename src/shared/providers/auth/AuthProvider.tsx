@@ -58,6 +58,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
+  console.log(redirectUri);
+
   // useEffect
   useEffect(() => {
     loadAuth();

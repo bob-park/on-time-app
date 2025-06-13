@@ -23,7 +23,11 @@ import LottieView from 'lottie-react-native';
 
 const WEEKEND_DAYS = [0, 6];
 
-const InvalidLocationModal = ({ show, onClose }: Readonly<{ show: boolean; onClose: () => void }>) => {
+const InvalidLocationModal = ({
+  show,
+  address,
+  onClose,
+}: Readonly<{ show: boolean; address?: string; onClose: () => void }>) => {
   return (
     <Modal visible={show} animationType="fade" transparent onRequestClose={onClose}>
       <BlurView className="relative flex h-screen w-screen flex-col items-center justify-center" tint="dark">
@@ -32,7 +36,7 @@ const InvalidLocationModal = ({ show, onClose }: Readonly<{ show: boolean; onClo
 
         {/* message */}
         <View
-          className="left-auto h-48 w-64 rounded-xl bg-gray-50 dark:bg-gray-700"
+          className="left-auto h-64 w-80 rounded-xl bg-gray-50 dark:bg-gray-700"
           style={{
             shadowColor: 'black',
             shadowOpacity: 0.15,
@@ -47,7 +51,20 @@ const InvalidLocationModal = ({ show, onClose }: Readonly<{ show: boolean; onClo
 
             {/* message */}
             <View className="mt-4 w-full">
-              <Text className="text-center text-base text-gray-400 dark:text-gray-200">혹시.. 구라핑?</Text>
+              <Text className="text-center text-base text-gray-400 dark:text-gray-200">사무실 아닌디?</Text>
+            </View>
+
+            <View className="m4 w-full">
+              <View className="flex flex-row items-start justify-center gap-3">
+                <View className="w-24 flex-none">
+                  <Text className="text-right text-base font-semibold text-gray-800 dark:text-gray-200">
+                    현재 위치 :
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-base font-semibold text-gray-800 dark:text-gray-200">{address}</Text>
+                </View>
+              </View>
             </View>
           </View>
 
@@ -72,6 +89,7 @@ export default function Attendance() {
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number }>();
   const [showInvalidModal, setShowInalidModal] = useState<boolean>(false);
   const [invalidLocation, setInvalidLocation] = useState<boolean>(false);
+  const [currentAddress, setCurrentAddress] = useState<string>();
 
   // queries
   const { locations } = useAttendanceLocations();
@@ -100,6 +118,19 @@ export default function Attendance() {
     }
 
     setWorkType('OUTSIDE');
+
+    async function getAddress() {
+      const address =
+        currentLocation &&
+        (await Location.reverseGeocodeAsync({
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
+        }));
+
+      address && address.length > 0 && address[0]?.formattedAddress && setCurrentAddress(address[0].formattedAddress);
+    }
+
+    getAddress();
   }, [currentLocation, locations]);
 
   useEffect(() => {
@@ -315,9 +346,9 @@ export default function Attendance() {
                   <TouchableOpacity
                     className={cx(
                       'flex h-14 w-48 flex-row items-center justify-center gap-3 rounded-xl',
-                      isClockInLoading || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
+                      isClockInLoading || !currentLocation || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
                     )}
-                    disabled={isClockInLoading || invalidLocation}
+                    disabled={isClockInLoading || invalidLocation || !currentLocation}
                     onPress={handleClockIn}
                   >
                     {isClockInLoading ? (
@@ -348,9 +379,11 @@ export default function Attendance() {
                 <TouchableOpacity
                   className={cx(
                     'flex h-14 w-48 flex-row items-center justify-center gap-3 rounded-xl',
-                    isClockOutLoading || invalidLocation || !!today?.clockOutTime ? 'bg-gray-500' : 'bg-gray-800',
+                    isClockOutLoading || !currentLocation || invalidLocation || !!today?.clockOutTime
+                      ? 'bg-gray-500'
+                      : 'bg-gray-800',
                   )}
-                  disabled={isClockOutLoading || invalidLocation || !!today?.clockOutTime}
+                  disabled={isClockOutLoading || !currentLocation || invalidLocation || !!today?.clockOutTime}
                   onPress={handleClockOut}
                 >
                   {isClockOutLoading ? (
@@ -412,7 +445,11 @@ export default function Attendance() {
           )}
         </View>
       </View>
-      <InvalidLocationModal show={showInvalidModal} onClose={() => setShowInalidModal(false)} />
+      <InvalidLocationModal
+        show={showInvalidModal}
+        address={currentAddress}
+        onClose={() => setShowInalidModal(false)}
+      />
     </>
   );
 }
