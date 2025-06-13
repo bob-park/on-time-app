@@ -29,7 +29,10 @@ export default function HomeIndex() {
 
   // state
   const workDurations = today?.clockInTime && today?.clockOutTime && getDuration(today.clockInTime, today.clockOutTime);
-  const remainingTime = today?.leaveWorkAt && new TimeCode(dayjs(today?.leaveWorkAt).unix() - dayjs().unix());
+  const remainingTime = {
+    isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
+    time: today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
+  };
 
   // hooks
   const router = useRouter();
@@ -205,13 +208,16 @@ export default function HomeIndex() {
                           <FontAwesome5 name="running" size={16} color={theme === 'light' ? 'black' : 'white'} />
                           <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">남은 시간</Text>
                         </View>
-                        {remainingTime && (
+                        {remainingTime.time && (
                           <View className="flex flex-row items-end gap-2">
+                            {remainingTime.isOvertime && (
+                              <Text className="text-base font-semibold dark:text-white">+</Text>
+                            )}
                             <Text className="text-base font-semibold dark:text-white">
-                              {remainingTime.formatHours}시간
+                              {remainingTime.time.formatHours}시간
                             </Text>
                             <Text className="text-base font-semibold dark:text-white">
-                              {remainingTime.formatMinutes}분
+                              {remainingTime.time.formatMinutes}분
                             </Text>
                           </View>
                         )}

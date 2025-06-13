@@ -165,8 +165,6 @@ export default function Attendance() {
   };
 
   const handleClockOut = () => {
-    console.log(today, currentLocation);
-
     today && currentLocation && clockOut({ ...currentLocation, attendanceRecordId: today.id });
   };
 
