@@ -243,10 +243,10 @@ export default function Schedule() {
       {/* 일정 */}
       <SafeAreaView className="mt-3 flex w-full flex-col items-center gap-2">
         {/* 내 일정 */}
-        <View className="flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100">
+        <View className="flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100 dark:border-gray-700">
           <View className="flex w-full flex-row items-center gap-3">
-            <Text className="text-base font-bold text-gray-400">내 일정</Text>
-            <Text className="font-extrabold text-blue-600">
+            <Text className="text-base font-bold text-gray-400 dark:text-gray-500">내 일정</Text>
+            <Text className="font-extrabold text-blue-600 dark:text-blue-400">
               {
                 vacations.filter(
                   (vacation) =>
@@ -275,7 +275,7 @@ export default function Schedule() {
 
                   <View className="flex flex-1 flex-col items-center gap-2">
                     <View className="w-full">
-                      <Text className="text-lg font-bold text-gray-600">
+                      <Text className="text-lg font-bold text-gray-600 dark:text-gray-300">
                         {parseVacationName(vacation.vacationType, vacation.vacationSubType)}
                       </Text>
                     </View>
@@ -301,10 +301,10 @@ export default function Schedule() {
         </View>
 
         {/* 동료 일정 */}
-        <View className="mt-3 flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100">
+        <View className="mt-3 flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100 dark:border-gray-700">
           <View className="flex w-full flex-row items-center gap-3">
-            <Text className="text-base font-bold text-gray-400">동료 일정</Text>
-            <Text className="font-extrabold text-blue-600">
+            <Text className="text-base font-bold text-gray-400 dark:text-gray-500">동료 일정</Text>
+            <Text className="font-extrabold text-blue-600 dark:text-blue-400">
               {
                 vacations.filter(
                   (vacation) =>
@@ -359,9 +359,9 @@ const ColleagueSchedule = ({
 
   return (
     <View className="m-2 flex w-full flex-row items-center gap-3">
-      <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-black">
+      <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-black dark:bg-gray-300">
         <Image
-          className="size-14 rounded-2xl"
+          className="size-16 rounded-2xl"
           source={{ uri: `${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar` }}
           alt="user-avatar"
         />
@@ -370,26 +370,28 @@ const ColleagueSchedule = ({
       <View className="flex flex-1 flex-col items-center gap-1">
         <View className="w-full">
           <View className="flex flex-row items-center gap-2">
-            <Text className="text-lg font-semibold text-gray-800">{user?.username || ''}</Text>
-            <Text className="text-lg font-bold text-gray-600">{parseVacationName(type, subType)}</Text>
+            <Text className="text-lg font-semibold text-gray-800 dark:text-gray-300">{user?.username || ''}</Text>
+            <Text className="text-lg font-bold text-gray-600 dark:text-gray-300">
+              {parseVacationName(type, subType)}
+            </Text>
           </View>
         </View>
         <View className="w-full">
-          <Text className="w-full text-sm">
+          <Text className="w-full text-sm dark:text-gray-400">
             <Text>{user?.team?.name}</Text>
             <Text> - </Text>
             <Text>{user?.position?.name || ''}</Text>
           </Text>
         </View>
         <View className="flex w-full flex-row items-center gap-2">
-          <Text className="text-sm font-semibold text-gray-500">
+          <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
             <Text className="">{dayjs(startDate).format('YYYY-MM-DD')}</Text>
             <Text className="">({getDaysOfWeek(dayjs(startDate).day())})</Text>
           </Text>
           {dayjs(startDate).isBefore(endDate) && (
             <>
-              <Text className="text-sm font-semibold text-gray-500"> - </Text>
-              <Text className="text-sm font-semibold text-gray-500">
+              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400"> - </Text>
+              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                 <Text className="">{dayjs(endDate).format('YYYY-MM-DD')}</Text>
                 <Text className="">({getDaysOfWeek(dayjs(endDate).day())})</Text>
               </Text>
