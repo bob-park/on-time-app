@@ -83,9 +83,9 @@ export default function Schedule() {
       <View className="w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
           <View className="">
-            <View className="flex flex-row items-center justify-center gap-1">
+            <View className="flex flex-row items-center justify-center gap-5">
               <TouchableOpacity
-                className="h-12 w-16 flex-none items-center justify-center rounded-xl bg-gray-50"
+                className="size-12 flex-none items-center justify-center rounded-xl bg-gray-100"
                 onPress={handlePrevWeek}
               >
                 <Ionicons name="chevron-back" size={24} color="black" />
@@ -96,7 +96,7 @@ export default function Schedule() {
                 </Text>
               </View>
               <TouchableOpacity
-                className="h-12 w-16 flex-none items-center justify-center rounded-xl bg-gray-50"
+                className="size-12 flex-none items-center justify-center rounded-xl bg-gray-100"
                 onPress={handleNextWeek}
               >
                 <Ionicons name="chevron-forward" size={24} color="black" />
@@ -116,7 +116,7 @@ export default function Schedule() {
       </View>
 
       {/* weeks */}
-      <View className="mt-5 h-32 w-full border-b-2 border-gray-100 pb-5">
+      <View className="mt-5 w-full border-b-2 border-gray-100 pb-10">
         <View key={`schedule-week-${uuid.v4()}`} className="flex w-full flex-row items-center justify-center gap-3">
           {new Array(7).fill('*').map((_, index) => (
             <View key={`schedule-item-${uuid.v4()}`} className="flex w-12 flex-col items-center justify-center gap-2">

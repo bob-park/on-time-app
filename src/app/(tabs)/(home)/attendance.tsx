@@ -13,6 +13,7 @@ import WalkLottie from '@/assets/lotties/walk.json';
 import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
+import Loading from '@/shared/components/loading/Loading';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isSameMarginOfError } from '@/utils/dataUtils';
 import { getDaysOfWeek, round } from '@/utils/parse';
@@ -168,8 +169,9 @@ export default function Attendance() {
         }
       },
     );
-
-    setCurrentLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+    setTimeout(() => {
+      setCurrentLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
+    }, 1_000);
   };
 
   const handleClockIn = () => {
@@ -179,6 +181,10 @@ export default function Attendance() {
   const handleClockOut = () => {
     today && currentLocation && clockOut({ ...currentLocation, attendanceRecordId: today.id });
   };
+
+  if (!currentLocation) {
+    return <Loading />;
+  }
 
   return (
     <>
