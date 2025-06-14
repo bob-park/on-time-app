@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -28,14 +28,31 @@ export default function HomeIndex() {
   const { today, reloadToday } = useTodayAttendance();
 
   // state
+  const [remainingTime, setRemainingTime] = useState<{ isOvertime: boolean; time: TimeCode | false }>({
+    isOvertime: false,
+    time: false,
+  });
+
   const workDurations = today?.clockInTime && today?.clockOutTime && getDuration(today.clockInTime, today.clockOutTime);
-  const remainingTime = {
-    isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
-    time: today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
-  };
 
   // hooks
   const router = useRouter();
+
+  // useEffect
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const remainingTime = {
+        isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
+        time: !!today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
+      };
+
+      setRemainingTime(remainingTime);
+    }, 1_000);
+
+    return () => {
+      intervalId && clearInterval(intervalId);
+    };
+  }, [today]);
 
   // handle
   const handleRefreshToday = () => {
