@@ -14,18 +14,18 @@ export { ErrorBoundary } from 'expo-router';
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AnimateAppLoader>
-          <RQProvider>
+      <RQProvider>
+        <AuthProvider>
+          <AnimateAppLoader>
             <StatusBar style="auto" animated />
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="login" options={{ headerShown: false }} />
               <Stack.Screen name="callback" options={{ headerShown: false }} />
             </Stack>
-          </RQProvider>
-        </AnimateAppLoader>
-      </AuthProvider>
+          </AnimateAppLoader>
+        </AuthProvider>
+      </RQProvider>
     </ThemeProvider>
   );
 }

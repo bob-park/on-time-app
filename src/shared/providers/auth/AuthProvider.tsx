@@ -6,6 +6,8 @@ import { TokenResponse, makeRedirectUri, refreshAsync } from 'expo-auth-session'
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { getUserDetail } from '@/domain/users/apis/users';
 import delay from '@/utils/delay';
 
@@ -58,6 +60,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
+  // queries
+  const queryClient = useQueryClient();
+
   // useEffect
   useEffect(() => {
     loadAuth();
@@ -71,6 +76,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     getUserDetail(user.uniqueId)
       .then((data: UserDetail) => setUserDetail(data))
       .catch((err) => console.error(err));
+
+    queryClient.clear();
   }, [user]);
 
   useEffect(() => {
