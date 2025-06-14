@@ -30,7 +30,6 @@ export const discovery = {
 export const redirectUri = makeRedirectUri({
   scheme: 'ontime',
   path: 'callback',
-  navtive: 'ontime://callback',
 });
 
 interface AuthContext {

@@ -53,7 +53,13 @@ export default function LoginPage() {
       const { code } = response.params;
 
       exchangeCodeAsync(
-        { clientId, clientSecret, redirectUri, code, extraParams: { code_verifier: request?.codeVerifier || '' } },
+        {
+          clientId,
+          clientSecret,
+          redirectUri,
+          code,
+          extraParams: { code_verifier: request?.codeVerifier || '', grant_type: 'authorization_code' },
+        },
         discovery,
       )
         .then((data) => {
@@ -80,7 +86,8 @@ export default function LoginPage() {
 
               return data.profile as User;
             })
-            .then((user) => onLoggedIn(user));
+            .then((user) => onLoggedIn(user))
+            .catch((err) => console.error(err));
         })
         .then(async () => {
           await delay(1_000);
@@ -89,7 +96,9 @@ export default function LoginPage() {
 
           router.replace('/(tabs)/(home)');
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [response]);
 
