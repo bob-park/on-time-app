@@ -8,14 +8,12 @@ export function getDaysOfWeek(day: number): string {
   return daysOfWeek[day];
 }
 
+export function isSameDate(d1: Date, d2: Date) {
+  return dayjs(d1).startOf('day').isSame(dayjs(d2).startOf('day'));
+}
+
 export function getWeekStartDate(date: Date): Date {
-  const dayOfWeek = dayjs(date).day();
-
-  if (dayOfWeek < 1) {
-    return dayjs(date).add(-6, 'day').toDate();
-  }
-
-  return dayjs(date).day(1).toDate();
+  return dayjs(date).day(0).startOf('day').toDate();
 }
 
 export function getDuration(startDate: Date, endDate: Date): number {

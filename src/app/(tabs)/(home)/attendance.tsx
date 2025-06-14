@@ -36,7 +36,7 @@ const InvalidLocationModal = ({
 
         {/* message */}
         <View
-          className="left-auto h-64 w-80 rounded-xl bg-gray-50 dark:bg-gray-700"
+          className="left-auto h-48 w-80 rounded-xl bg-gray-50 dark:bg-gray-700"
           style={{
             shadowColor: 'black',
             shadowOpacity: 0.15,
@@ -51,22 +51,7 @@ const InvalidLocationModal = ({
 
             {/* message */}
             <View className="mt-4 w-full">
-              <Text className="text-center text-base text-gray-500 dark:text-gray-200">사무실 아닌디??</Text>
-            </View>
-
-            <View className="m4 w-full">
-              <View className="flex flex-row items-start justify-center gap-3">
-                <View className="w-24 flex-none">
-                  <Text className="text-right text-base font-semibold text-gray-800 dark:text-gray-200">
-                    현재 위치 :
-                  </Text>
-                </View>
-                <View className="flex-1">
-                  <Text className="text-pretty break-keep font-semibold text-gray-800 dark:text-gray-200">
-                    {address}
-                  </Text>
-                </View>
-              </View>
+              <Text className="text-center text-lg font-bold text-gray-900 dark:text-gray-200">사무실 아닌디??</Text>
             </View>
           </View>
 
