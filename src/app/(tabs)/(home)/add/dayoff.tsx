@@ -88,10 +88,10 @@ export default function AddDayOff() {
 
           <View className="">
             <TouchableOpacity
-              className="h-10 w-24 items-center justify-center rounded-2xl bg-gray-100"
+              className="h-10 w-24 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
               onPress={handleCreateVacation}
             >
-              <Text className="font-bold text-gray-700">신청</Text>
+              <Text className="font-bold text-gray-700 dark:text-gray-100">신청</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -101,23 +101,24 @@ export default function AddDayOff() {
       <View className="mt-2 w-full">
         <View className="flex flex-col items-center justify-center gap-2">
           {/* 연차 */}
-          <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4">
+          <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4 dark:bg-gray-800">
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">전체 휴가</Text>
-              <Text className="text-lg font-extrabold">{leaveEntry?.totalLeaveDays}</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">전체 휴가</Text>
+              <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalLeaveDays}</Text>
             </View>
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">사용 개수</Text>
-              <Text className="text-lg font-extrabold">{leaveEntry?.usedLeaveDays}</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">사용 개수</Text>
+              <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.usedLeaveDays}</Text>
             </View>
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">남은 개수</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">남은 개수</Text>
               <Text
                 className={cx('text-lg font-extrabold', {
-                  'text-amber-600':
+                  'text-black dark:text-white': remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.5,
+                  'text-amber-600 dark:text-amber-400':
                     remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.3 &&
                     remainingDays < (leaveEntry?.totalLeaveDays || 0) * 0.5,
-                  'text-red-600': remainingDays < (leaveEntry?.totalLeaveDays || 0) * 0.3,
+                  'text-red-600 dark:text-red-400': remainingDays < (leaveEntry?.totalLeaveDays || 0) * 0.3,
                 })}
               >
                 {remainingDays}
@@ -126,23 +127,24 @@ export default function AddDayOff() {
           </View>
 
           {/* 보상 휴가 */}
-          <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4">
+          <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4 dark:bg-gray-800">
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">보상 휴가</Text>
-              <Text className="text-lg font-extrabold">{leaveEntry?.totalCompLeaveDays}</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">보상 휴가</Text>
+              <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalCompLeaveDays}</Text>
             </View>
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">사용 개수</Text>
-              <Text className="text-lg font-extrabold">{leaveEntry?.usedCompLeaveDays}</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">사용 개수</Text>
+              <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.usedCompLeaveDays}</Text>
             </View>
             <View className="mx-4">
-              <Text className="text-xs font-semibold text-gray-500">남은 개수</Text>
+              <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">남은 개수</Text>
               <Text
                 className={cx('text-lg font-extrabold', {
-                  'text-amber-600':
+                  'text-black dark:text-white': remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
+                  'text-amber-600 dark:text-amber-400':
                     remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.3 &&
                     remainingCompDays < (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
-                  'text-red-600': remainingCompDays < (leaveEntry?.totalCompLeaveDays || 0) * 0.3,
+                  'text-red-600 dark:text-red-400': remainingCompDays < (leaveEntry?.totalCompLeaveDays || 0) * 0.3,
                 })}
               >
                 {remainingCompDays}
@@ -161,22 +163,22 @@ export default function AddDayOff() {
               {/* vacation type */}
               <View className="w-full">
                 <View className="mb-2">
-                  <Text className="text-base font-bold text-gray-400">휴가 구분</Text>
+                  <Text className="text-base font-bold text-gray-400 dark:text-gray-300">휴가 구분</Text>
                 </View>
 
                 <View className="flex w-full flex-row items-center gap-3">
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationType !== 'GENERAL',
-                      'bg-gray-700': vacationType === 'GENERAL',
+                      'bg-gray-100 dark:bg-gray-800': vacationType !== 'GENERAL',
+                      'bg-gray-700 dark:bg-gray-100': vacationType === 'GENERAL',
                     })}
                     disabled={vacationType === 'GENERAL'}
                     onPress={() => setVacationType('GENERAL')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationType !== 'GENERAL',
-                        'text-gray-100': vacationType === 'GENERAL',
+                        'text-gray-700 dark:text-gray-100': vacationType !== 'GENERAL',
+                        'text-gray-100 dark:text-gray-800': vacationType === 'GENERAL',
                       })}
                     >
                       연차
@@ -184,16 +186,16 @@ export default function AddDayOff() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationType !== 'COMPENSATORY',
-                      'bg-gray-700': vacationType === 'COMPENSATORY',
+                      'bg-gray-100 dark:bg-gray-800': vacationType !== 'COMPENSATORY',
+                      'bg-gray-700 dark:bg-gray-100': vacationType === 'COMPENSATORY',
                     })}
                     disabled={vacationType === 'COMPENSATORY'}
                     onPress={() => setVacationType('COMPENSATORY')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationType !== 'COMPENSATORY',
-                        'text-gray-100': vacationType === 'COMPENSATORY',
+                        'text-gray-700 dark:text-gray-100': vacationType !== 'COMPENSATORY',
+                        'text-gray-100 dark:text-gray-800': vacationType === 'COMPENSATORY',
                       })}
                     >
                       보상 휴가
@@ -201,16 +203,16 @@ export default function AddDayOff() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationType !== 'OFFICIAL',
-                      'bg-gray-700': vacationType === 'OFFICIAL',
+                      'bg-gray-100 dark:bg-gray-800': vacationType !== 'OFFICIAL',
+                      'bg-gray-700 dark:bg-gray-100': vacationType === 'OFFICIAL',
                     })}
                     disabled={vacationType === 'OFFICIAL'}
                     onPress={() => setVacationType('OFFICIAL')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationType !== 'OFFICIAL',
-                        'text-gray-100': vacationType === 'OFFICIAL',
+                        'text-gray-700 dark:text-gray-100': vacationType !== 'OFFICIAL',
+                        'text-gray-100 dark:text-gray-800': vacationType === 'OFFICIAL',
                       })}
                     >
                       공가
@@ -222,22 +224,22 @@ export default function AddDayOff() {
               {/* vacation sub type */}
               <View className="mt-4 w-full">
                 <View className="mb-2">
-                  <Text className="text-base font-bold text-gray-400">부가 구분</Text>
+                  <Text className="text-base font-bold text-gray-400 dark:text-gray-300">부가 구분</Text>
                 </View>
 
                 <View className="flex w-full flex-row items-center gap-3">
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationSubType !== 'all',
-                      'bg-gray-700': vacationSubType === 'all',
+                      'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'all',
+                      'bg-gray-700 dark:bg-gray-100': vacationSubType === 'all',
                     })}
                     disabled={vacationSubType === 'all'}
                     onPress={() => setVacationSubType('all')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationSubType !== 'all',
-                        'text-gray-100': vacationSubType === 'all',
+                        'text-gray-700 dark:text-gray-100': vacationSubType !== 'all',
+                        'text-gray-100 dark:text-gray-800': vacationSubType === 'all',
                       })}
                     >
                       종일
@@ -245,16 +247,16 @@ export default function AddDayOff() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationSubType !== 'AM_HALF_DAY_OFF',
-                      'bg-gray-700': vacationSubType === 'AM_HALF_DAY_OFF',
+                      'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'AM_HALF_DAY_OFF',
+                      'bg-gray-700 dark:bg-gray-100': vacationSubType === 'AM_HALF_DAY_OFF',
                     })}
                     disabled={vacationSubType === 'AM_HALF_DAY_OFF'}
                     onPress={() => setVacationSubType('AM_HALF_DAY_OFF')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationSubType !== 'AM_HALF_DAY_OFF',
-                        'text-gray-100': vacationSubType === 'AM_HALF_DAY_OFF',
+                        'text-gray-700 dark:text-gray-100': vacationSubType !== 'AM_HALF_DAY_OFF',
+                        'text-gray-100 dark:text-gray-800': vacationSubType === 'AM_HALF_DAY_OFF',
                       })}
                     >
                       오전 반차
@@ -262,16 +264,16 @@ export default function AddDayOff() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     className={cx('h-10 w-20 items-center justify-center rounded-xl', {
-                      'bg-gray-100': vacationSubType !== 'PM_HALF_DAY_OFF',
-                      'bg-gray-700': vacationSubType === 'PM_HALF_DAY_OFF',
+                      'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'PM_HALF_DAY_OFF',
+                      'bg-gray-700 dark:bg-gray-100': vacationSubType === 'PM_HALF_DAY_OFF',
                     })}
                     disabled={vacationSubType === 'PM_HALF_DAY_OFF'}
                     onPress={() => setVacationSubType('PM_HALF_DAY_OFF')}
                   >
                     <Text
                       className={cx('font-semibold', {
-                        'text-gray-700': vacationSubType !== 'PM_HALF_DAY_OFF',
-                        'text-gray-100': vacationSubType === 'PM_HALF_DAY_OFF',
+                        'text-gray-700 dark:text-gray-100': vacationSubType !== 'PM_HALF_DAY_OFF',
+                        'text-gray-100 dark:text-gray-800': vacationSubType === 'PM_HALF_DAY_OFF',
                       })}
                     >
                       오후 반차
@@ -285,7 +287,7 @@ export default function AddDayOff() {
           {/* vacation sub type */}
           <View className="mt-4 w-full">
             <View className="mb-2">
-              <Text className="text-base font-bold text-gray-400">사유</Text>
+              <Text className="text-base font-bold text-gray-400 dark:text-gray-300">사유</Text>
             </View>
             <View
               className={cx(
@@ -317,8 +319,23 @@ export default function AddDayOff() {
               }
               styles={{
                 ...defaultStyles,
-                today: { backgroundColor: 'white', borderColor: 'blue', borderWidth: 1, borderRadius: '100%' },
-                selected: { backgroundColor: 'blue', borderRadius: '100%' },
+                today: {
+                  backgroundColor: theme === 'light' ? 'white' : 'black',
+                  borderColor: 'blue',
+                  borderWidth: 1,
+                  borderRadius: '100%',
+                },
+                selected: {
+                  backgroundColor: 'blue',
+                  borderRadius: '100%',
+                },
+                selected_label: { color: 'white' },
+                range_start_label: {
+                  color: 'white',
+                },
+                range_end_label: {
+                  color: 'white',
+                },
               }}
             />
           </View>
