@@ -18,10 +18,10 @@ export default function RootLayout() {
         <AuthProvider>
           <AnimateAppLoader>
             <StatusBar style="auto" animated />
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="login" options={{ headerShown: false }} />
-              <Stack.Screen name="callback" options={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="login" />
+              <Stack.Screen name="callback" />
             </Stack>
           </AnimateAppLoader>
         </AuthProvider>

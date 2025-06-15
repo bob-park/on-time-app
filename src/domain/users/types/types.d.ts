@@ -26,3 +26,15 @@ interface UserDetail {
   team?: Team;
   position?: Position;
 }
+
+interface UserLeaveEntry {
+  id: number;
+  userUniqueId: string;
+  year: number;
+  totalLeaveDays: number;
+  usedDays: number;
+  totalCompLeaveDays: number;
+  compUsedDays: number;
+  createdDate: Date;
+  lastModifiedDate?: Date;
+}

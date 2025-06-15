@@ -286,7 +286,7 @@ export default function Schedule() {
                       </Text>
                       {dayjs(vacation.startDate).isBefore(vacation.endDate) && (
                         <>
-                          <Text className="font-semibold text-gray-500"> - </Text>
+                          <Text className="font-semibold text-gray-500">-</Text>
                           <Text className="font-semibold text-gray-500">
                             <Text className="">{dayjs(vacation.endDate).format('YYYY-MM-DD')}</Text>
                             <Text className="">({getDaysOfWeek(dayjs(vacation.endDate).day())})</Text>
@@ -390,7 +390,7 @@ const ColleagueSchedule = ({
           </Text>
           {dayjs(startDate).isBefore(endDate) && (
             <>
-              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400"> - </Text>
+              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">-</Text>
               <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
                 <Text className="">{dayjs(endDate).format('YYYY-MM-DD')}</Text>
                 <Text className="">({getDaysOfWeek(dayjs(endDate).day())})</Text>

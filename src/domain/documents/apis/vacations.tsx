@@ -1,5 +1,4 @@
 import api, { generateAuthHeader } from '@/shared/api';
-import delay from '@/utils/delay';
 
 import dayjs from 'dayjs';
 

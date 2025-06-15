@@ -40,13 +40,10 @@ export default function HomeIndex() {
 
   // useEffect
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      const remainingTime = {
-        isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
-        time: !!today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
-      };
+    calculateRemainingTime();
 
-      setRemainingTime(remainingTime);
+    const intervalId = setInterval(() => {
+      calculateRemainingTime();
     }, 1_000);
 
     return () => {
@@ -57,6 +54,15 @@ export default function HomeIndex() {
   // handle
   const handleRefreshToday = () => {
     reloadToday();
+  };
+
+  const calculateRemainingTime = () => {
+    const remainingTime = {
+      isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
+      time: !!today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
+    };
+
+    setRemainingTime(remainingTime);
   };
 
   return (
@@ -120,7 +126,10 @@ export default function HomeIndex() {
             <Text className="text-base font-bold dark:text-white">근무 입력</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
+          <TouchableOpacity
+            className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            onPress={() => router.push('./add/dayoff')}
+          >
             <Fontisto name="parasol" size={20} color="#f0abfc" />
             <Text className="text-base font-bold dark:text-white">휴가 등록</Text>
           </TouchableOpacity>
