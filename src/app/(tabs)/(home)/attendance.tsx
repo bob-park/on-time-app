@@ -199,9 +199,9 @@ export default function Attendance() {
 
             {/* today */}
             <View className="flex flex-row items-end gap-1">
-              <Text className="text-3xl font-bold dark:text-white">{dayjs().format('MM월 DD일')}</Text>
+              <Text className="text-xl font-bold dark:text-white">{dayjs().format('MM월 DD일')}</Text>
               <Text
-                className={cx('text-xl font-bold', {
+                className={cx('text-base font-bold', {
                   'text-black dark:text-white': !WEEKEND_DAYS.includes(dayjs().day()),
                   'text-blue-500 dark:text-blue-300': dayjs().day() === 6,
                   'text-red-600 dark:text-red-300': dayjs().day() === 0,
@@ -222,7 +222,7 @@ export default function Attendance() {
             <View className="w-full">
               <View className="flex flex-row items-center gap-3">
                 <TouchableOpacity
-                  className={cx('flex h-14 w-28 flex-row items-center justify-center gap-1 rounded-xl', {
+                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'OFFICE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OFFICE',
                   })}
@@ -231,7 +231,7 @@ export default function Attendance() {
                 >
                   <MaterialCommunityIcons
                     name="office-building-outline"
-                    size={20}
+                    size={18}
                     color={
                       workType === 'OFFICE'
                         ? theme === 'light'
@@ -243,7 +243,7 @@ export default function Attendance() {
                     }
                   />
                   <Text
-                    className={cx('font-bold', {
+                    className={cx('text-sm font-bold', {
                       'text-gray-600 dark:text-white': workType !== 'OFFICE',
                       'text-gray-100 dark:text-gray-800': workType === 'OFFICE',
                     })}
@@ -253,7 +253,7 @@ export default function Attendance() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={cx('flex h-14 w-28 flex-row items-center justify-center gap-1 rounded-xl', {
+                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'OUTSIDE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OUTSIDE',
                   })}
@@ -262,7 +262,7 @@ export default function Attendance() {
                 >
                   <FontAwesome
                     name="car"
-                    size={20}
+                    size={18}
                     color={
                       workType === 'OUTSIDE'
                         ? theme === 'light'
@@ -274,7 +274,7 @@ export default function Attendance() {
                     }
                   />
                   <Text
-                    className={cx('font-bold', {
+                    className={cx('text-sm font-bold', {
                       'text-gray-600 dark:text-white': workType !== 'OUTSIDE',
                       'text-gray-100 dark:text-gray-800': workType === 'OUTSIDE',
                     })}
@@ -284,7 +284,7 @@ export default function Attendance() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={cx('flex h-14 w-28 flex-row items-center justify-center gap-1 rounded-xl', {
+                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'HOME',
                     'bg-gray-700 dark:bg-gray-300': workType === 'HOME',
                   })}
@@ -293,7 +293,7 @@ export default function Attendance() {
                 >
                   <Ionicons
                     name="home-sharp"
-                    size={20}
+                    size={18}
                     color={
                       workType === 'HOME'
                         ? theme === 'light'
@@ -305,7 +305,7 @@ export default function Attendance() {
                     }
                   />
                   <Text
-                    className={cx('font-bold', {
+                    className={cx('text-sm font-bold', {
                       'text-gray-600 dark:text-white': workType !== 'HOME',
                       'text-gray-100 dark:text-gray-800': workType === 'HOME',
                     })}

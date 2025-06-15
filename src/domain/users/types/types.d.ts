@@ -32,9 +32,9 @@ interface UserLeaveEntry {
   userUniqueId: string;
   year: number;
   totalLeaveDays: number;
-  usedDays: number;
+  usedLeaveDays: number;
   totalCompLeaveDays: number;
-  compUsedDays: number;
+  usedCompLeaveDays: number;
   createdDate: Date;
   lastModifiedDate?: Date;
 }

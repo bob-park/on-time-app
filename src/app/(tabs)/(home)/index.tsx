@@ -72,9 +72,9 @@ export default function HomeIndex() {
         <View className="flex flex-row items-center justify-between gap-3">
           {/* today */}
           <View className="flex flex-row items-end gap-1">
-            <Text className="text-3xl font-bold dark:text-white">{dayjs().format('MM월 DD일')}</Text>
+            <Text className="text-xl font-bold dark:text-white">{dayjs().format('MM월 DD일')}</Text>
             <Text
-              className={cx('text-xl font-bold', {
+              className={cx('text-base font-bold', {
                 'text-black dark:text-white': !WEEKEND_DAYS.includes(dayjs().day()),
                 'text-blue-500 dark:text-blue-300': dayjs().day() === 6,
                 'text-red-600 dark:text-red-300': dayjs().day() === 0,
@@ -86,7 +86,7 @@ export default function HomeIndex() {
 
           {/* notification */}
           <TouchableOpacity className="relative items-center justify-between">
-            <MaterialIcons name="notifications-none" size={30} color={theme === 'light' ? 'black' : 'white'} />
+            <MaterialIcons name="notifications-none" size={24} color={theme === 'light' ? 'black' : 'white'} />
 
             <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
               <View className="size-2 rounded-full bg-red-500"></View>
@@ -104,7 +104,7 @@ export default function HomeIndex() {
         >
           <Ionicons name="search" size={24} color="gray" />
           <TextInput
-            className={cx('my-2 items-center text-base dark:text-white', {
+            className={cx('my-2 items-center text-sm dark:text-white', {
               'h-12': Device.osName === 'Android',
               'h-8': Device.osName !== 'Android',
             })}
@@ -119,24 +119,24 @@ export default function HomeIndex() {
       <View className="w-full">
         <ScrollView className="h-16" horizontal>
           <TouchableOpacity
-            className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-5 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
             onPress={() => router.push('./attendance')}
           >
             <MaterialIcons name="timer" size={24} color="#34d399" />
-            <Text className="text-base font-bold dark:text-white">근무 입력</Text>
+            <Text className="text-sm font-bold dark:text-white">근무 입력</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="mr-5 flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-5 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
             onPress={() => router.push('./add/dayoff')}
           >
             <Fontisto name="parasol" size={20} color="#f0abfc" />
-            <Text className="text-base font-bold dark:text-white">휴가 등록</Text>
+            <Text className="text-sm font-bold dark:text-white">휴가 신청</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex h-14 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
+          <TouchableOpacity className="flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
             <MaterialIcons name="work" size={24} color="#6b7280" />
-            <Text className="text-base font-bold dark:text-white">근무 확인</Text>
+            <Text className="text-sm font-bold dark:text-white">근무 확인</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -150,9 +150,9 @@ export default function HomeIndex() {
           renderItem={() => (
             <View className="flex flex-col items-center gap-3">
               <View className="flex w-full flex-row items-center gap-2">
-                <Text className="text-lg font-bold text-gray-400 dark:text-gray-500">내 근무</Text>
+                <Text className="text-base font-bold text-gray-400 dark:text-gray-500">내 근무</Text>
                 {today?.workType && (
-                  <Text className="text-lg">
+                  <Text className="text-sm">
                     <Text className="font-semibold">(</Text>
                     {today.workType === 'HOME' && <Text className="font-semibold">재택 근무</Text>}
                     {today.workType === 'OFFICE' && <Text className="font-semibold">사무실</Text>}
