@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Modal, Text, TouchableOpacity, View } from 'react-native';
 
 import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 
@@ -82,8 +83,16 @@ export default function Attendance() {
   // queries
   const { locations } = useAttendanceLocations();
   const { today } = useTodayAttendance();
-  const { clockIn, isLoading: isClockInLoading } = useClockIn({});
-  const { clockOut, isLoading: isClockOutLoading } = useClockOut({});
+  const { clockIn, isLoading: isClockInLoading } = useClockIn({
+    onSuccess: () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    },
+  });
+  const { clockOut, isLoading: isClockOutLoading } = useClockOut({
+    onSuccess: () => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    },
+  });
 
   // hooks
   const router = useRouter();

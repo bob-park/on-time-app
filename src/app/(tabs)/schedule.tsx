@@ -137,6 +137,7 @@ export default function Schedule() {
     endDateFrom: week.endDate,
     page: 0,
     size: 100,
+    status: 'APPROVED',
   });
 
   // useEffect
