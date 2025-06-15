@@ -1,4 +1,5 @@
 import api, { generateAuthHeader } from '@/shared/api';
+import delay from '@/utils/delay';
 
 import dayjs from 'dayjs';
 
@@ -23,6 +24,19 @@ export async function getVacations(
     .json<Page<DocumentVacation>>();
 
   // await delay(1_000);
+
+  return result;
+}
+
+export async function createVacation(accessToken: string, req: CreateDocumentVacationRequest) {
+  const result = await api
+    .post('api/v1/documents/vacations', {
+      headers: generateAuthHeader(accessToken),
+      json: req,
+    })
+    .json<DocumentVacation>();
+
+  await delay(1_000);
 
   return result;
 }

@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { getVacations } from '@/domain/documents/apis/vacations';
+import { createVacation, getVacations } from '@/domain/documents/apis/vacations';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 
 export function useVacations(
@@ -22,4 +22,22 @@ export function useVacations(
   });
 
   return { vacations: data || [], isLoading };
+}
+
+export function useCreateVacation({ onSuccess, onError }: QueryHandler<DocumentResponse>) {
+  // context
+  const { accessToken } = useContext(AuthContext);
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ['create', 'documents', 'vacation'],
+    mutationFn: (req: CreateDocumentVacationRequest) => createVacation(accessToken, req),
+    onSuccess: (data) => {
+      onSuccess && onSuccess(data);
+    },
+    onError: () => {
+      onError && onError();
+    },
+  });
+
+  return { createVacation: mutate, isLoading: isPending };
 }

@@ -23,3 +23,12 @@ interface DocumentVacation extends DocumentResponse {
   usedDays: number;
   reason?: string;
 }
+
+interface CreateDocumentVacationRequest {
+  userUniqueId: string;
+  vacationType: VacationType;
+  vacationSubType?: VacationSubType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+}
