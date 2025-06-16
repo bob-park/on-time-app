@@ -13,7 +13,10 @@ export default function HomeLayout() {
   return (
     <View className="flex size-full bg-white p-3 dark:bg-black">
       <Stack
-        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme === 'light' ? 'white' : 'black' } }}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: theme === 'light' ? 'white' : 'black' },
+        }}
       />
     </View>
   );

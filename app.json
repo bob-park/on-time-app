@@ -73,6 +73,13 @@
             }
           }
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "enableBackgroundRemoteNotifications": true
+        }
       ]
     ],
     "experiments": {

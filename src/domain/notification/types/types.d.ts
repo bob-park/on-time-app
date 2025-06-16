@@ -1,0 +1,1 @@
+type NotificationType = 'IOS' | 'ANDROID';

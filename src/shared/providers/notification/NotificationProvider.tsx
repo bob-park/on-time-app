@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Linking } from 'react-native';
 
@@ -6,6 +6,9 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
+
+import { useUserNotification } from '@/domain/notification/queries/userNotification';
+import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 
 const KEY_NOTIFICATION_TOKEN = 'notificationToken';
 
@@ -34,10 +37,14 @@ export const NotificationContext = createContext<NotificationContextType>({
 });
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+  // context
+  const { user } = useContext(AuthContext);
+
   // state
   const [token, setToken] = useState<string>();
 
-  console.log('token', token);
+  // queries
+  const { createUserNotification } = useUserNotification({ userUniqueId: user?.uniqueId || '' });
 
   // useEffect
   useEffect(() => {
@@ -51,12 +58,16 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
       handleUpdateToken(data);
     });
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!token) {
       return;
     }
+
+    console.log('notificationToken', token);
+
+    createUserNotification({ type: Device.osName === 'iOS' ? 'IOS' : 'ANDROID', notificationToken: token });
 
     return () => {};
   }, [token]);
@@ -70,7 +81,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
     }
 
     if (!Device.isDevice) {
-      console.warn('is not device...');
+      console.warn('no device');
       return;
     }
 
@@ -81,8 +92,6 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
     })
       .then((data) => data.data)
       .catch((err) => console.error(err));
-
-    console.log('expoPushToken', token);
 
     handleUpdateToken(token || '');
   };
@@ -101,7 +110,6 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       },
       trigger: null,
     });
-    return;
   };
 
   // memorize

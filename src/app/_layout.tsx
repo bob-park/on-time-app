@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
 import AuthProvider from '@/shared/providers/auth/AuthProvider';
+import NotificationProvider from '@/shared/providers/notification/NotificationProvider';
 import RQProvider from '@/shared/providers/query/RQProvider';
 import ThemeProvider from '@/shared/providers/theme/ThemeProvider';
 
@@ -17,12 +18,14 @@ export default function RootLayout() {
       <RQProvider>
         <AuthProvider>
           <AnimateAppLoader>
-            <StatusBar style="auto" animated />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="login" />
-              <Stack.Screen name="callback" />
-            </Stack>
+            <NotificationProvider>
+              <StatusBar style="auto" animated />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="login" />
+                <Stack.Screen name="callback" />
+              </Stack>
+            </NotificationProvider>
           </AnimateAppLoader>
         </AuthProvider>
       </RQProvider>
