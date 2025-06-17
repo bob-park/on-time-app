@@ -9,6 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 
 import { useUserNotification } from '@/domain/notification/queries/userNotification';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { showToast } from '@/utils/toast';
 
 const KEY_NOTIFICATION_TOKEN = 'notificationToken';
 
@@ -19,12 +20,8 @@ Notifications.setNotificationHandler({
     shouldShowBanner: true,
     shouldShowList: true,
   }),
-  handleSuccess: (notificationId) => {
-    console.log('handleSuccess', notificationId);
-  },
-  handleError: (notificationId, error) => {
-    console.log('handleError', notificationId, error);
-  },
+  handleSuccess: (notificationId) => {},
+  handleError: (notificationId, error) => {},
 });
 
 interface NotificationContextType {
@@ -58,6 +55,17 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
       handleUpdateToken(data);
     });
+
+    const subscription = Notifications.addNotificationReceivedListener((notification) => {
+      showToast({
+        title: notification.request.content.title || 'On Time 알리미',
+        description: notification.request.content.body || '',
+      });
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, [user]);
 
   useEffect(() => {
@@ -91,7 +99,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     if (!Device.isDevice) {
       console.warn('no device');
-      // return;
+      return;
     }
 
     const projectId = Constants.expoConfig?.extra?.esp?.projectId ?? Constants.easConfig?.projectId;
