@@ -38,3 +38,15 @@ interface UserLeaveEntry {
   createdDate: Date;
   lastModifiedDate?: Date;
 }
+
+interface UserCompLeaveEntry {
+  id: number;
+  contents: string;
+  effectedDate: Date;
+  leaveDays: number;
+  usedDays: number;
+  totalCompLeaveDays: number;
+  usedCompLeaveDays: number;
+  createdDate: Date;
+  lastModifiedDate?: Date;
+}

@@ -31,4 +31,8 @@ interface CreateDocumentVacationRequest {
   startDate: string;
   endDate: string;
   reason: string;
+  compLeaveEntries?: {
+    compLeaveEntryId: number;
+    usedDays: number;
+  }[];
 }
