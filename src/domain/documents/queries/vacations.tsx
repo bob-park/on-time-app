@@ -24,7 +24,7 @@ export function useVacations(
   return { vacations: data || [], isLoading };
 }
 
-export function useCreateVacation({ onSuccess, onError }: QueryHandler<DocumentResponse>) {
+export function useCreateVacation({ onSuccess, onError }: QueryHandler<DocumentVacation>) {
   // context
   const { accessToken } = useContext(AuthContext);
 

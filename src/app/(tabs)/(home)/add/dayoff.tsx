@@ -15,9 +15,23 @@ import { useUserLeaveEntry } from '@/domain/users/queries/users';
 import Loading from '@/shared/components/loading/Loading';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+import { showToast } from '@/utils/toast';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
+
+function parseVacationType(vacationType: VacationType) {
+  switch (vacationType) {
+    case 'GENERAL':
+      return '연차';
+    case 'COMPENSATORY':
+      return '보상 휴가';
+    case 'OFFICIAL':
+      return '공가';
+    default:
+      return '';
+  }
+}
 
 export default function AddDayOff() {
   // context
@@ -34,6 +48,11 @@ export default function AddDayOff() {
       requestDocument(data.id);
 
       router.push('/(tabs)/(home)');
+
+      showToast({
+        title: '휴가 신청 완료',
+        description: `${parseVacationType(data.vacationType)}(이)가 신청되었습니다.`,
+      });
     },
   });
 

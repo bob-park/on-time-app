@@ -23,7 +23,7 @@ const toastConfig: ToastConfig = {
         style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
       >
         <View className="w-full">
-          <Text className="text-xl font-bold dark:text-white">{text1}</Text>
+          <Text className="text-lg font-bold dark:text-white">{text1}</Text>
         </View>
         <View className="w-full">
           <Text className="text-gray-500 dark:text-gray-500">{text2}</Text>

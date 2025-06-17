@@ -102,7 +102,7 @@ export default function Attendance() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
       showToast({
-        title: '출근 처리',
+        title: '출근 완료',
         description: `${dayjs(data.clockInTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 출근 처리하였습니다.`,
       });
     },
@@ -112,7 +112,7 @@ export default function Attendance() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
       showToast({
-        title: '퇴근 처리',
+        title: '퇴근 완료',
         description: `${dayjs(data.clockOutTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 퇴근 처리하였습니다.`,
       });
     },
