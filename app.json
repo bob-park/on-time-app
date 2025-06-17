@@ -30,7 +30,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.bobpark.ontimeapp"
+      "package": "com.bobpark.ontimeapp",
+      "googleServicesFile": "./google-service.json"
     },
     "web": {
       "bundler": "metro",

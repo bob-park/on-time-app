@@ -74,6 +74,15 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // handle
   const handleInit = async () => {
+    if (Device.osName === 'Android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
     const { status } = await Notifications.requestPermissionsAsync();
 
     if (status !== 'granted') {
@@ -82,7 +91,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     if (!Device.isDevice) {
       console.warn('no device');
-      return;
+      // return;
     }
 
     const projectId = Constants.expoConfig?.extra?.esp?.projectId ?? Constants.easConfig?.projectId;

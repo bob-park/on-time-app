@@ -18,12 +18,26 @@ import Loading from '@/shared/components/loading/Loading';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isSameMarginOfError } from '@/utils/dataUtils';
 import { getDaysOfWeek, round } from '@/utils/parse';
+import { showToast } from '@/utils/toast';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import LottieView from 'lottie-react-native';
 
 const WEEKEND_DAYS = [0, 6];
+
+function parseWorkType(workType: AttendanceWorkType) {
+  switch (workType) {
+    case 'OFFICE':
+      return '사무실';
+    case 'HOME':
+      return '재택근무';
+    case 'OUTSIDE':
+      return '외근';
+    default:
+      return '';
+  }
+}
 
 const InvalidLocationModal = ({
   show,
@@ -84,13 +98,23 @@ export default function Attendance() {
   const { locations } = useAttendanceLocations();
   const { today } = useTodayAttendance();
   const { clockIn, isLoading: isClockInLoading } = useClockIn({
-    onSuccess: () => {
+    onSuccess: (data) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+      showToast({
+        title: '출근 처리',
+        description: `${dayjs(data.clockInTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 출근 처리하였습니다.`,
+      });
     },
   });
   const { clockOut, isLoading: isClockOutLoading } = useClockOut({
-    onSuccess: () => {
+    onSuccess: (data) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+      showToast({
+        title: '퇴근 처리',
+        description: `${dayjs(data.clockOutTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 퇴근 처리하였습니다.`,
+      });
     },
   });
 

@@ -52,3 +52,5 @@ yarn-error.*
 *.ipr
 
 
+### google ###
+google-service.json
