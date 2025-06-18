@@ -8,6 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { useQueryClient } from '@tanstack/react-query';
 
+import { deleteUserNotificationProvider } from '@/domain/notification/apis/userNotification';
 import { getUserDetail } from '@/domain/users/apis/users';
 import delay from '@/utils/delay';
 
@@ -17,6 +18,7 @@ const KEY_USER = 'user';
 const KEY_ACCESS_TOKEN = 'accessToken';
 const KEY_REFRESH_TOKEN = 'refreshToken';
 const KEY_EXPIRED_AT = 'expiredAt';
+const KEY_USER_PROVIDER_ID = 'userProviderId';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -75,7 +77,10 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
     getUserDetail(user.uniqueId)
       .then((data: UserDetail) => setUserDetail(data))
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        handleLogout();
+      });
 
     queryClient.clear();
   }, [user]);
@@ -104,16 +109,25 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   };
 
   const handleLogout = () => {
-    AsyncStorage.removeItem(KEY_USER);
-    SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN);
-    SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN);
-    SecureStore.deleteItemAsync(KEY_EXPIRED_AT);
+    Promise.all([
+      SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
+        if (data && user) {
+          await deleteUserNotificationProvider({ userUniqueId: user.uniqueId, userProviderId: data });
+        }
 
-    setUser(undefined);
-    setIsLoggedIn(false);
-    setAccessToken('');
-    setRefreshToken(undefined);
-    setExpiredAt(undefined);
+        SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);
+      }),
+      AsyncStorage.removeItem(KEY_USER),
+      SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN),
+      SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
+      SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
+    ]).then(() => {
+      setUser(undefined);
+      setIsLoggedIn(false);
+      setAccessToken('');
+      setRefreshToken(undefined);
+      setExpiredAt(undefined);
+    });
   };
 
   const handleRefreshAccessToken = (refreshToken: string) => {
@@ -128,7 +142,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       .catch((err) => {
         console.error(err);
 
-        setIsLoggedIn(false);
+        handleLogout();
       });
   };
 

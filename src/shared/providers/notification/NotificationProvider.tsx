@@ -11,7 +11,7 @@ import { useUserNotification } from '@/domain/notification/queries/userNotificat
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { showToast } from '@/utils/toast';
 
-const KEY_NOTIFICATION_TOKEN = 'notificationToken';
+const KEY_USER_PROVIDER_ID = 'userProviderId';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -25,27 +25,31 @@ Notifications.setNotificationHandler({
 });
 
 interface NotificationContextType {
-  token?: string;
-  onSendNotification: ({ title, description }: { title: string; description: string }) => void;
+  userProviderId?: string;
 }
 
-export const NotificationContext = createContext<NotificationContextType>({
-  onSendNotification: ({ title, description }) => {},
-});
+export const NotificationContext = createContext<NotificationContextType>({});
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // context
   const { user } = useContext(AuthContext);
 
   // state
-  const [token, setToken] = useState<string>();
+  const [userProviderId, setUserProviderId] = useState<string>();
 
   // queries
-  const { createUserNotification } = useUserNotification({ userUniqueId: user?.uniqueId || '' });
+  const { createUserNotification } = useUserNotification(
+    { userUniqueId: user?.uniqueId || '' },
+    {
+      onSuccess: (data) => {
+        handleUpdateUserProviderId(data.id);
+      },
+    },
+  );
 
   // useEffect
   useEffect(() => {
-    SecureStore.getItemAsync(KEY_NOTIFICATION_TOKEN).then((data) => {
+    SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then((data) => {
       if (!data) {
         // init
         handleInit();
@@ -53,7 +57,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
         return;
       }
 
-      handleUpdateToken(data);
+      handleUpdateUserProviderId(data);
     });
 
     const subscription = Notifications.addNotificationReceivedListener((notification) => {
@@ -67,18 +71,6 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       subscription.remove();
     };
   }, [user]);
-
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-
-    console.log('notificationToken', token);
-
-    createUserNotification({ type: Device.osName === 'iOS' ? 'IOS' : 'ANDROID', notificationToken: token });
-
-    return () => {};
-  }, [token]);
 
   // handle
   const handleInit = async () => {
@@ -110,13 +102,13 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       .then((data) => data.data)
       .catch((err) => console.error(err));
 
-    handleUpdateToken(token || '');
+    createUserNotification({ type: Device.osName === 'iOS' ? 'IOS' : 'ANDROID', notificationToken: token || '' });
   };
 
-  const handleUpdateToken = (token: string) => {
-    setToken(token);
+  const handleUpdateUserProviderId = (id: string) => {
+    setUserProviderId(id);
 
-    SecureStore.setItemAsync(KEY_NOTIFICATION_TOKEN, token);
+    SecureStore.setItemAsync(KEY_USER_PROVIDER_ID, id);
   };
 
   const handleSendNotification = ({ title, description }: { title: string; description: string }) => {
@@ -131,8 +123,8 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // memorize
   const memorizedContextValue = useMemo<NotificationContextType>(
-    () => ({ token, onSendNotification: handleSendNotification }),
-    [token],
+    () => ({ userProviderId, onSendNotification: handleSendNotification }),
+    [userProviderId],
   );
 
   return <NotificationContext value={memorizedContextValue}>{children}</NotificationContext>;

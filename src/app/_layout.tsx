@@ -38,8 +38,8 @@ export default function RootLayout() {
     <ThemeProvider>
       <RQProvider>
         <AuthProvider>
-          <AnimateAppLoader>
-            <NotificationProvider>
+          <NotificationProvider>
+            <AnimateAppLoader>
               <StatusBar style="auto" animated />
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
@@ -47,8 +47,8 @@ export default function RootLayout() {
                 <Stack.Screen name="callback" />
               </Stack>
               <Toast config={toastConfig} />
-            </NotificationProvider>
-          </AnimateAppLoader>
+            </AnimateAppLoader>
+          </NotificationProvider>
         </AuthProvider>
       </RQProvider>
     </ThemeProvider>
