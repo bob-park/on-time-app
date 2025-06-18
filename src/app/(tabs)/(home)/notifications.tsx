@@ -4,7 +4,7 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
@@ -18,24 +18,36 @@ import LottieView from 'lottie-react-native';
 
 dayjs.extend(relativeTime).locale(ko);
 
-const MessageItem = ({ message, onRead }: Readonly<{ message: NotificationMessage; onRead: (id: string) => void }>) => {
+const MessageItem = ({
+  mode = 'light',
+  message,
+  onRead,
+}: Readonly<{ mode?: 'light' | 'dark'; message: NotificationMessage; onRead: (id: string) => void }>) => {
   return (
     <View className="relative px-2 py-3">
       <TouchableOpacity
-        className="flex flex-row items-center gap-3 rounded-lg bg-gray-50 px-6 py-4"
-        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 1, height: 2 } }}
+        className="flex flex-row items-center gap-3 rounded-lg bg-gray-50 px-6 py-4 dark:bg-gray-900"
+        style={{
+          shadowColor: mode === 'light' ? '#000' : '#FFF',
+          shadowOpacity: 0.15,
+          shadowOffset: { width: 1, height: 2 },
+        }}
         disabled={message.read}
         onPress={() => onRead(message.id)}
       >
         <View className="flex-1">
           <View className="flex w-full flex-col items-center gap-1">
-            <Text className="w-full text-lg font-semibold">{message.title}</Text>
-            <Text className="w-full text-sm text-gray-500">{message.message}</Text>
+            <Text className="w-full text-lg font-semibold dark:text-white">{message.title}</Text>
+            <Text className="w-full text-sm text-gray-500 dark:text-gray-400">{message.message}</Text>
           </View>
         </View>
         <View className="w-16 flex-none">
           <View className="-mt-5">
-            <Text className="text-right text-xs text-gray-500" numberOfLines={2} lineBreakMode="tail">
+            <Text
+              className="text-right text-xs text-gray-500 dark:text-gray-400"
+              numberOfLines={2}
+              lineBreakMode="tail"
+            >
               {dayjs(message.createdDate).fromNow()}
             </Text>
           </View>
@@ -53,7 +65,7 @@ const MessageItem = ({ message, onRead }: Readonly<{ message: NotificationMessag
 
 const NoMessage = () => {
   return (
-    <View className="flex size-full flex-col items-center justify-center gap-3">
+    <View className="mt-24 flex w-full flex-col items-center justify-center gap-3">
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
@@ -66,7 +78,7 @@ const NoMessage = () => {
 export default function NotificationsPage() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { messages, onRead } = useContext(NotificationContext);
+  const { messages, onRead, onClearAll } = useContext(NotificationContext);
 
   // hooks
   const router = useRouter();
@@ -85,6 +97,21 @@ export default function NotificationsPage() {
           <View className="flex flex-row items-end gap-1">
             <Text className="text-xl font-bold dark:text-white">알림</Text>
           </View>
+
+          {/* clear action */}
+          <View className="absolute right-3 top-0">
+            <TouchableOpacity
+              className="size-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-900"
+              disabled={messages.length === 0}
+              onPress={() => onClearAll()}
+            >
+              <MaterialCommunityIcons
+                name="chat-remove-outline"
+                size={24}
+                color={theme === 'light' ? 'black' : 'white'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -92,11 +119,10 @@ export default function NotificationsPage() {
         <FlashList
           className=""
           data={messages}
-          renderItem={({ item }) => <MessageItem message={item} onRead={onRead} />}
-          ListFooterComponent={<View className="h-16 w-full"></View>}
+          renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={onRead} />}
+          ListFooterComponent={messages.length === 0 ? <NoMessage /> : <View className="h-16 w-full"></View>}
           onRefresh={() => {}}
         />
-        {messages.length === 0 && <NoMessage />}
       </SafeAreaView>
     </View>
   );

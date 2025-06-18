@@ -260,7 +260,7 @@ export default function Attendance() {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'OFFICE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OFFICE',
                   })}
-                  disabled={workType === 'OFFICE'}
+                  disabled={workType === 'OFFICE' || today?.status !== 'WAITING'}
                   onPress={() => setWorkType('OFFICE')}
                 >
                   <MaterialCommunityIcons
@@ -291,7 +291,7 @@ export default function Attendance() {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'OUTSIDE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OUTSIDE',
                   })}
-                  disabled={workType === 'OUTSIDE'}
+                  disabled={workType === 'OUTSIDE' || today?.status !== 'WAITING'}
                   onPress={() => setWorkType('OUTSIDE')}
                 >
                   <FontAwesome
@@ -322,7 +322,7 @@ export default function Attendance() {
                     'bg-gray-100 dark:bg-gray-900': workType !== 'HOME',
                     'bg-gray-700 dark:bg-gray-300': workType === 'HOME',
                   })}
-                  disabled={workType === 'HOME'}
+                  disabled={workType === 'HOME' || today?.status !== 'WAITING'}
                   onPress={() => setWorkType('HOME')}
                 >
                   <Ionicons

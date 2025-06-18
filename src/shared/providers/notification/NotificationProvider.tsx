@@ -4,6 +4,8 @@ import { Linking, Text, View } from 'react-native';
 import Toast, { ToastConfig } from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -13,6 +15,7 @@ import { useUserNotification } from '@/domain/notification/queries/userNotificat
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 
 const KEY_USER_PROVIDER_ID = 'userProviderId';
+const KEY_NOTIFICATION_MESSAGES = 'notificationMessages';
 
 // custom toast
 const toastConfig: ToastConfig = {
@@ -49,12 +52,14 @@ interface NotificationContextType {
   messages: NotificationMessage[];
   showToast: (message: { title: string; description?: string }) => void;
   onRead: (id: string) => void;
+  onClearAll: () => void;
 }
 
 export const NotificationContext = createContext<NotificationContextType>({
   messages: [],
   showToast: () => {},
   onRead: () => {},
+  onClearAll: () => {},
 });
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -76,6 +81,16 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
   );
 
   // useEffect
+  useEffect(() => {
+    AsyncStorage.getItem(KEY_NOTIFICATION_MESSAGES).then((data) => {
+      if (!data) {
+        return;
+      }
+
+      setMessages(JSON.parse(data));
+    });
+  }, []);
+
   useEffect(() => {
     SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then((data) => {
       if (!data) {
@@ -100,6 +115,12 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       subscription.remove();
     };
   }, [user]);
+
+  useEffect(() => {
+    const savedMessages = messages.slice(0, 10);
+
+    AsyncStorage.setItem(KEY_NOTIFICATION_MESSAGES, JSON.stringify(savedMessages)).then(() => {});
+  }, [messages]);
 
   // handle
   const handleInit = async () => {
@@ -163,7 +184,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // memorize
   const memorizedContextValue = useMemo<NotificationContextType>(
-    () => ({ userProviderId, messages, showToast, onRead: handleReadMessage }),
+    () => ({ userProviderId, messages, showToast, onRead: handleReadMessage, onClearAll: () => setMessages([]) }),
     [userProviderId, messages],
   );
 
