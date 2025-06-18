@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 
 import { Entypo } from '@expo/vector-icons';
 
+import NoDataLottie from '@/assets/lotties/no-data.json';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
@@ -13,6 +14,7 @@ import { FlashList } from '@shopify/flash-list';
 import dayjs from 'dayjs';
 import ko from 'dayjs/locale/ko';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import LottieView from 'lottie-react-native';
 
 dayjs.extend(relativeTime).locale(ko);
 
@@ -45,6 +47,18 @@ const MessageItem = ({ message, onRead }: Readonly<{ message: NotificationMessag
           <Text className="text-xs font-bold text-white">new</Text>
         </View>
       )}
+    </View>
+  );
+};
+
+const NoMessage = () => {
+  return (
+    <View className="flex size-full flex-col items-center justify-center gap-3">
+      <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
+
+      <View className="items-center justify-center">
+        <Text className="text-lg font-extrabold text-gray-500">새로운 소식이 없나봐요.</Text>
+      </View>
     </View>
   );
 };
@@ -82,6 +96,7 @@ export default function NotificationsPage() {
           ListFooterComponent={<View className="h-16 w-full"></View>}
           onRefresh={() => {}}
         />
+        {messages.length === 0 && <NoMessage />}
       </SafeAreaView>
     </View>
   );
