@@ -354,7 +354,7 @@ export default function AddDayOff() {
               </View>
             </View>
 
-            <View className="mt-4 h-[500px] w-full border-b-[2px] border-gray-100">
+            <View className="bg-blue mt-4 h-[500px] w-full border-b-[2px] border-gray-100">
               <DateTimePicker
                 mode="range"
                 locale="ko"
@@ -367,15 +367,15 @@ export default function AddDayOff() {
                   ...defaultStyles,
                   today: {
                     backgroundColor: theme === 'light' ? 'white' : 'black',
-                    borderColor: 'blue',
+                    borderColor: '#2563eb',
                     borderWidth: 1,
                     borderRadius: '100%',
                   },
                   selected: {
-                    backgroundColor: 'blue',
+                    backgroundColor: '#2563eb',
                     borderRadius: '100%',
                   },
-                  selected_label: { color: 'white' },
+                  selected_label: { color: 'white', backgroundColor: '#2563eb' },
                   range_start_label: {
                     color: 'white',
                   },

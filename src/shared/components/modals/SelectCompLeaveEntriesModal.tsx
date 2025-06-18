@@ -143,7 +143,7 @@ const CompLeaveEntry = ({
             <View className="flex w-full flex-row items-center gap-2">
               <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">휴가 발생일 : </Text>
               <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">
-                {dayjs(entry.effectedDate).format('YYYY-MM-DD (dd)')}
+                {dayjs(entry.effectiveDate).format('YYYY-MM-DD (dd)')}
               </Text>
             </View>
 

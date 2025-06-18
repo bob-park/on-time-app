@@ -13,6 +13,8 @@ export function useUserCompLeaveEntries({ userUniqueId }: { userUniqueId?: strin
     queryKey: ['users', userUniqueId, 'comp', 'leave', 'entries'],
     queryFn: () => getUserCompLeaveEntries(accessToken, { userUniqueId: userUniqueId || '' }),
     enabled: !!userUniqueId,
+    staleTime: 10 * 1_000,
+    gcTime: 20 * 1_000,
   });
 
   return { compLeaveEntries: data || [], isLoading };

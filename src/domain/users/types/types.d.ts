@@ -42,7 +42,7 @@ interface UserLeaveEntry {
 interface UserCompLeaveEntry {
   id: number;
   contents: string;
-  effectedDate: Date;
+  effectiveDate: Date;
   leaveDays: number;
   usedDays: number;
   totalCompLeaveDays: number;
