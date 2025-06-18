@@ -128,7 +128,7 @@ const CompLeaveEntry = ({
     <TouchableOpacity className="my-2" onPress={handleToggle}>
       <View
         className={cx('flex h-20 w-full flex-row items-center gap-2 rounded-2xl px-3 py-2', {
-          'border-2 border-gray-200 bg-gray-200 bg-gray-700 dark:border-gray-700': selected,
+          'border-2 border-gray-200 bg-gray-200 dark:border-gray-700 dark:bg-gray-700': selected,
         })}
       >
         <Text className="w-44 flex-none text-sm dark:text-white" ellipsizeMode="tail" numberOfLines={2}>

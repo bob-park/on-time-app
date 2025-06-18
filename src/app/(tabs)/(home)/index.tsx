@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
+import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isIncludeTime } from '@/utils/dataUtils';
 import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
@@ -23,6 +24,7 @@ const ONE_HOUR = 3_600;
 export default function HomeIndex() {
   // context
   const { theme } = useContext(ThemeContext);
+  const { messages } = useContext(NotificationContext);
 
   // query
   const { today, reloadToday } = useTodayAttendance();
@@ -91,9 +93,11 @@ export default function HomeIndex() {
           >
             <MaterialIcons name="notifications-none" size={24} color={theme === 'light' ? 'black' : 'white'} />
 
-            <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
-              <View className="size-2 rounded-full bg-red-500"></View>
-            </View>
+            {messages.some((message) => !message.read) && (
+              <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
+                <View className="size-2 rounded-full bg-red-500"></View>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>

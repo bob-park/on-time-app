@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Linking, Text, View } from 'react-native';
 import Toast, { ToastConfig } from 'react-native-toast-message';
+import uuid from 'react-native-uuid';
 
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
@@ -45,11 +46,15 @@ Notifications.setNotificationHandler({
 
 interface NotificationContextType {
   userProviderId?: string;
+  messages: NotificationMessage[];
   showToast: (message: { title: string; description?: string }) => void;
+  onRead: (id: string) => void;
 }
 
 export const NotificationContext = createContext<NotificationContextType>({
+  messages: [],
   showToast: () => {},
+  onRead: () => {},
 });
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -58,6 +63,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // state
   const [userProviderId, setUserProviderId] = useState<string>();
+  const [messages, setMessages] = useState<NotificationMessage[]>([]);
 
   // queries
   const { createUserNotification } = useUserNotification(
@@ -86,6 +92,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       showToast({
         title: notification.request.content.title || 'On Time 알리미',
         description: notification.request.content.body || '',
+        read: false,
       });
     });
 
@@ -133,19 +140,31 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
     SecureStore.setItemAsync(KEY_USER_PROVIDER_ID, id);
   };
 
-  const showToast = ({ title, description }: { title: string; description?: string }) => {
+  const showToast = ({ title, description, read = true }: { title: string; description?: string; read?: boolean }) => {
     Toast.hide();
     Toast.show({
       type: 'selectedToast',
       text1: title,
       text2: description,
     });
+
+    setMessages((prev) => {
+      const newMessages = prev.slice();
+
+      newMessages.unshift({ id: uuid.v4(), title, message: description, read, createdDate: new Date() });
+
+      return newMessages;
+    });
+  };
+
+  const handleReadMessage = (id: string) => {
+    setMessages(messages.map((message) => (message.id === id ? { ...message, read: true } : message)));
   };
 
   // memorize
   const memorizedContextValue = useMemo<NotificationContextType>(
-    () => ({ userProviderId, showToast }),
-    [userProviderId],
+    () => ({ userProviderId, messages, showToast, onRead: handleReadMessage }),
+    [userProviderId, messages],
   );
 
   return (
