@@ -15,8 +15,8 @@ import { useUserLeaveEntry } from '@/domain/users/queries/users';
 import Loading from '@/shared/components/loading/Loading';
 import SelectCompLeaveEntriesModal from '@/shared/components/modals/SelectCompLeaveEntriesModal';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-import { showToast } from '@/utils/toast';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
@@ -41,6 +41,7 @@ export default function AddDayOff() {
   // context
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
+  const { showToast } = useContext(NotificationContext);
 
   // queries
   const { leaveEntry } = useUserLeaveEntry({ uniqueId: user?.uniqueId, year: dayjs().year() });

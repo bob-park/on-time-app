@@ -1,6 +1,4 @@
-import { Text, View } from 'react-native';
 import 'react-native-reanimated';
-import Toast, { ToastConfig } from 'react-native-toast-message';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -13,25 +11,6 @@ import RQProvider from '@/shared/providers/query/RQProvider';
 import ThemeProvider from '@/shared/providers/theme/ThemeProvider';
 
 export { ErrorBoundary } from 'expo-router';
-
-// custom toast
-const toastConfig: ToastConfig = {
-  selectedToast: ({ text1, text2 }) => (
-    <View className="mt-4 w-full px-5">
-      <View
-        className="flex w-full flex-col items-center gap-1 rounded-2xl border-[1px] border-gray-100 bg-gray-50 px-8 py-4 dark:border-gray-800 dark:bg-gray-950"
-        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
-      >
-        <View className="w-full">
-          <Text className="text-base font-bold dark:text-white">{text1}</Text>
-        </View>
-        <View className="w-full">
-          <Text className="text-sm text-gray-500 dark:text-gray-500">{text2}</Text>
-        </View>
-      </View>
-    </View>
-  ),
-};
 
 export default function RootLayout() {
   return (
@@ -46,7 +25,6 @@ export default function RootLayout() {
                 <Stack.Screen name="login" />
                 <Stack.Screen name="callback" />
               </Stack>
-              <Toast config={toastConfig} />
             </AnimateAppLoader>
           </NotificationProvider>
         </AuthProvider>

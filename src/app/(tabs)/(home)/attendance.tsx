@@ -15,10 +15,10 @@ import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import Loading from '@/shared/components/loading/Loading';
+import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isSameMarginOfError } from '@/utils/dataUtils';
 import { getDaysOfWeek, round } from '@/utils/parse';
-import { showToast } from '@/utils/toast';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
@@ -86,6 +86,7 @@ const InvalidLocationModal = ({
 export default function Attendance() {
   // context
   const { theme } = useContext(ThemeContext);
+  const { showToast } = useContext(NotificationContext);
 
   // state
   const [workType, setWorkType] = useState<AttendanceWorkType>('OFFICE');

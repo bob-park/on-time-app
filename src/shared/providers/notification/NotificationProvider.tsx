@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { Linking } from 'react-native';
+import { Linking, Text, View } from 'react-native';
+import Toast, { ToastConfig } from 'react-native-toast-message';
 
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
@@ -9,9 +10,27 @@ import * as SecureStore from 'expo-secure-store';
 
 import { useUserNotification } from '@/domain/notification/queries/userNotification';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-import { showToast } from '@/utils/toast';
 
 const KEY_USER_PROVIDER_ID = 'userProviderId';
+
+// custom toast
+const toastConfig: ToastConfig = {
+  selectedToast: ({ text1, text2 }) => (
+    <View className="mt-4 w-full px-5">
+      <View
+        className="flex w-full flex-col items-center gap-1 rounded-2xl border-[1px] border-gray-100 bg-gray-50 px-8 py-4 dark:border-gray-800 dark:bg-gray-950"
+        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
+      >
+        <View className="w-full">
+          <Text className="text-base font-bold dark:text-white">{text1}</Text>
+        </View>
+        <View className="w-full">
+          <Text className="text-sm text-gray-500 dark:text-gray-500">{text2}</Text>
+        </View>
+      </View>
+    </View>
+  ),
+};
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -26,9 +45,12 @@ Notifications.setNotificationHandler({
 
 interface NotificationContextType {
   userProviderId?: string;
+  showToast: (message: { title: string; description?: string }) => void;
 }
 
-export const NotificationContext = createContext<NotificationContextType>({});
+export const NotificationContext = createContext<NotificationContextType>({
+  showToast: () => {},
+});
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // context
@@ -111,21 +133,25 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
     SecureStore.setItemAsync(KEY_USER_PROVIDER_ID, id);
   };
 
-  const handleSendNotification = ({ title, description }: { title: string; description: string }) => {
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body: description,
-      },
-      trigger: null,
+  const showToast = ({ title, description }: { title: string; description?: string }) => {
+    Toast.hide();
+    Toast.show({
+      type: 'selectedToast',
+      text1: title,
+      text2: description,
     });
   };
 
   // memorize
   const memorizedContextValue = useMemo<NotificationContextType>(
-    () => ({ userProviderId, onSendNotification: handleSendNotification }),
+    () => ({ userProviderId, showToast }),
     [userProviderId],
   );
 
-  return <NotificationContext value={memorizedContextValue}>{children}</NotificationContext>;
+  return (
+    <NotificationContext value={memorizedContextValue}>
+      {children}
+      <Toast config={toastConfig} />
+    </NotificationContext>
+  );
 }

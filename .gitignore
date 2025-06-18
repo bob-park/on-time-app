@@ -41,6 +41,7 @@ yarn-error.*
 
 ### project ###
 *.DS_Store
+build-*.ipa
 
 ### history ###
 .history
