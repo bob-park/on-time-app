@@ -358,6 +358,10 @@ const ColleagueSchedule = ({
   // queries
   const { user } = useUser(userUniqueId);
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <View className="m-2 flex w-full flex-row items-center gap-3">
       <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-black dark:bg-gray-300">
