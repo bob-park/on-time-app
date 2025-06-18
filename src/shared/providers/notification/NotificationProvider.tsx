@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Linking, Text, View } from 'react-native';
 import Toast, { ToastConfig } from 'react-native-toast-message';
@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
 import { useUserNotification } from '@/domain/notification/queries/userNotification';
@@ -70,6 +71,9 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
   const [userProviderId, setUserProviderId] = useState<string>();
   const [messages, setMessages] = useState<NotificationMessage[]>([]);
 
+  // hooks
+  const router = useRouter();
+
   // queries
   const { createUserNotification } = useUserNotification(
     { userUniqueId: user?.uniqueId || '' },
@@ -103,7 +107,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       handleUpdateUserProviderId(data);
     });
 
-    const subscription = Notifications.addNotificationReceivedListener((notification) => {
+    const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
       showToast({
         title: notification.request.content.title || 'On Time 알리미',
         description: notification.request.content.body || '',
@@ -111,8 +115,21 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       });
     });
 
+    const responseReceivedListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      handleAddMessage({
+        id: uuid.v4(),
+        title: response.notification.request.content.title || 'On Time 알리미',
+        message: response.notification.request.content.body || '',
+        read: false,
+        createdDate: new Date(),
+      });
+
+      router.push('/(tabs)/(home)/notifications');
+    });
+
     return () => {
-      subscription.remove();
+      responseReceivedListener.remove();
+      receivedListener.remove();
     };
   }, [user]);
 
@@ -169,10 +186,14 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       text2: description,
     });
 
+    handleAddMessage({ id: uuid.v4(), title: title, message: description, read, createdDate: new Date() });
+  };
+
+  const handleAddMessage = (message: NotificationMessage) => {
     setMessages((prev) => {
       const newMessages = prev.slice();
 
-      newMessages.unshift({ id: uuid.v4(), title, message: description, read, createdDate: new Date() });
+      newMessages.unshift(message);
 
       return newMessages;
     });
