@@ -85,7 +85,10 @@ export default function HomeIndex() {
           </View>
 
           {/* notification */}
-          <TouchableOpacity className="relative items-center justify-between">
+          <TouchableOpacity
+            className="relative items-center justify-between"
+            onPress={() => router.push('./notifications')}
+          >
             <MaterialIcons name="notifications-none" size={24} color={theme === 'light' ? 'black' : 'white'} />
 
             <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">

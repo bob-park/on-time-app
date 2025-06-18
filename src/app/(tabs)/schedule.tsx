@@ -173,7 +173,7 @@ export default function Schedule() {
   return (
     <View className="flex size-full flex-col items-center bg-white px-4 py-2 dark:bg-black">
       {/* headers */}
-      <View className="w-full px-2">
+      <View className="mt-3 w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
           <View className="">
             <View className="flex flex-row items-center justify-center gap-5">
