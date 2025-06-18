@@ -136,24 +136,26 @@ const CompLeaveEntry = ({
         </View>
         <View className="flex-1">
           <View className="flex flex-col items-center gap-2">
-            <Text className="w-full text-base font-semibold" numberOfLines={2} lineBreakMode="tail">
+            <Text className="w-full text-base font-semibold dark:text-white" numberOfLines={2} lineBreakMode="tail">
               {entry.contents}
             </Text>
 
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500">휴가 발생일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500">
+              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">휴가 발생일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">
                 {dayjs(entry.effectedDate).format('YYYY-MM-DD (dd)')}
               </Text>
             </View>
 
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500">생성 휴가일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500">{entry.leaveDays}</Text>
+              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">생성 휴가일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">{entry.leaveDays}</Text>
             </View>
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500">잔여일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500">{entry.leaveDays - entry.usedDays}</Text>
+              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">잔여일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">
+                {entry.leaveDays - entry.usedDays}
+              </Text>
             </View>
           </View>
         </View>
@@ -163,6 +165,12 @@ const CompLeaveEntry = ({
               <MaterialCommunityIcons name="checkbox-marked" size={24} color="black" />
             ) : (
               <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="black" />
+            ))}
+          {theme === 'dark' &&
+            (selected ? (
+              <MaterialCommunityIcons name="checkbox-outline" size={24} color="white" />
+            ) : (
+              <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="white" />
             ))}
         </View>
       </TouchableOpacity>
