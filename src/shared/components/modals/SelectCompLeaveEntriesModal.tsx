@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useUserCompLeaveEntries } from '@/domain/users/queries/usersCompLeaveEntries';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -11,6 +11,9 @@ import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
 import dayjs from 'dayjs';
+import ko from 'dayjs/locale/ko';
+
+dayjs.locale(ko);
 
 interface SelectCompLeaveEntriesModalProps {
   show: boolean;
@@ -82,20 +85,10 @@ export default function SelectCompLeaveEntriesModal({
         </View>
 
         {/* contents */}
-        <View className="size-full p-4">
+        <View className="size-full px-5 py-4">
           <FlashList
             className="w-full"
             data={compLeaveEntries}
-            ListHeaderComponent={
-              <View className="mb-1 mt-1 flex w-full flex-row items-center gap-2 rounded-t-xl bg-gray-100 p-3 dark:bg-gray-800">
-                <Text className="w-44 flex-none text-center text-sm font-bold dark:text-gray-100" ellipsizeMode="tail">
-                  내용
-                </Text>
-                <Text className="w-24 flex-none text-center text-sm font-bold dark:text-gray-100">발생일</Text>
-                <Text className="w-12 flex-none text-center text-sm font-bold dark:text-gray-100">휴가일</Text>
-                <Text className="w-12 flex-none text-center text-sm font-bold dark:text-gray-100">잔여일</Text>
-              </View>
-            }
             renderItem={({ item, index }) => (
               <CompLeaveEntry
                 entry={item}
@@ -103,6 +96,7 @@ export default function SelectCompLeaveEntriesModal({
                 onToggle={handleSelectToggle}
               />
             )}
+            ListFooterComponent={<View className="h-40 w-full" />}
           />
         </View>
       </View>
@@ -119,25 +113,59 @@ const CompLeaveEntry = ({
   selected?: boolean;
   onToggle?: (id: number) => void;
 }>) => {
+  // context
+  const { theme } = useContext(ThemeContext);
+
   // handle
   const handleToggle = () => {
     onToggle && onToggle(entry.id);
   };
 
   return (
-    <TouchableOpacity className="my-2" onPress={handleToggle}>
-      <View
-        className={cx('flex h-20 w-full flex-row items-center gap-2 rounded-2xl px-3 py-2', {
-          'border-2 border-gray-200 bg-gray-200 dark:border-gray-700 dark:bg-gray-700': selected,
+    <View className="px-4 py-2">
+      <TouchableOpacity
+        className={cx('flex w-full flex-row items-start gap-2 rounded-2xl px-4 py-4', {
+          'bg-gray-50 dark:bg-gray-900': !selected,
+          'bg-gray-200 dark:bg-gray-700': selected,
         })}
+        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
+        onPress={handleToggle}
       >
-        <Text className="w-44 flex-none text-sm dark:text-white" ellipsizeMode="tail" numberOfLines={2}>
-          {entry.contents}
-        </Text>
-        <Text className="w-24 flex-none text-sm dark:text-white">{dayjs(entry.effectedDate).format('YYYY-MM-DD')}</Text>
-        <Text className="w-12 flex-none text-right text-sm font-semibold dark:text-white">{entry.leaveDays}</Text>
-        <Text className="w-12 flex-none text-right text-sm font-semibold dark:text-white">{entry.usedDays}</Text>
-      </View>
-    </TouchableOpacity>
+        <View className="mt-2 w-12 flex-none">
+          <Feather name="calendar" size={24} color={theme === 'light' ? 'black' : 'white'} />
+        </View>
+        <View className="flex-1">
+          <View className="flex flex-col items-center gap-2">
+            <Text className="w-full text-base font-semibold" numberOfLines={2} lineBreakMode="tail">
+              {entry.contents}
+            </Text>
+
+            <View className="flex w-full flex-row items-center gap-2">
+              <Text className="w-20 flex-none text-sm text-gray-500">휴가 발생일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500">
+                {dayjs(entry.effectedDate).format('YYYY-MM-DD (dd)')}
+              </Text>
+            </View>
+
+            <View className="flex w-full flex-row items-center gap-2">
+              <Text className="w-20 flex-none text-sm text-gray-500">생성 휴가일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500">{entry.leaveDays}</Text>
+            </View>
+            <View className="flex w-full flex-row items-center gap-2">
+              <Text className="w-20 flex-none text-sm text-gray-500">잔여일 : </Text>
+              <Text className="flex-1 text-sm text-gray-500">{entry.leaveDays - entry.usedDays}</Text>
+            </View>
+          </View>
+        </View>
+        <View className="w-12 flex-none">
+          {theme === 'light' &&
+            (selected ? (
+              <MaterialCommunityIcons name="checkbox-marked" size={24} color="black" />
+            ) : (
+              <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="black" />
+            ))}
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
