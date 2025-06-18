@@ -76,7 +76,10 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     }
 
     getUserDetail(user.uniqueId)
-      .then((data: UserDetail) => setUserDetail(data))
+      .then((data: UserDetail) => {
+        setUserDetail(data);
+        setIsLoggedIn(true);
+      })
       .catch((err) => {
         console.error(err);
         handleLogout();
@@ -157,11 +160,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
     SecureStore.getItemAsync(KEY_EXPIRED_AT).then((data) => {
       if (!data) {
-        setIsLoggedIn(false);
         return;
       }
 
-      setIsLoggedIn(dayjs(data).isAfter(dayjs()));
       setExpiredAt(dayjs(data).toDate());
     });
 
