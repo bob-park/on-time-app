@@ -109,6 +109,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
       showToast({
+        id: notification.request.identifier,
         title: notification.request.content.title || 'On Time 알리미',
         description: notification.request.content.body || '',
         read: false,
@@ -117,7 +118,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     const responseReceivedListener = Notifications.addNotificationResponseReceivedListener((response) => {
       handleAddMessage({
-        id: uuid.v4(),
+        id: response.notification.request.identifier,
         title: response.notification.request.content.title || 'On Time 알리미',
         message: response.notification.request.content.body || '',
         read: false,
@@ -178,7 +179,17 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
     SecureStore.setItemAsync(KEY_USER_PROVIDER_ID, id);
   };
 
-  const showToast = ({ title, description, read = true }: { title: string; description?: string; read?: boolean }) => {
+  const showToast = ({
+    id,
+    title,
+    description,
+    read = true,
+  }: {
+    id?: string;
+    title: string;
+    description?: string;
+    read?: boolean;
+  }) => {
     Toast.hide();
     Toast.show({
       type: 'selectedToast',
@@ -186,12 +197,16 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       text2: description,
     });
 
-    handleAddMessage({ id: uuid.v4(), title: title, message: description, read, createdDate: new Date() });
+    handleAddMessage({ id: id ?? uuid.v4(), title: title, message: description, read, createdDate: new Date() });
   };
 
   const handleAddMessage = (message: NotificationMessage) => {
     setMessages((prev) => {
       const newMessages = prev.slice();
+
+      if (newMessages.some((item) => item.id === message.id)) {
+        return newMessages;
+      }
 
       newMessages.unshift(message);
 
