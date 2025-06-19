@@ -68,7 +68,7 @@ export default function HomeIndex() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center gap-4 px-4 py-2">
+    <View className="flex size-full flex-col items-center gap-4">
       {/* headers */}
       <View className="w-full px-2">
         <View className="flex flex-row items-center justify-between gap-3">

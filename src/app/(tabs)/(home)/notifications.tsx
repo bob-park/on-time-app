@@ -4,7 +4,7 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
@@ -24,7 +24,7 @@ const MessageItem = ({
   onRead,
 }: Readonly<{ mode?: 'light' | 'dark'; message: NotificationMessage; onRead: (id: string) => void }>) => {
   return (
-    <View className="relative px-2 py-3">
+    <View className="relative mt-4">
       <TouchableOpacity
         className="flex flex-row items-center gap-3 rounded-lg bg-gray-50 px-6 py-4 dark:bg-gray-900"
         style={{
@@ -105,11 +105,7 @@ export default function NotificationsPage() {
               disabled={messages.length === 0}
               onPress={() => onClearAll()}
             >
-              <MaterialCommunityIcons
-                name="chat-remove-outline"
-                size={24}
-                color={theme === 'light' ? 'black' : 'white'}
-              />
+              <MaterialIcons name="delete-outline" size={24} color={theme === 'light' ? 'black' : 'white'} />
             </TouchableOpacity>
           </View>
         </View>

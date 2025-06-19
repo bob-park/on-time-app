@@ -222,7 +222,7 @@ export default function Attendance() {
 
   return (
     <>
-      <View className="flex size-full flex-col items-center px-4 py-2">
+      <View className="flex size-full flex-col items-center">
         {/* headers */}
         <View className="w-full px-2">
           <View className="flex flex-row items-center gap-4">
