@@ -233,8 +233,8 @@ export default function Schedule() {
       </View>
 
       {/* weeks */}
-      <SafeAreaView className="mt-5 w-full border-b-2 border-gray-100 pb-10 dark:border-gray-700">
-        <View className="h-28">
+      <SafeAreaView className="mt-5 h-32 w-full border-b-2 border-gray-100 dark:border-gray-700">
+        <View className="h-24">
           <SafeAreaView className="" style={{ flex: 1 }}>
             <AnimatedPagerView
               {...rest}
