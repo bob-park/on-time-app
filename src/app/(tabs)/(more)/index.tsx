@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 
 import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
+import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -32,10 +33,10 @@ export default function MoreIndex() {
         <View className="flex w-full flex-row items-center gap-2">
           {/* avatar */}
           <View className="w-28 flex-none p-3">
-            <Image
-              className="size-24 rounded-2xl"
-              source={{ uri: `${DEFAULT_API_HOST}/api/v1/users/${user?.uniqueId}/avatar` }}
-              alt="user-avatar"
+            <UserAvatar
+              src={`${DEFAULT_API_HOST}/api/v1/users/${user?.uniqueId}/avatar`}
+              username={user?.username}
+              size="base"
             />
           </View>
 

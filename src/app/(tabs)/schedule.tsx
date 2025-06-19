@@ -8,6 +8,7 @@ import uuid from 'react-native-uuid';
 import { Fontisto, Octicons } from '@expo/vector-icons';
 
 import { useVacations } from '@/domain/documents/queries/vacations';
+import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -423,11 +424,11 @@ const ColleagueSchedule = ({
 
   return (
     <View className="m-2 flex w-full flex-row items-center gap-3">
-      <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-black dark:bg-gray-300">
-        <Image
-          className="size-16 rounded-2xl"
-          source={{ uri: `${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar` }}
-          alt="user-avatar"
+      <View className="size-16 flex-none">
+        <UserAvatar
+          src={`${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar`}
+          username={user?.username}
+          size="sm"
         />
       </View>
 
