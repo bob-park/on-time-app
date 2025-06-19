@@ -1,9 +1,11 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { Image, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { usePagerView } from 'react-native-pager-view';
+import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import uuid from 'react-native-uuid';
 
-import { Fontisto, Ionicons, Octicons } from '@expo/vector-icons';
+import { Fontisto, Octicons } from '@expo/vector-icons';
 
 import { useVacations } from '@/domain/documents/queries/vacations';
 import { useUser } from '@/domain/users/queries/users';
@@ -14,17 +16,11 @@ import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
 import dayjs from 'dayjs';
+import ko from 'dayjs/locale/ko';
+
+dayjs.locale(ko);
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
-
-function resetWeek() {
-  const baseStartDate = getWeekStartDate(dayjs().startOf('day').toDate());
-
-  return {
-    startDate: baseStartDate,
-    endDate: dayjs(baseStartDate).add(6, 'day').toDate(),
-  };
-}
 
 function includeDate(targetDate: Date, { startDate, endDate }: { startDate: Date; endDate: Date }) {
   const startDay = dayjs(startDate).startOf('day');
@@ -122,52 +118,94 @@ const WeekDayItem = ({
   );
 };
 
+const defaultWeeks = [
+  {
+    startDate: getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()),
+    endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()))
+      .add(6, 'day')
+      .toDate(),
+  },
+  {
+    startDate: getWeekStartDate(dayjs().startOf('day').toDate()),
+    endDate: dayjs(getWeekStartDate(dayjs().toDate())).add(6, 'day').toDate(),
+  },
+  {
+    startDate: getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()),
+    endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()))
+      .add(6, 'day')
+      .toDate(),
+  },
+];
+
 export default function Schedule() {
   // context
   const { user } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
 
   // state
-  const [week, setWeek] = useState<{ startDate: Date; endDate: Date }>(() => resetWeek());
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().startOf('day').toDate());
+  const [weeks, setWeeks] = useState<{ startDate: Date; endDate: Date }[]>(defaultWeeks);
 
   // queries
   const { vacations } = useVacations({
-    startDateFrom: week.startDate,
-    endDateFrom: week.endDate,
+    startDateFrom: weeks[1].startDate,
+    endDateFrom: weeks[1].endDate,
     page: 0,
     size: 100,
     status: 'APPROVED',
   });
 
+  // hooks
+  const { AnimatedPagerView, ref, ...rest } = usePagerView({ pagesAmount: 3 });
+
   // useEffect
+  useEffect(() => {}, [rest.activePage]);
 
   // handle
+  const handlePageSelected = (e: OnPageSelectedEventData) => {
+    const position = e.position;
+
+    if (position === 0) {
+      handlePrevWeeks();
+    } else if (position === 2) {
+      handleNextWeeks();
+    }
+
+    position !== 1 && ref.current.setPageWithoutAnimation(1);
+  };
+
+  const handlePrevWeeks = () => {
+    const startDate = getWeekStartDate(dayjs(weeks[0].startDate).add(-1, 'day').toDate());
+
+    setWeeks([
+      {
+        startDate,
+        endDate: dayjs(startDate).add(6, 'day').toDate(),
+      },
+      weeks[0],
+      weeks[1],
+    ]);
+
+    setSelectedDate(dayjs(startDate).add(7, 'day').toDate());
+  };
+
+  const handleNextWeeks = () => {
+    const startDate = getWeekStartDate(dayjs(weeks[2].endDate).add(1, 'day').toDate());
+
+    setWeeks([
+      weeks[1],
+      weeks[2],
+      {
+        startDate,
+        endDate: dayjs(startDate).add(6, 'day').toDate(),
+      },
+    ]);
+
+    setSelectedDate(dayjs(startDate).add(-7, 'day').toDate());
+  };
   const handleSelectToday = () => {
-    setWeek(resetWeek());
+    setWeeks(defaultWeeks);
+
     setSelectedDate(dayjs().startOf('day').toDate());
-  };
-
-  const handlePrevWeek = () => {
-    const startDate = dayjs(week.startDate).add(-7, 'day').toDate();
-
-    setWeek({
-      startDate,
-      endDate: dayjs(startDate).add(6, 'day').toDate(),
-    });
-
-    setSelectedDate(startDate);
-  };
-
-  const handleNextWeek = () => {
-    const startDate = dayjs(week.endDate).add(1, 'day').toDate();
-
-    setWeek({
-      startDate,
-      endDate: dayjs(startDate).add(6, 'day').toDate(),
-    });
-
-    setSelectedDate(startDate);
   };
 
   return (
@@ -177,23 +215,9 @@ export default function Schedule() {
         <View className="flex flex-row items-center justify-between gap-4">
           <View className="">
             <View className="flex flex-row items-center justify-center gap-5">
-              <TouchableOpacity
-                className="size-8 flex-none items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700"
-                onPress={handlePrevWeek}
-              >
-                <Ionicons name="chevron-back" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              </TouchableOpacity>
               <View className="">
-                <Text className="text-2xl font-bold dark:text-white">
-                  {dayjs(week.startDate).format('YYYY년 MM월')}
-                </Text>
+                <Text className="text-2xl font-bold dark:text-white">{dayjs(selectedDate).format('YYYY년 MM월')}</Text>
               </View>
-              <TouchableOpacity
-                className="size-8 flex-none items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700"
-                onPress={handleNextWeek}
-              >
-                <Ionicons name="chevron-forward" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              </TouchableOpacity>
             </View>
           </View>
 
@@ -209,37 +233,72 @@ export default function Schedule() {
       </View>
 
       {/* weeks */}
-      <View className="mt-5 w-full border-b-2 border-gray-100 pb-10 dark:border-gray-700">
-        <View key={`schedule-week-${uuid.v4()}`} className="flex w-full flex-row items-center justify-center gap-3">
-          {new Array(7).fill('*').map((_, index) => (
-            <View key={`schedule-item-${uuid.v4()}`} className="flex w-12 flex-col items-center justify-center gap-2">
-              <View className="w-full items-center justify-center">
-                <Text
-                  className={cx('font-bold', {
-                    'text-blue-400': dayjs(week.startDate).add(index, 'day').day() === 6,
-                    'text-red-400': dayjs(week.startDate).add(index, 'day').day() === 0,
-                    'text-gray-400 dark:text-gray-300': ![0, 6].includes(dayjs(week.startDate).add(index, 'day').day()),
-                  })}
-                >
-                  {getDaysOfWeek(dayjs(week.startDate).add(index, 'day').day())}
-                </Text>
-              </View>
+      <SafeAreaView className="mt-5 w-full border-b-2 border-gray-100 pb-10 dark:border-gray-700">
+        <View className="h-28">
+          <SafeAreaView className="" style={{ flex: 1 }}>
+            <AnimatedPagerView
+              {...rest}
+              className="h-full"
+              style={{ flex: 1 }}
+              ref={ref}
+              initialPage={1}
+              layoutDirection="ltr"
+              pageMargin={10}
+              orientation="horizontal"
+              onPageSelected={(e) => handlePageSelected(e.nativeEvent)}
+            >
+              {useMemo(
+                () =>
+                  weeks.map((week, pageIndex) => (
+                    <View
+                      key={`weeks-page-${pageIndex}`}
+                      className="flex w-full flex-row items-center justify-center gap-3"
+                      collapsable={false}
+                    >
+                      {new Array(7).fill('*').map((_, index) => (
+                        <View
+                          key={`schedule-item-${pageIndex}-${index}`}
+                          className="flex w-12 flex-col items-center justify-center gap-2"
+                        >
+                          <View className="w-full items-center justify-center">
+                            <Text
+                              className={cx('font-bold', {
+                                'text-blue-400': dayjs(weeks[pageIndex].startDate).add(index, 'day').day() === 6,
+                                'text-red-400': dayjs(weeks[pageIndex].startDate).add(index, 'day').day() === 0,
+                                'text-gray-400 dark:text-gray-300': ![0, 6].includes(
+                                  dayjs(weeks[pageIndex].startDate).add(index, 'day').day(),
+                                ),
+                              })}
+                            >
+                              {getDaysOfWeek(dayjs(weeks[pageIndex].startDate).add(index, 'day').day())}
+                            </Text>
+                          </View>
 
-              <WeekDayItem
-                date={dayjs(week.startDate).add(index, 'day').toDate()}
-                today={isSameDate(selectedDate, dayjs(week.startDate).add(index, 'day').toDate())}
-                todo={vacations.some((vacation) =>
-                  includeDate(dayjs(week.startDate).add(index, 'day').toDate(), {
-                    startDate: vacation.startDate,
-                    endDate: vacation.endDate,
-                  }),
-                )}
-                onPress={(date) => setSelectedDate(date)}
-              />
-            </View>
-          ))}
+                          <WeekDayItem
+                            date={dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate()}
+                            today={isSameDate(
+                              selectedDate,
+                              dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate(),
+                            )}
+                            todo={vacations.some((vacation) =>
+                              includeDate(dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate(), {
+                                startDate: vacation.startDate,
+                                endDate: vacation.endDate,
+                              }),
+                            )}
+                            onPress={(date) => setSelectedDate(date)}
+                          />
+                        </View>
+                      ))}
+                    </View>
+                  )),
+                [weeks, selectedDate, vacations],
+              )}
+            </AnimatedPagerView>
+          </SafeAreaView>
         </View>
-      </View>
+        {/* pager view */}
+      </SafeAreaView>
 
       {/* 일정 */}
       <SafeAreaView className="mt-3 flex w-full flex-col items-center gap-2">
