@@ -1,10 +1,10 @@
 import { useContext } from 'react';
 
-import { Image, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
@@ -79,6 +79,18 @@ export default function MoreIndex() {
                 icon={<MaterialIcons name="logout" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={handleLogout}
               />
+
+              <MenuItem
+                text="알림 설정"
+                move
+                icon={
+                  <MaterialIcons
+                    name="notifications-none"
+                    size={24}
+                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
+                  />
+                }
+              />
             </Menu>
           </View>
 
@@ -100,13 +112,7 @@ export default function MoreIndex() {
               <MenuItem
                 move
                 text="공지사항"
-                icon={
-                  <MaterialIcons
-                    name="notifications-none"
-                    size={24}
-                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
-                  />
-                }
+                icon={<FontAwesome6 name="newspaper" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
               />
               <MenuItem
                 move
