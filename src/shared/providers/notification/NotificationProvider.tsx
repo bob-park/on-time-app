@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
 import { useUserNotification } from '@/domain/notification/queries/userNotification';
@@ -73,6 +73,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // hooks
   const router = useRouter();
+  const pathname = usePathname();
 
   // queries
   const { createUserNotification } = useUserNotification(
@@ -86,6 +87,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // useEffect
   useEffect(() => {
+    // TODO: server 에서 notifications 목록 조회로 변경 필요
     AsyncStorage.getItem(KEY_NOTIFICATION_MESSAGES).then((data) => {
       if (!data) {
         return;
@@ -125,7 +127,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
         createdDate: new Date(),
       });
 
-      router.push('/(tabs)/(home)/notifications');
+      pathname !== '/notifications' && router.push('/(tabs)/(home)/notifications');
     });
 
     return () => {
