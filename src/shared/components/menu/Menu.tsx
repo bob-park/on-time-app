@@ -15,7 +15,7 @@ export default function Menu({ title, children }: Readonly<{ title: string; chil
       </View>
 
       {/* menu items */}
-      <View className="flex w-full flex-col gap-5">{children}</View>
+      <View className="flex w-full flex-col gap-2">{children}</View>
     </View>
   );
 }
@@ -39,7 +39,7 @@ export function MenuItem({
       <TouchableOpacity className="flex flex-row items-center justify-between gap-2 px-5 py-3" onPress={handlePress}>
         <View className="flex flex-row items-center gap-3">
           <View className="w-8 flex-none">{icon}</View>
-          <Text className="text-lg font-semibold text-gray-500 dark:text-gray-300">{text}</Text>
+          <Text className="text-base font-semibold text-gray-500 dark:text-gray-300">{text}</Text>
         </View>
 
         {move && (
