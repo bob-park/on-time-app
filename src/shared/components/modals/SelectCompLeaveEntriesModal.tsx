@@ -66,7 +66,7 @@ export default function SelectCompLeaveEntriesModal({
         {/* headers */}
         <View className="relative mt-6 w-full">
           <View className="mt-2 flex flex-col items-center justify-center gap-3">
-            <Text className="text-xl font-bold">보상 휴가 선택</Text>
+            <Text className="text-xl font-bold dark:text-white">보상 휴가 선택</Text>
           </View>
 
           <TouchableOpacity
