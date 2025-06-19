@@ -4,7 +4,7 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, MaterialIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';

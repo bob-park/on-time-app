@@ -4,6 +4,7 @@ import { Modal, Text, TouchableOpacity, View } from 'react-native';
 
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
+import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useUserCompLeaveEntries } from '@/domain/users/queries/usersCompLeaveEntries';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -12,8 +13,21 @@ import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import ko from 'dayjs/locale/ko';
+import LottieView from 'lottie-react-native';
 
 dayjs.locale(ko);
+
+const NoData = () => {
+  return (
+    <View className="mt-24 flex w-full flex-col items-center justify-center gap-3">
+      <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
+
+      <View className="items-center justify-center">
+        <Text className="text-lg font-extrabold text-gray-500">보상 휴가가 없어요..</Text>
+      </View>
+    </View>
+  );
+};
 
 interface SelectCompLeaveEntriesModalProps {
   show: boolean;
@@ -96,7 +110,7 @@ export default function SelectCompLeaveEntriesModal({
                 onToggle={handleSelectToggle}
               />
             )}
-            ListFooterComponent={<View className="h-40 w-full" />}
+            ListFooterComponent={compLeaveEntries.length === 0 ? <NoData /> : <View className="h-40 w-full" />}
           />
         </View>
       </View>
