@@ -8,6 +8,7 @@ import { Entypo, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 
 import { useUpdateUserNotification, useUserNotifications } from '@/domain/notification/queries/userNotification';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 function parseNotificationType(type: NotificationType) {
@@ -42,6 +43,7 @@ export default function NotificationSettings() {
   // context
   const { user } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
+  const { userProviderId } = useContext(NotificationContext);
 
   // hooks
   const router = useRouter();
@@ -72,25 +74,29 @@ export default function NotificationSettings() {
       {/* contents */}
       <View className="mt-5 w-full px-3">
         <View className="flex flex-col items-center gap-1">
-          {notificationProviders.map((provider) => (
-            <View
-              key={`notification-providers-item-${provider.id}`}
-              className="flex h-16 w-full flex-row items-center gap-3"
-            >
-              <View className="w-10 flex-none">{parseNotificationIcon(provider.provider.type, theme)}</View>
-              <View className="flex-1">
-                <Text className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                  {parseNotificationType(provider.provider.type)}
-                </Text>
+          {notificationProviders
+            .filter((provider) =>
+              ['IOS', 'ANDROID'].includes(provider.provider.type) ? provider.id === userProviderId : true,
+            )
+            .map((provider) => (
+              <View
+                key={`notification-providers-item-${provider.id}`}
+                className="flex h-16 w-full flex-row items-center gap-3"
+              >
+                <View className="w-10 flex-none">{parseNotificationIcon(provider.provider.type, theme)}</View>
+                <View className="flex-1">
+                  <Text className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    {parseNotificationType(provider.provider.type)}
+                  </Text>
+                </View>
+                <View className="w-14 flex-none">
+                  <Switch
+                    value={provider.enabled}
+                    onValueChange={(value) => handleUpdateEnabled({ providerId: provider.id, enabled: value })}
+                  />
+                </View>
               </View>
-              <View className="w-14 flex-none">
-                <Switch
-                  value={provider.enabled}
-                  onValueChange={(value) => handleUpdateEnabled({ providerId: provider.id, enabled: value })}
-                />
-              </View>
-            </View>
-          ))}
+            ))}
         </View>
       </View>
     </View>
