@@ -55,7 +55,7 @@ const MessageItem = ({
       </TouchableOpacity>
 
       {!message.read && (
-        <View className="absolute left-0 top-1 w-12 items-center justify-center rounded-lg bg-red-500 py-1">
+        <View className="absolute -top-2 left-0 w-12 items-center justify-center rounded-lg bg-red-500 py-1">
           <Text className="text-xs font-bold text-white">new</Text>
         </View>
       )}
