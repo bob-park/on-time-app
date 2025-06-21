@@ -234,7 +234,7 @@ export default function Schedule() {
       </View>
 
       {/* weeks */}
-      <SafeAreaView className="mt-5 h-32 w-full border-b-2 border-gray-100 dark:border-gray-700">
+      <SafeAreaView className="mt-5 h-32 w-full">
         <View className="h-24">
           <SafeAreaView className="" style={{ flex: 1 }}>
             <AnimatedPagerView
@@ -298,13 +298,16 @@ export default function Schedule() {
             </AnimatedPagerView>
           </SafeAreaView>
         </View>
-        {/* pager view */}
+
+        <View className="absolute bottom-0 flex w-full flex-col items-center justify-center gap-3">
+          <View className="h-[6px] w-24 rounded-2xl bg-gray-200"></View>
+        </View>
       </SafeAreaView>
 
       {/* 일정 */}
       <SafeAreaView className="mt-3 flex w-full flex-col items-center gap-2">
         {/* 내 일정 */}
-        <View className="flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100 dark:border-gray-700">
+        <View className="flex w-full flex-col items-center gap-3 rounded-2xl border-t-[2px] border-gray-100 px-3 pt-3 dark:border-gray-700">
           <View className="flex w-full flex-row items-center gap-3">
             <Text className="text-base font-bold text-gray-400 dark:text-gray-500">내 일정</Text>
             <Text className="font-extrabold text-blue-600 dark:text-blue-400">
@@ -362,7 +365,7 @@ export default function Schedule() {
         </View>
 
         {/* 동료 일정 */}
-        <View className="mt-3 flex w-full flex-col items-center gap-3 border-b-[2px] border-gray-100 dark:border-gray-700">
+        <View className="mt-3 flex w-full flex-col items-center gap-3 border-t-[2px] border-gray-100 px-3 pt-3 dark:border-gray-700">
           <View className="flex w-full flex-row items-center gap-3">
             <Text className="text-base font-bold text-gray-400 dark:text-gray-500">동료 일정</Text>
             <Text className="font-extrabold text-blue-600 dark:text-blue-400">
