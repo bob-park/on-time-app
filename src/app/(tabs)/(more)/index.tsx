@@ -107,6 +107,7 @@ export default function MoreIndex() {
                     color={theme === 'light' ? '#6b7280' : '#d1d5db'}
                   />
                 }
+                onPress={() => router.push('./notifications')}
               />
             </Menu>
           </View>

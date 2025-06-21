@@ -1,4 +1,4 @@
-type NotificationType = 'IOS' | 'ANDROID';
+type NotificationType = 'IOS' | 'ANDROID' | 'SLACK' | 'SMTP';
 
 interface NotificationProvider {
   id: number;
@@ -13,4 +13,5 @@ interface UserNotificationProvider {
   id: string;
   provider: NotificationProvider;
   user?: User;
+  enabled: boolean;
 }

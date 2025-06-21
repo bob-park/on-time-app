@@ -1,5 +1,9 @@
 import api from '@/shared/api';
 
+export async function getUserNotifications({ userUniqueId }: { userUniqueId: string }) {
+  return api.get(`api/v1/users/${userUniqueId}/notification`).json<UserNotificationProvider[]>();
+}
+
 export async function createUserNotification({
   userUniqueId,
   type,
@@ -12,6 +16,22 @@ export async function createUserNotification({
   return api
     .post(`api/v1/users/${userUniqueId}/notification`, {
       json: { type, options: { token: notificationToken } },
+    })
+    .json<UserNotificationProvider>();
+}
+
+export async function updateUserNotificationProvider({
+  userUniqueId,
+  userProviderId,
+  enabled,
+}: {
+  userUniqueId: string;
+  userProviderId: string;
+  enabled: boolean;
+}) {
+  return api
+    .put(`api/v1/users/${userUniqueId}/notification/${userProviderId}`, {
+      json: { enabled },
     })
     .json<UserNotificationProvider>();
 }
