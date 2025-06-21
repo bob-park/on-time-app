@@ -102,7 +102,8 @@ export default function AddDayOff() {
       reason,
       compLeaveEntries: (selectedCompLeaveEntries || []).map((item) => ({
         compLeaveEntryId: item.id,
-        usedDays: dayjs.duration(dayjs(selectedDate.endDate).unix() - dayjs(selectedDate.startDate).unix()).days() + 1,
+        usedDays:
+          dayjs.duration(dayjs(selectedDate.endDate).unix() - dayjs(selectedDate.startDate).unix() + 1_000).days() + 1,
       })),
     });
   };

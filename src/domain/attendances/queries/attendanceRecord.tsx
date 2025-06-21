@@ -14,7 +14,7 @@ export function useTodayAttendance() {
   const { user, accessToken } = useContext(AuthContext);
 
   const { data, isLoading, refetch } = useQuery<AttendanceRecord>({
-    queryKey: ['attendances', 'clockIn', now],
+    queryKey: ['attendances', now],
     queryFn: () =>
       getAttendanceRecords(accessToken || '', {
         userUniqueId: user?.uniqueId || '',
@@ -46,7 +46,7 @@ export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
       longitude: number;
     }) => clockIn(accessToken, { userUniqueId: user?.uniqueId || '', workType, latitude, longitude }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['attendances', 'clockIn', data.workingDate], data);
+      queryClient.setQueryData(['attendances', data.workingDate], data);
 
       onSuccess && onSuccess(data);
     },
@@ -73,7 +73,7 @@ export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
       longitude: number;
     }) => clockOut(accessToken, { userUniqueId: user?.uniqueId || '', attendanceRecordId, latitude, longitude }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['attendances', 'clockIn', data.workingDate], data);
+      queryClient.setQueryData(['attendances', data.workingDate], data);
 
       onSuccess && onSuccess(data);
     },

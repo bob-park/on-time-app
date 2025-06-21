@@ -7,9 +7,15 @@ import { useRouter } from 'expo-router';
 import { Entypo, FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
+import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
@@ -20,6 +26,9 @@ export default function MoreIndex() {
 
   // hooks
   const router = useRouter();
+
+  // queries
+  const { employment } = useUserEmployment(user?.uniqueId);
 
   // handle
   const handleLogout = () => {
@@ -61,6 +70,14 @@ export default function MoreIndex() {
                 {/* team - position */}
                 <View className="flex flex-row items-center gap-1">
                   <Text className="font-semibold text-gray-500 dark:text-gray-400">{user?.team?.name}</Text>
+                  <Text className="font-semibold text-gray-500 dark:text-gray-400">
+                    <Text className="">| </Text>
+                    <Text className="">
+                      {dayjs
+                        .duration((dayjs().startOf('day').unix() - dayjs(employment?.effectiveDate).unix()) * 1_000)
+                        .format('Y년 M개월 D일')}
+                    </Text>
+                  </Text>
                 </View>
               </View>
             </View>

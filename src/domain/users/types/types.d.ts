@@ -50,3 +50,12 @@ interface UserCompLeaveEntry {
   createdDate: Date;
   lastModifiedDate?: Date;
 }
+
+interface UserEmployment {
+  id: number;
+  userUniqueId: string;
+  effectiveDate: Date;
+  status: 'ACTIVE' | 'INACTIVE';
+  createdDate: Date;
+  createdBy: string;
+}

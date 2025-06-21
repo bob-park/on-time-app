@@ -24,7 +24,7 @@ const MessageItem = ({
   onRead,
 }: Readonly<{ mode?: 'light' | 'dark'; message: NotificationMessage; onRead: (id: string) => void }>) => {
   return (
-    <View className="relative mt-4">
+    <View className="relative mt-4 px-3">
       <TouchableOpacity
         className="flex flex-row items-center gap-3 rounded-lg bg-gray-50 px-6 py-4 dark:bg-gray-900"
         style={{
