@@ -12,7 +12,6 @@ import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
-import cx from 'classnames';
 import dayjs from 'dayjs';
 import ko from 'dayjs/locale/ko';
 import duration from 'dayjs/plugin/duration';
@@ -171,7 +170,7 @@ export default function DayoffHistoriesPage() {
             data={newVacations.filter((vacation) =>
               selectedVacationType === 'ALL' ? true : vacation.vacationType === selectedVacationType,
             )}
-            renderItem={({ item }) => <VacationItem vacation={item} />}
+            renderItem={({ item }) => <VacationItem vacation={item} mode={theme} />}
             ListFooterComponent={<View className="h-16 w-full" />}
           />
         </SafeAreaView>
