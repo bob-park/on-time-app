@@ -52,12 +52,7 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
 
 export default function TabLayout() {
   // context
-  const { isLoggedIn } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
-
-  if (!isLoggedIn) {
-    return <Redirect href="/login" />;
-  }
 
   return (
     <View className="relative size-full bg-white dark:bg-black">

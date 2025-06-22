@@ -3,7 +3,6 @@ import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
 import { exchangeCodeAsync, useAuthRequest } from 'expo-auth-session';
-import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 
 import { MaterialIcons } from '@expo/vector-icons';
@@ -27,7 +26,6 @@ export default function LoginPage() {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
 
   // hooks
-  const router = useRouter();
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId,
@@ -61,8 +59,6 @@ export default function LoginPage() {
         })
         .then(async () => {
           await delay(1_000);
-
-          router.replace('/(tabs)/(home)');
         })
         .catch((err) => {
           console.error(err);
