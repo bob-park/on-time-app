@@ -15,13 +15,13 @@ import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import Loading from '@/shared/components/loading/Loading';
+import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isSameMarginOfError } from '@/utils/dataUtils';
 import { getDaysOfWeek, round } from '@/utils/parse';
 
 import cx from 'classnames';
-import dayjs from 'dayjs';
 import LottieView from 'lottie-react-native';
 
 const WEEKEND_DAYS = [0, 6];

@@ -10,16 +10,13 @@ import { Fontisto, Octicons } from '@expo/vector-icons';
 import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
-import dayjs from 'dayjs';
-import ko from 'dayjs/locale/ko';
-
-dayjs.locale(ko);
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 

@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { FontAwesome, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
+import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isIncludeTime } from '@/utils/dataUtils';
@@ -16,7 +17,6 @@ import { TimeCode } from '@/utils/timecode/TimeCode';
 
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
-import dayjs from 'dayjs';
 
 const WEEKEND_DAYS = [0, 6];
 const ONE_HOUR = 3_600;

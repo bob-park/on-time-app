@@ -10,9 +10,8 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { deleteUserNotificationProvider } from '@/domain/notification/apis/userNotification';
 import { getUserDetail } from '@/domain/users/apis/users';
+import dayjs from '@/shared/dayjs';
 import delay from '@/utils/delay';
-
-import dayjs from 'dayjs';
 
 const KEY_USER = 'user';
 const KEY_ACCESS_TOKEN = 'accessToken';

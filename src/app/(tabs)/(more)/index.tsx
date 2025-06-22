@@ -9,13 +9,9 @@ import { Entypo, FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@ex
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-
-dayjs.extend(duration);
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 

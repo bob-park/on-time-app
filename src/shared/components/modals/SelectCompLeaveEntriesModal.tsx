@@ -6,16 +6,13 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useUserCompLeaveEntries } from '@/domain/users/queries/usersCompLeaveEntries';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
-import dayjs from 'dayjs';
-import ko from 'dayjs/locale/ko';
 import LottieView from 'lottie-react-native';
-
-dayjs.locale(ko);
 
 const NoData = () => {
   return (

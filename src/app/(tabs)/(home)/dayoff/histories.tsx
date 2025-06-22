@@ -9,16 +9,12 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useVacations } from '@/domain/documents/queries/vacations';
 import SelectedButton from '@/shared/components/buttons/SelectedButton';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
-import dayjs from 'dayjs';
-import ko from 'dayjs/locale/ko';
-import duration from 'dayjs/plugin/duration';
 import LottieView from 'lottie-react-native';
-
-dayjs.extend(duration).locale(ko);
 
 function parseVacationType(vacationType: VacationType) {
   switch (vacationType) {

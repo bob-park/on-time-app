@@ -10,12 +10,12 @@ import * as WebBrowser from 'expo-web-browser';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
+import dayjs from '@/shared/dayjs';
 import { AuthContext, clientId, clientSecret, discovery, redirectUri } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
-import dayjs from 'dayjs';
 import LottieView from 'lottie-react-native';
 
 const KEY_ACCESS_TOKEN = 'accessToken';

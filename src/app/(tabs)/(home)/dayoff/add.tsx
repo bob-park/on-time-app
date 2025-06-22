@@ -14,15 +14,12 @@ import { useCreateVacation } from '@/domain/documents/queries/vacations';
 import { useUserLeaveEntry } from '@/domain/users/queries/users';
 import Loading from '@/shared/components/loading/Loading';
 import SelectCompLeaveEntriesModal from '@/shared/components/modals/SelectCompLeaveEntriesModal';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import cx from 'classnames';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-
-dayjs.extend(duration);
 
 function parseVacationType(vacationType: VacationType) {
   switch (vacationType) {

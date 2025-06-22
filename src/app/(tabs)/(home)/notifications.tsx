@@ -7,16 +7,13 @@ import { useRouter } from 'expo-router';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
+import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
-import dayjs from 'dayjs';
-import ko from 'dayjs/locale/ko';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import LottieView from 'lottie-react-native';
-
-dayjs.extend(relativeTime).locale(ko);
 
 const MessageItem = ({
   mode = 'light',

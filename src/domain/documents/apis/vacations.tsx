@@ -1,7 +1,6 @@
 import api, { generateAuthHeader } from '@/shared/api';
+import dayjs from '@/shared/dayjs';
 import delay from '@/utils/delay';
-
-import dayjs from 'dayjs';
 
 export async function getVacations(
   accessToken: string,

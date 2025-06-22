@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs from '@/shared/dayjs';
 
 export function isSameMarginOfError(source: number, target: number, margin: number) {
   let pow = 0;

@@ -3,9 +3,8 @@ import { useContext } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { clockIn, clockOut, getAttendanceRecords } from '@/domain/attendances/apis/attendanceRecord';
+import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-
-import dayjs from 'dayjs';
 
 export function useTodayAttendance() {
   const now = dayjs().format('YYYY-MM-DD');
