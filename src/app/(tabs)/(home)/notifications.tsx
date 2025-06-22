@@ -26,7 +26,7 @@ const MessageItem = ({
   return (
     <View className="relative mt-4 px-3">
       <TouchableOpacity
-        className="flex flex-row items-center gap-3 rounded-lg bg-gray-50 px-6 py-4 dark:bg-gray-900"
+        className="flex flex-row items-center gap-3 rounded-2xl bg-gray-50 px-6 py-4 dark:bg-gray-900"
         style={{
           shadowColor: mode === 'light' ? '#000' : '#FFF',
           shadowOpacity: 0.15,

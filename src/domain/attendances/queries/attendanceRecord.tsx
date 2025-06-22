@@ -45,7 +45,7 @@ export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
       longitude: number;
     }) => clockIn(accessToken, { userUniqueId: user?.uniqueId || '', workType, latitude, longitude }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['attendances', data.workingDate], data);
+      queryClient.invalidateQueries({ queryKey: ['attendances', data.workingDate] });
 
       onSuccess && onSuccess(data);
     },
@@ -72,7 +72,7 @@ export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
       longitude: number;
     }) => clockOut(accessToken, { userUniqueId: user?.uniqueId || '', attendanceRecordId, latitude, longitude }),
     onSuccess: (data) => {
-      queryClient.setQueryData(['attendances', data.workingDate], data);
+      queryClient.invalidateQueries({ queryKey: ['attendances', data.workingDate] });
 
       onSuccess && onSuccess(data);
     },
