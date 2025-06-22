@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 
 import { Entypo, Feather } from '@expo/vector-icons';
 
+import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useVacations } from '@/domain/documents/queries/vacations';
 import SelectedButton from '@/shared/components/buttons/SelectedButton';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -15,6 +16,7 @@ import { FlashList } from '@shopify/flash-list';
 import dayjs from 'dayjs';
 import ko from 'dayjs/locale/ko';
 import duration from 'dayjs/plugin/duration';
+import LottieView from 'lottie-react-native';
 
 dayjs.extend(duration).locale(ko);
 
@@ -30,6 +32,18 @@ function parseVacationType(vacationType: VacationType) {
       return '';
   }
 }
+
+const NoVacation = () => {
+  return (
+    <View className="mt-24 flex w-full flex-col items-center justify-center gap-3">
+      <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
+
+      <View className="items-center justify-center">
+        <Text className="text-lg font-extrabold text-gray-500">휴가을 사용하지 않으셨군요?</Text>
+      </View>
+    </View>
+  );
+};
 
 const VacationItem = ({
   vacation,
@@ -90,17 +104,22 @@ export default function DayoffHistoriesPage() {
   const router = useRouter();
 
   // query
-  const { vacations } = useVacations({
+  const { vacations, reload } = useVacations({
     userUniqueId: user?.uniqueId,
     startDateFrom: dayjs().startOf('year').toDate(),
     endDateFrom: dayjs().endOf('year').toDate(),
+    status: 'APPROVED',
     page: 0,
     size: 1000,
   });
 
   // state
-  const newVacations = vacations.slice().sort((o1, o2) => (dayjs(o1.startDate).isBefore(o2.startDate) ? 1 : -1));
   const [selectedVacationType, setSelectedVacationType] = useState<VacationType | 'ALL'>('ALL');
+  const newVacations = vacations
+    .slice()
+    .filter((vacation) => (selectedVacationType === 'ALL' ? true : vacation.vacationType === selectedVacationType));
+
+  newVacations.sort((o1, o2) => (dayjs(o1.startDate).isBefore(o2.startDate) ? 1 : -1));
 
   return (
     <View className="flex size-full flex-col items-center">
@@ -122,7 +141,7 @@ export default function DayoffHistoriesPage() {
       </View>
 
       {/* contents */}
-      <View className="flex w-full flex-col items-center gap-2">
+      <View className="flex size-full flex-col items-center gap-2">
         <View className="mt-3 w-full">
           <View className="flex flex-row items-center gap-3">
             <Text className="text-lg font-bold text-gray-500">{dayjs().format('YYYY')}</Text>
@@ -167,11 +186,10 @@ export default function DayoffHistoriesPage() {
         <SafeAreaView className="size-full">
           <FlashList
             className="w-full"
-            data={newVacations.filter((vacation) =>
-              selectedVacationType === 'ALL' ? true : vacation.vacationType === selectedVacationType,
-            )}
+            data={newVacations}
             renderItem={({ item }) => <VacationItem vacation={item} mode={theme} />}
-            ListFooterComponent={<View className="h-16 w-full" />}
+            ListFooterComponent={newVacations.length > 0 ? <View className="h-36 w-full" /> : <NoVacation />}
+            onRefresh={() => reload()}
           />
         </SafeAreaView>
       </View>

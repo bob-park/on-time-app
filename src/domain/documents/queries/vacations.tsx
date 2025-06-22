@@ -16,12 +16,12 @@ export function useVacations(
   // context
   const { accessToken } = useContext(AuthContext);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['documents', 'vacations', params],
     queryFn: () => getVacations(accessToken, params).then((data) => data.content),
   });
 
-  return { vacations: data || [], isLoading };
+  return { vacations: data || [], isLoading, reload: refetch };
 }
 
 export function useCreateVacation({ onSuccess, onError }: QueryHandler<DocumentVacation>) {
