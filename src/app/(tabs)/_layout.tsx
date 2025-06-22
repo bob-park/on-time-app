@@ -1,6 +1,6 @@
 import { useContext, useRef } from 'react';
 
-import { Animated, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Pressable, Text, View } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
@@ -35,7 +35,10 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={(e) => {
+        onPress && onPress(e);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      }}
       onPressOut={handlePressOut}
       style={[style]}
       android_ripple={{ borderless: false, radius: 0 }}
@@ -75,19 +78,14 @@ export default function TabLayout() {
             backgroundColor: theme === 'light' ? '#fff' : '#000',
           },
           tabBarLabel: ({ focused, children }) => (
-            <TouchableOpacity
-              className="flex flex-col items-center justify-center gap-1"
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
+            <Text
+              className={cx('text-xs', {
+                'font-semibold text-black dark:text-white': focused,
+                'text-gray-400 dark:text-gray-300': !focused,
+              })}
             >
-              <Text
-                className={cx('text-xs', {
-                  'font-semibold text-black dark:text-white': focused,
-                  'text-gray-400 dark:text-gray-300': !focused,
-                })}
-              >
-                {children}
-              </Text>
-            </TouchableOpacity>
+              {children}
+            </Text>
           ),
         }}
       >
