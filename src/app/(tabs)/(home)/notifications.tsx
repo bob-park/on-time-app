@@ -12,7 +12,6 @@ import { NotificationContext } from '@/shared/providers/notification/Notificatio
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import LottieView from 'lottie-react-native';
 
 const MessageItem = ({
