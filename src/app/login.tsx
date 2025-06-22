@@ -2,25 +2,19 @@ import { useContext, useEffect, useState } from 'react';
 
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 
-import { exchangeCodeAsync, fetchUserInfoAsync, useAuthRequest } from 'expo-auth-session';
+import { exchangeCodeAsync, useAuthRequest } from 'expo-auth-session';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
 import { MaterialIcons } from '@expo/vector-icons';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
-import dayjs from '@/shared/dayjs';
 import { AuthContext, clientId, clientSecret, discovery, redirectUri } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
 import cx from 'classnames';
 import LottieView from 'lottie-react-native';
-
-const KEY_ACCESS_TOKEN = 'accessToken';
-const KEY_REFRESH_TOKEN = 'refreshToken';
-const KEY_EXPIRED_AT = 'expiredAt';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -63,36 +57,10 @@ export default function LoginPage() {
         discovery,
       )
         .then((data) => {
-          const unixtimestamp = (data.expiresIn || 0) + data.issuedAt;
-
-          Promise.all([
-            SecureStore.setItemAsync(KEY_ACCESS_TOKEN, data.accessToken),
-            SecureStore.setItemAsync(KEY_REFRESH_TOKEN, data.refreshToken || ''),
-            SecureStore.setItemAsync(KEY_EXPIRED_AT, dayjs.unix(unixtimestamp).toISOString()),
-          ]);
-
-          fetchUserInfoAsync(
-            {
-              accessToken: data.accessToken,
-            },
-            {
-              userInfoEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/userinfo`,
-            },
-          )
-            .then((data) => {
-              if (!data) {
-                throw new Error('null');
-              }
-
-              return data.profile as User;
-            })
-            .then((user) => onLoggedIn(user))
-            .catch((err) => console.error(err));
+          onLoggedIn(data);
         })
         .then(async () => {
           await delay(1_000);
-
-          setIsLoggingIn(true);
 
           router.replace('/(tabs)/(home)');
         })

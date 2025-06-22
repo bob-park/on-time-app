@@ -1,8 +1,6 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { TokenResponse, makeRedirectUri, refreshAsync } from 'expo-auth-session';
+import { TokenResponse, fetchUserInfoAsync, makeRedirectUri, refreshAsync } from 'expo-auth-session';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -13,7 +11,6 @@ import { getUserDetail } from '@/domain/users/apis/users';
 import dayjs from '@/shared/dayjs';
 import delay from '@/utils/delay';
 
-const KEY_USER = 'user';
 const KEY_ACCESS_TOKEN = 'accessToken';
 const KEY_REFRESH_TOKEN = 'refreshToken';
 const KEY_EXPIRED_AT = 'expiredAt';
@@ -28,6 +25,7 @@ export const discovery = {
   authorizationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/authorize`,
   tokenEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/token`,
   revocationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/revoke`,
+  userInfoEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/userinfo`,
 };
 
 export const redirectUri = makeRedirectUri({
@@ -36,12 +34,11 @@ export const redirectUri = makeRedirectUri({
 });
 
 interface AuthContext {
-  user?: User;
   userDetail?: UserDetail;
   accessToken: string;
   refreshToken?: string;
   isLoggedIn: boolean;
-  onLoggedIn: (user: User) => void;
+  onLoggedIn: (token: TokenResponse) => void;
   onLogout: () => void;
 }
 
@@ -77,15 +74,43 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     getUserDetail(user.uniqueId)
       .then((data: UserDetail) => {
         setUserDetail(data);
+        console.log('logged in');
         setIsLoggedIn(true);
       })
       .catch((err) => {
         console.error(err);
         handleLogout();
       });
-
-    queryClient.clear();
   }, [user]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    // fetch user info
+    fetchUserInfoAsync(
+      {
+        accessToken,
+      },
+      discovery,
+    )
+      .then((data) => {
+        if (!data) {
+          throw new Error('unauthorized');
+        }
+
+        return data.profile as User;
+      })
+      .then(async (user) => {
+        setUser(user);
+        loadAuth();
+      })
+      .catch((err) => {
+        console.error(err);
+        handleLogout();
+      });
+  }, [accessToken]);
 
   useEffect(() => {
     if (!expiredAt) {
@@ -103,13 +128,6 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     };
   }, [expiredAt, refreshToken]);
 
-  // handle
-  const handleLogin = (user: User) => {
-    loadAuth();
-    setUser(user);
-    AsyncStorage.setItem(KEY_USER, JSON.stringify(user));
-  };
-
   const handleLogout = () => {
     Promise.all([
       SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
@@ -119,7 +137,6 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
         SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);
       }),
-      AsyncStorage.removeItem(KEY_USER),
       SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN),
       SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
       SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
@@ -137,7 +154,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
     refreshAsync({ refreshToken, clientId, clientSecret }, discovery)
       .then(async (data) => {
-        await saveAuth(data);
+        await handleLoggedIn(data);
 
         loadAuth();
       })
@@ -149,41 +166,38 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   };
 
   const loadAuth = () => {
-    AsyncStorage.getItem(KEY_USER).then((data) => {
-      if (!data) {
-        return;
-      }
+    console.log('loaded auth...');
 
-      setUser(JSON.parse(data) as User);
-    });
+    Promise.all([
+      SecureStore.getItemAsync(KEY_EXPIRED_AT).then((data) => {
+        if (!data) {
+          return;
+        }
 
-    SecureStore.getItemAsync(KEY_EXPIRED_AT).then((data) => {
-      if (!data) {
-        return;
-      }
+        return dayjs(data).toDate();
+      }),
+      SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
+        if (!data) {
+          return;
+        }
 
-      setExpiredAt(dayjs(data).toDate());
-    });
+        return data;
+      }),
+      SecureStore.getItemAsync(KEY_REFRESH_TOKEN).then((data) => {
+        if (!data) {
+          return;
+        }
 
-    // TODO: access Token 체크
-    SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
-      if (!data) {
-        return;
-      }
-
-      setAccessToken(data);
-    });
-
-    SecureStore.getItemAsync(KEY_REFRESH_TOKEN).then((data) => {
-      if (!data) {
-        return;
-      }
-
-      setRefreshToken(data);
+        return data;
+      }),
+    ]).then(([expiredAt, accessToken, refreshToken]) => {
+      setExpiredAt(expiredAt);
+      setAccessToken(accessToken || '');
+      setRefreshToken(refreshToken);
     });
   };
 
-  const saveAuth = (token: TokenResponse) => {
+  const handleLoggedIn = (token: TokenResponse) => {
     const unixtimestamp = (token.expiresIn || 0) + token.issuedAt;
 
     Promise.all([
@@ -191,6 +205,12 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       SecureStore.setItemAsync(KEY_REFRESH_TOKEN, token.refreshToken || ''),
       SecureStore.setItemAsync(KEY_EXPIRED_AT, dayjs.unix(unixtimestamp).toISOString()),
     ]).then(async () => {
+      setAccessToken(token.accessToken);
+      setRefreshToken(token.refreshToken);
+      setExpiredAt(dayjs.unix(unixtimestamp).toDate());
+
+      queryClient.clear();
+
       await delay(1_000);
     });
   };
@@ -203,7 +223,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       userDetail,
       accessToken,
       refreshToken,
-      onLoggedIn: handleLogin,
+      onLoggedIn: handleLoggedIn,
       onLogout: handleLogout,
     }),
     [user, userDetail, accessToken, refreshToken, isLoggedIn],
