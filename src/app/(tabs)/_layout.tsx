@@ -1,9 +1,10 @@
 import { useContext, useRef } from 'react';
 
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Animated, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
+import * as Haptics from 'expo-haptics';
 import { Redirect, Tabs } from 'expo-router';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
@@ -56,13 +57,13 @@ export default function TabLayout() {
   }
 
   return (
-    <View className="size-full bg-white dark:bg-black">
+    <View className="relative size-full bg-white dark:bg-black">
       {/* header */}
       <View className="mt-14 flex flex-col items-center justify-center gap-3"></View>
 
       {/* tabs */}
       <Tabs
-        backBehavior="history" // default 가 initial route 이기 때문에 뒤로가기 하면 home 으로 감
+        backBehavior="history"
         screenOptions={{
           animation: 'fade',
           headerShown: false,
@@ -74,14 +75,19 @@ export default function TabLayout() {
             backgroundColor: theme === 'light' ? '#fff' : '#000',
           },
           tabBarLabel: ({ focused, children }) => (
-            <Text
-              className={cx('text-xs', {
-                'font-semibold text-black dark:text-white': focused,
-                'text-gray-400 dark:text-gray-300': !focused,
-              })}
+            <TouchableOpacity
+              className="flex flex-col items-center justify-center gap-1"
+              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
             >
-              {children}
-            </Text>
+              <Text
+                className={cx('text-xs', {
+                  'font-semibold text-black dark:text-white': focused,
+                  'text-gray-400 dark:text-gray-300': !focused,
+                })}
+              >
+                {children}
+              </Text>
+            </TouchableOpacity>
           ),
         }}
       >

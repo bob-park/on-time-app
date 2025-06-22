@@ -107,12 +107,12 @@ export default function NotificationsPage() {
         </View>
       </View>
 
-      <SafeAreaView className="size-full px-2">
+      <SafeAreaView className="size-full">
         <FlashList
-          className=""
+          className="w-full"
           data={messages}
           renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={onRead} />}
-          ListFooterComponent={messages.length === 0 ? <NoMessage /> : <View className="h-16 w-full"></View>}
+          ListFooterComponent={messages.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
           onRefresh={() => {}}
         />
       </SafeAreaView>

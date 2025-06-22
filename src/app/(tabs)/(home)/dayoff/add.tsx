@@ -116,7 +116,7 @@ export default function AddDayOff() {
 
   return (
     <>
-      <View className="flex size-full flex-col items-center">
+      <View className="flex size-full flex-col items-center pb-40">
         {/* headers */}
         <View className="w-full px-2">
           <View className="flex flex-row items-center justify-between gap-4">
@@ -357,7 +357,7 @@ export default function AddDayOff() {
               </View>
             </View>
 
-            <View className="bg-blue mt-4 h-[500px] w-full border-b-[2px] border-gray-100">
+            <View className="bg-blue mt-4 w-full border-b-[2px] border-gray-100">
               <DateTimePicker
                 mode="range"
                 locale="ko"

@@ -207,7 +207,7 @@ export default function Schedule() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center bg-white px-4 py-2 dark:bg-black">
+    <View className="flex size-full flex-col items-center bg-white px-4 pb-[360px] pt-2 dark:bg-black">
       {/* headers */}
       <View className="mt-3 w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
@@ -302,7 +302,7 @@ export default function Schedule() {
       </SafeAreaView>
 
       {/* 일정 */}
-      <SafeAreaView className="mt-3 flex w-full flex-col items-center gap-2">
+      <View className="mt-3 flex size-full flex-col items-center gap-2">
         {/* 내 일정 */}
         <View className="flex w-full flex-col items-center gap-3 rounded-2xl border-t-[2px] border-gray-100 px-3 pt-3 dark:border-gray-700">
           <View className="flex w-full flex-row items-center gap-3">
@@ -376,7 +376,7 @@ export default function Schedule() {
             </Text>
           </View>
 
-          <View className="size-full">
+          <SafeAreaView className="size-full">
             <FlashList
               className="w-full"
               data={vacations.filter(
@@ -395,9 +395,9 @@ export default function Schedule() {
               )}
               onRefresh={() => {}}
             />
-          </View>
+          </SafeAreaView>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

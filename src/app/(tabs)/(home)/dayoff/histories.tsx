@@ -118,7 +118,7 @@ export default function DayoffHistoriesPage() {
   newVacations.sort((o1, o2) => (dayjs(o1.startDate).isBefore(o2.startDate) ? 1 : -1));
 
   return (
-    <View className="flex size-full flex-col items-center">
+    <View className="flex size-full flex-col items-center pb-24">
       {/* headers */}
       <View className="w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
@@ -179,7 +179,7 @@ export default function DayoffHistoriesPage() {
             className="w-full"
             data={newVacations}
             renderItem={({ item }) => <VacationItem vacation={item} mode={theme} />}
-            ListFooterComponent={newVacations.length > 0 ? <View className="h-36 w-full" /> : <NoVacation />}
+            ListFooterComponent={newVacations.length > 0 ? <View className="h-2 w-full" /> : <NoVacation />}
             onRefresh={() => reload()}
           />
         </SafeAreaView>
