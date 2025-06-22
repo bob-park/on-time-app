@@ -93,6 +93,11 @@ export default function AddDayOff() {
 
   // handle
   const handleCreateVacation = () => {
+    if (dayjs(selectedDate.startDate).isAfter(selectedDate.endDate)) {
+      showToast({ title: '휴가일이 이상한디?', description: '똑바로 선택해주셈! 알겠셈?' });
+      return;
+    }
+
     createVacation({
       userUniqueId: user?.uniqueId || '',
       vacationType,

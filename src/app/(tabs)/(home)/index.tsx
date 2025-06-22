@@ -5,7 +5,7 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import * as Device from 'expo-device';
 import { useRouter } from 'expo-router';
 
-import { FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
@@ -126,7 +126,7 @@ export default function HomeIndex() {
       <View className="w-full">
         <ScrollView className="h-16" horizontal>
           <TouchableOpacity
-            className="mr-5 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
             onPress={() => router.push('./attendance')}
           >
             <MaterialIcons name="timer" size={24} color="#34d399" />
@@ -134,14 +134,22 @@ export default function HomeIndex() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="mr-5 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
-            onPress={() => router.push('./add/dayoff')}
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            onPress={() => router.push('./dayoff/add')}
           >
             <Fontisto name="parasol" size={20} color="#f0abfc" />
             <Text className="text-sm font-bold dark:text-white">휴가 신청</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
+          <TouchableOpacity
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            onPress={() => router.push('./dayoff/histories')}
+          >
+            <FontAwesome name="history" size={20} color="#2563eb" />
+            <Text className="text-sm font-bold dark:text-white">휴가 내역</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="bg- flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
             <MaterialIcons name="work" size={24} color="#6b7280" />
             <Text className="text-sm font-bold dark:text-white">근무 확인</Text>
           </TouchableOpacity>

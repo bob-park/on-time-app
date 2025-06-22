@@ -23,8 +23,6 @@ export async function getVacations(
     })
     .json<Page<DocumentVacation>>();
 
-  // await delay(1_000);
-
   return result;
 }
 
