@@ -106,7 +106,7 @@ const WeekDayItem = ({
       >
         {dayjs(date).date()}
       </Text>
-      <View className="-mt-1 h-2 w-full items-center justify-center">
+      <View className="-mt-1 h-3 w-full items-center justify-center">
         {todo && (
           <Octicons
             name="dot-fill"
