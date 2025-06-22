@@ -21,7 +21,6 @@ export function useTodayAttendance() {
         startDate: now,
         endDate: now,
       }).then((data) => data[0]),
-
     enabled: !!accessToken,
   });
 

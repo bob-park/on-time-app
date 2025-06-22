@@ -11,9 +11,18 @@ export default function MoreLayout() {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <View className="flex size-full bg-white p-3 dark:bg-black">
+    <View className="flex size-full bg-white dark:bg-black">
       <Stack
-        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme === 'light' ? 'white' : 'black' } }}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: {
+            paddingLeft: 24,
+            paddingRight: 24,
+            paddingTop: 12,
+            paddingBottom: 12,
+            backgroundColor: theme === 'light' ? 'white' : 'black',
+          },
+        }}
       />
     </View>
   );

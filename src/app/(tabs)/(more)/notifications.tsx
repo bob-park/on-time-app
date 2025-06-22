@@ -58,7 +58,7 @@ export default function NotificationSettings() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center gap-4 p-4">
+    <View className="flex size-full flex-col items-center gap-4">
       {/* header */}
       <View className="relative flex w-full flex-row items-center justify-center gap-4">
         {/* backward */}
