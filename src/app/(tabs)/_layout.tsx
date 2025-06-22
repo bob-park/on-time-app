@@ -64,6 +64,7 @@ export default function TabLayout() {
       <Tabs
         backBehavior="history" // default 가 initial route 이기 때문에 뒤로가기 하면 home 으로 감
         screenOptions={{
+          animation: 'fade',
           headerShown: false,
           tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
           tabBarStyle: {

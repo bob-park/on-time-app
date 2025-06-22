@@ -77,7 +77,7 @@ const VacationItem = ({
               </Text>
             </View>
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-16 flex-none text-xs text-gray-500 dark:text-gray-400">휴가 사용일 : </Text>
+              <Text className="w-16 flex-none text-right text-xs text-gray-500 dark:text-gray-400">휴가 사용일 : </Text>
               <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400">
                 <Text className="">
                   <Text className="">{vacation.usedDays} 일</Text>
@@ -143,12 +143,7 @@ export default function DayoffHistoriesPage() {
             <Text className="text-lg font-bold text-gray-500">{dayjs().format('YYYY')}</Text>
             <Text className="text-lg font-bold text-gray-500">
               <Text className="">(총 사용 개수: </Text>
-              <Text className="">
-                {newVacations
-                  .filter((vacation) => vacation.vacationType === 'GENERAL')
-                  .reduce((current, vacation) => vacation.usedDays + current, 0)}{' '}
-                개
-              </Text>
+              <Text className="">{newVacations.reduce((current, vacation) => vacation.usedDays + current, 0)} 개</Text>
               <Text className="">)</Text>
             </Text>
           </View>
