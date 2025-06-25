@@ -41,7 +41,7 @@ function parseNotificationIcon(type: NotificationType, theme: 'dark' | 'light') 
 
 export default function NotificationSettings() {
   // context
-  const { user } = useContext(AuthContext);
+  const { userDetail } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const { userProviderId } = useContext(NotificationContext);
 
@@ -49,8 +49,8 @@ export default function NotificationSettings() {
   const router = useRouter();
 
   // queries
-  const { notificationProviders } = useUserNotifications({ userUniqueId: user?.uniqueId });
-  const { updateProvider } = useUpdateUserNotification({ userUniqueId: user?.uniqueId || '' }, {});
+  const { notificationProviders } = useUserNotifications({ userUniqueId: userDetail?.uniqueId });
+  const { updateProvider } = useUpdateUserNotification({ userUniqueId: userDetail?.uniqueId || '' }, {});
 
   // handle
   const handleUpdateEnabled = ({ providerId, enabled }: { providerId: string; enabled: boolean }) => {

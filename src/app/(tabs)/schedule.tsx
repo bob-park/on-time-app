@@ -137,7 +137,7 @@ const defaultWeeks = [
 
 export default function Schedule() {
   // context
-  const { user } = useContext(AuthContext);
+  const { userDetail } = useContext(AuthContext);
 
   // state
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().startOf('day').toDate());
@@ -311,7 +311,7 @@ export default function Schedule() {
               {
                 vacations.filter(
                   (vacation) =>
-                    vacation.userUniqueId === user?.uniqueId &&
+                    vacation.userUniqueId === userDetail?.uniqueId &&
                     includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
                 ).length
               }
@@ -322,7 +322,7 @@ export default function Schedule() {
             {vacations
               .filter(
                 (vacation) =>
-                  vacation.userUniqueId === user?.uniqueId &&
+                  vacation.userUniqueId === userDetail?.uniqueId &&
                   includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
               )
               .map((vacation) => (
@@ -369,7 +369,7 @@ export default function Schedule() {
               {
                 vacations.filter(
                   (vacation) =>
-                    vacation.userUniqueId !== user?.uniqueId &&
+                    vacation.userUniqueId !== userDetail?.uniqueId &&
                     includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
                 ).length
               }
@@ -381,7 +381,7 @@ export default function Schedule() {
               className="w-full"
               data={vacations.filter(
                 (vacation) =>
-                  vacation.userUniqueId !== user?.uniqueId &&
+                  vacation.userUniqueId !== userDetail?.uniqueId &&
                   includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
               )}
               renderItem={({ item, index }) => (

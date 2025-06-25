@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Linking, Text, View } from 'react-native';
 import Toast, { ToastConfig } from 'react-native-toast-message';
@@ -65,7 +65,7 @@ export const NotificationContext = createContext<NotificationContextType>({
 
 export default function NotificationProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // context
-  const { user } = useContext(AuthContext);
+  const { userDetail } = useContext(AuthContext);
 
   // state
   const [userProviderId, setUserProviderId] = useState<string>();
@@ -77,7 +77,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // queries
   const { createUserNotification } = useUserNotification(
-    { userUniqueId: user?.uniqueId || '' },
+    { userUniqueId: userDetail?.uniqueId || '' },
     {
       onSuccess: (data) => {
         handleUpdateUserProviderId(data.id);
@@ -134,7 +134,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       responseReceivedListener.remove();
       receivedListener.remove();
     };
-  }, [user]);
+  }, [userDetail]);
 
   useEffect(() => {
     const savedMessages = messages.slice(0, 10);
