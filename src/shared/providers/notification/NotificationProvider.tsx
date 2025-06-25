@@ -46,12 +46,10 @@ Notifications.setNotificationHandler({
 
 interface NotificationContextType {
   userProviderId?: string;
-  notifications: UserNotificationHistory[];
   showToast: (message: { title: string; description?: string }) => void;
 }
 
 export const NotificationContext = createContext<NotificationContextType>({
-  notifications: [],
   showToast: () => {},
 });
 
@@ -75,11 +73,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       },
     },
   );
-  const { pages } = useNotificationHistories({ page: 0, size: 25 });
-  const notifications = pages.reduce(
-    (current, value) => current.concat(value.content),
-    [] as UserNotificationHistory[],
-  );
+  const { refetch } = useNotificationHistories({ page: 0, size: 25 });
 
   // useEffect
   useEffect(() => {}, []);
@@ -103,9 +97,13 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
         description: notification.request.content.body || '',
         read: false,
       });
+
+      refetch();
     });
 
     const responseReceivedListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      refetch();
+
       pathname !== '/notifications' && router.push('/(tabs)/(home)/notifications');
     });
 
@@ -175,8 +173,8 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // memorize
   const memorizedContextValue = useMemo<NotificationContextType>(
-    () => ({ userProviderId, notifications, showToast }),
-    [userProviderId, notifications],
+    () => ({ userProviderId, showToast }),
+    [userProviderId],
   );
 
   return (

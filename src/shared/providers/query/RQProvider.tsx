@@ -4,19 +4,19 @@ import * as Clipboard from 'expo-clipboard';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export default function RQProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retryOnMount: true,
-        refetchOnReconnect: true,
-        staleTime: 60 * 1_000,
-        gcTime: 120 * 1_000,
-      },
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retryOnMount: true,
+      refetchOnReconnect: true,
+      staleTime: 60 * 1_000,
+      gcTime: 120 * 1_000,
     },
-  });
+  },
+});
 
+export default function RQProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // handle
   const handleCopy = async (text: string) => {
     try {

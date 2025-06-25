@@ -75,14 +75,17 @@ const NoMessage = () => {
 export default function NotificationsPage() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { notifications } = useContext(NotificationContext);
 
   // hooks
   const router = useRouter();
 
   // queries
   const { read } = useReadNotification({});
-  const { refetch, isLoading } = useNotificationHistories({ page: 0, size: 25 });
+  const { pages, refetch, isLoading } = useNotificationHistories({ page: 0, size: 25 });
+  const notifications = pages.reduce(
+    (current, value) => current.concat(value.content),
+    [] as UserNotificationHistory[],
+  );
 
   // handle
   const handleRead = (id: string) => {

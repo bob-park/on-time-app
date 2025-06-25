@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { FontAwesome, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
+import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
 import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -24,10 +25,14 @@ const ONE_HOUR = 3_600;
 export default function HomeIndex() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { notifications } = useContext(NotificationContext);
 
   // query
   const { today, reloadToday } = useTodayAttendance();
+  const { pages } = useNotificationHistories({ page: 0, size: 25 });
+  const notifications = pages.reduce(
+    (current, value) => current.concat(value.content),
+    [] as UserNotificationHistory[],
+  );
 
   // state
   const [remainingTime, setRemainingTime] = useState<{ isOvertime: boolean; time: TimeCode | false }>({
