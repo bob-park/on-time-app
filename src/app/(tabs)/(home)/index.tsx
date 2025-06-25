@@ -106,14 +106,14 @@ export default function HomeIndex() {
       <View className="w-full">
         <View
           className={cx(
-            'flex w-full flex-row items-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
+            'flex w-full flex-row items-center gap-2 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
           )}
         >
           <Ionicons name="search" size={24} color="gray" />
           <TextInput
-            className={cx('my-2 items-center text-sm dark:text-white', {
-              'h-12': Device.osName === 'Android',
-              'h-8': Device.osName !== 'Android',
+            className={cx('items-center text-sm dark:text-white', {
+              'h-12': Device.osName !== 'iOS',
+              'my-2 h-8': Device.osName === 'iOS',
             })}
             numberOfLines={1}
             placeholder="찾는게 있으신가요?"

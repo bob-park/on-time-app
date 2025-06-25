@@ -344,9 +344,9 @@ export default function AddDayOff() {
                 )}
               >
                 <TextInput
-                  className={cx('my-2 items-center text-sm dark:text-white', {
-                    'h-12': Device.osName === 'Android',
-                    'h-8': Device.osName !== 'Android',
+                  className={cx('my-2 w-full items-center text-base dark:text-white', {
+                    'h-12': Device.osName !== 'iOS',
+                    'my-2 h-8': Device.osName === 'iOS',
                   })}
                   numberOfLines={1}
                   placeholder="개인 사유"

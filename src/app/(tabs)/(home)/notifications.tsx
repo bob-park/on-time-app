@@ -92,7 +92,7 @@ export default function NotificationsPage() {
   return (
     <View className="flex size-full flex-col items-center gap-4 bg-white dark:bg-black">
       {/* headers */}
-      <View className="w-full px-2">
+      <View className="w-full">
         <View className="flex flex-row items-center gap-4">
           {/* backward */}
           <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
