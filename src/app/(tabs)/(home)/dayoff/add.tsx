@@ -37,11 +37,11 @@ function parseVacationType(vacationType: VacationType) {
 export default function AddDayOff() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { user } = useContext(AuthContext);
+  const { userDetail } = useContext(AuthContext);
   const { showToast } = useContext(NotificationContext);
 
   // queries
-  const { leaveEntry } = useUserLeaveEntry({ uniqueId: user?.uniqueId, year: dayjs().year() });
+  const { leaveEntry } = useUserLeaveEntry({ uniqueId: userDetail?.uniqueId, year: dayjs().year() });
   const { requestDocument } = useRequestDocument();
   const { createVacation, isLoading } = useCreateVacation({
     onSuccess: (data) => {
@@ -96,7 +96,7 @@ export default function AddDayOff() {
     }
 
     createVacation({
-      userUniqueId: user?.uniqueId || '',
+      userUniqueId: userDetail?.uniqueId || '',
       vacationType,
       vacationSubType: vacationSubType === 'all' ? undefined : vacationSubType,
       startDate: dayjs(selectedDate.startDate).format('YYYY-MM-DD'),
@@ -118,7 +118,7 @@ export default function AddDayOff() {
     <>
       <View className="flex size-full flex-col items-center pb-40">
         {/* headers */}
-        <View className="w-full px-2">
+        <View className="w-full">
           <View className="flex flex-row items-center justify-between gap-4">
             <View className="flex flex-row items-center gap-3">
               {/* backward */}

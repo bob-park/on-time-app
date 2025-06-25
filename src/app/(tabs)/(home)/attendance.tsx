@@ -224,7 +224,7 @@ export default function Attendance() {
     <>
       <View className="flex size-full flex-col items-center">
         {/* headers */}
-        <View className="w-full px-2">
+        <View className="w-full">
           <View className="flex flex-row items-center gap-4">
             {/* backward */}
             <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>

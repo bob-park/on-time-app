@@ -93,7 +93,7 @@ const VacationItem = ({
 
 export default function DayoffHistoriesPage() {
   // context
-  const { user } = useContext(AuthContext);
+  const { userDetail } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
 
   // hooks
@@ -101,7 +101,7 @@ export default function DayoffHistoriesPage() {
 
   // query
   const { vacations, reload } = useVacations({
-    userUniqueId: user?.uniqueId,
+    userUniqueId: userDetail?.uniqueId,
     startDateFrom: dayjs().startOf('year').toDate(),
     endDateFrom: dayjs().endOf('year').toDate(),
     status: 'APPROVED',
@@ -120,7 +120,7 @@ export default function DayoffHistoriesPage() {
   return (
     <View className="flex size-full flex-col items-center pb-24">
       {/* headers */}
-      <View className="w-full px-2">
+      <View className="w-full">
         <View className="flex flex-row items-center justify-between gap-4">
           <View className="flex flex-row items-center gap-3">
             {/* backward */}

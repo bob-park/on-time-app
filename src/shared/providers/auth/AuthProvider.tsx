@@ -219,14 +219,13 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const memorizeValue = useMemo<AuthContext>(
     () => ({
       isLoggedIn,
-      user,
       userDetail,
       accessToken,
       refreshToken,
       onLoggedIn: handleLoggedIn,
       onLogout: handleLogout,
     }),
-    [user, userDetail, accessToken, refreshToken, isLoggedIn],
+    [userDetail, accessToken, refreshToken, isLoggedIn],
   );
 
   return <AuthContext value={memorizeValue}>{children}</AuthContext>;
