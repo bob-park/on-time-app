@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { Entypo, MaterialIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
+import { useNotificationHistories, useReadNotification } from '@/domain/notification/queries/userNotification';
 import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -18,7 +19,7 @@ const MessageItem = ({
   mode = 'light',
   message,
   onRead,
-}: Readonly<{ mode?: 'light' | 'dark'; message: NotificationMessage; onRead: (id: string) => void }>) => {
+}: Readonly<{ mode?: 'light' | 'dark'; message: UserNotificationHistory; onRead: (id: string) => void }>) => {
   return (
     <View className="relative mt-4 px-3">
       <TouchableOpacity
@@ -28,13 +29,13 @@ const MessageItem = ({
           shadowOpacity: 0.15,
           shadowOffset: { width: 1, height: 2 },
         }}
-        disabled={message.read}
+        disabled={message.isRead}
         onPress={() => onRead(message.id)}
       >
         <View className="flex-1">
           <View className="flex w-full flex-col items-center gap-1">
             <Text className="w-full text-lg font-semibold dark:text-white">{message.title}</Text>
-            <Text className="w-full text-sm text-gray-500 dark:text-gray-400">{message.message}</Text>
+            <Text className="w-full text-sm text-gray-500 dark:text-gray-400">{message.contents}</Text>
           </View>
         </View>
         <View className="w-16 flex-none">
@@ -50,7 +51,7 @@ const MessageItem = ({
         </View>
       </TouchableOpacity>
 
-      {!message.read && (
+      {!message.isRead && (
         <View className="absolute -top-2 left-0 w-12 items-center justify-center rounded-lg bg-red-500 py-1">
           <Text className="text-xs font-bold text-white">new</Text>
         </View>
@@ -74,10 +75,19 @@ const NoMessage = () => {
 export default function NotificationsPage() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { messages, onRead, onClearAll } = useContext(NotificationContext);
+  const { notifications } = useContext(NotificationContext);
 
   // hooks
   const router = useRouter();
+
+  // queries
+  const { read } = useReadNotification({});
+  const { refetch, isLoading } = useNotificationHistories({ page: 0, size: 25 });
+
+  // handle
+  const handleRead = (id: string) => {
+    read(id);
+  };
 
   return (
     <View className="flex size-full flex-col items-center gap-4 bg-white dark:bg-black">
@@ -98,8 +108,8 @@ export default function NotificationsPage() {
           <View className="absolute right-3 top-0">
             <TouchableOpacity
               className="size-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-900"
-              disabled={messages.length === 0}
-              onPress={() => onClearAll()}
+              disabled={notifications.length === 0}
+              onPress={() => {}}
             >
               <MaterialIcons name="delete-outline" size={24} color={theme === 'light' ? 'black' : 'white'} />
             </TouchableOpacity>
@@ -110,10 +120,11 @@ export default function NotificationsPage() {
       <SafeAreaView className="size-full">
         <FlashList
           className="w-full"
-          data={messages}
-          renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={onRead} />}
-          ListFooterComponent={messages.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
-          onRefresh={() => {}}
+          data={notifications}
+          refreshing={isLoading}
+          renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={handleRead} />}
+          ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
+          onRefresh={() => refetch()}
         />
       </SafeAreaView>
     </View>

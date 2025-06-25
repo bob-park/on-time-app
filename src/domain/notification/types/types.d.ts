@@ -15,3 +15,13 @@ interface UserNotificationProvider {
   user?: User;
   enabled: boolean;
 }
+
+interface UserNotificationHistory {
+  id: string;
+  userUniqueId: string;
+  title: string;
+  contents?: string;
+  isRead: boolean;
+  createdDate: Date;
+  lastModifiedDate?: Date;
+}

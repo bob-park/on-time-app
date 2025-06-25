@@ -1,4 +1,4 @@
-import api from '@/shared/api';
+import api, { generateAuthHeader } from '@/shared/api';
 
 export async function getUserNotifications({ userUniqueId }: { userUniqueId: string }) {
   return api.get(`api/v1/users/${userUniqueId}/notification`).json<UserNotificationProvider[]>();
@@ -44,4 +44,45 @@ export async function deleteUserNotificationProvider({
   userProviderId: string;
 }) {
   return api.delete(`api/v1/users/${userUniqueId}/notification/${userProviderId}`).json<{ id: string }>();
+}
+
+export async function read(
+  accessToken: string,
+  {
+    userUniqueId,
+    historyId,
+  }: {
+    userUniqueId: string;
+    historyId: string;
+  },
+) {
+  return api
+    .post(`api/v1/users/${userUniqueId}/notifications/histories/${historyId}/read`, {
+      headers: generateAuthHeader(accessToken),
+    })
+    .json<UserNotificationHistory>();
+}
+
+export async function searchHistories(
+  accessToken: string,
+  {
+    userUniqueId,
+    isRead,
+    page,
+    size,
+  }: {
+    userUniqueId: string;
+    isRead?: boolean;
+  } & PageRequest,
+) {
+  return api
+    .get(`api/v1/users/${userUniqueId}/notifications/histories`, {
+      headers: generateAuthHeader(accessToken),
+      searchParams: {
+        isRead: isRead || '',
+        page,
+        size,
+      },
+    })
+    .json<Page<UserNotificationHistory>>();
 }

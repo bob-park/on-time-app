@@ -24,7 +24,7 @@ const ONE_HOUR = 3_600;
 export default function HomeIndex() {
   // context
   const { theme } = useContext(ThemeContext);
-  const { messages } = useContext(NotificationContext);
+  const { notifications } = useContext(NotificationContext);
 
   // query
   const { today, reloadToday } = useTodayAttendance();
@@ -93,7 +93,7 @@ export default function HomeIndex() {
           >
             <MaterialIcons name="notifications-none" size={24} color={theme === 'light' ? 'black' : 'white'} />
 
-            {messages.some((message) => !message.read) && (
+            {notifications.some((notification) => !notification.isRead) && (
               <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
                 <View className="size-2 rounded-full bg-red-500"></View>
               </View>
