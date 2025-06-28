@@ -108,9 +108,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       })
       .catch((err) => {
         console.error(err);
-        handleLogout();
+        refreshToken ? handleRefreshAccessToken(refreshToken) : handleLogout();
       });
-  }, [accessToken]);
+  }, [accessToken, refreshToken]);
 
   useEffect(() => {
     if (!expiredAt) {
