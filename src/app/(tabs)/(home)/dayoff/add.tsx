@@ -340,13 +340,13 @@ export default function AddDayOff() {
               </View>
               <View
                 className={cx(
-                  'flex w-full flex-row items-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
+                  'flex w-full flex-row items-center justify-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
                 )}
               >
                 <TextInput
-                  className={cx('my-2 w-full items-center text-base dark:text-white', {
+                  className={cx('my-2 w-full dark:text-white', {
                     'h-12': Device.osName !== 'iOS',
-                    'my-2 h-8': Device.osName === 'iOS',
+                    'h-8': Device.osName === 'iOS',
                   })}
                   numberOfLines={1}
                   placeholder="개인 사유"
