@@ -5,11 +5,10 @@ import { Animated, Pressable, Text, View } from 'react-native';
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
 import * as Haptics from 'expo-haptics';
-import { Redirect, Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
 
-import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import cx from 'classnames';
@@ -55,7 +54,7 @@ export default function TabLayout() {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <View className="relative size-full bg-white dark:bg-black">
+    <View className="relative size-full bg-gray-50 dark:bg-gray-950">
       {/* header */}
       <View className="mt-14 flex flex-col items-center justify-center gap-3"></View>
 

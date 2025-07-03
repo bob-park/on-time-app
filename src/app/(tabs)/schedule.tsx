@@ -207,7 +207,7 @@ export default function Schedule() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center bg-white px-4 pb-[360px] pt-2 dark:bg-black">
+    <View className="flex size-full flex-col items-center bg-gray-50 px-4 pb-[360px] pt-2 dark:bg-gray-950">
       {/* headers */}
       <View className="mt-3 w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
@@ -221,7 +221,7 @@ export default function Schedule() {
 
           <View>
             <TouchableOpacity
-              className="h-8 w-14 flex-none items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700"
+              className="h-8 w-14 flex-none items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-700"
               onPress={handleSelectToday}
             >
               <Text className="font-bold text-gray-700 dark:text-gray-100">오늘</Text>

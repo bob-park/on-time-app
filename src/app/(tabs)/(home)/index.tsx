@@ -10,7 +10,6 @@ import { FontAwesome, FontAwesome5, Fontisto, Ionicons, MaterialIcons } from '@e
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
 import dayjs from '@/shared/dayjs';
-import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isIncludeTime } from '@/utils/dataUtils';
 import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
@@ -99,7 +98,7 @@ export default function HomeIndex() {
             <MaterialIcons name="notifications-none" size={24} color={theme === 'light' ? 'black' : 'white'} />
 
             {notifications.some((notification) => !notification.isRead) && (
-              <View className="absolute right-0 top-0 flex size-4 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
+              <View className="absolute right-0 top-0 flex size-3 flex-col items-center justify-center rounded-full bg-white dark:bg-black">
                 <View className="size-2 rounded-full bg-red-500"></View>
               </View>
             )}
@@ -111,7 +110,7 @@ export default function HomeIndex() {
       <View className="w-full">
         <View
           className={cx(
-            'flex w-full flex-row items-center gap-2 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
+            'flex w-full flex-row items-center gap-2 rounded-xl border-[1px] border-white bg-white px-3 dark:border-black dark:bg-black',
           )}
         >
           <Ionicons name="search" size={24} color="gray" />
@@ -131,7 +130,7 @@ export default function HomeIndex() {
       <View className="w-full">
         <ScrollView className="h-16" horizontal>
           <TouchableOpacity
-            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 dark:bg-black"
             onPress={() => router.push('./attendance')}
           >
             <MaterialIcons name="timer" size={24} color="#34d399" />
@@ -139,7 +138,7 @@ export default function HomeIndex() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 dark:bg-black"
             onPress={() => router.push('./dayoff/add')}
           >
             <Fontisto name="parasol" size={20} color="#f0abfc" />
@@ -147,14 +146,14 @@ export default function HomeIndex() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900"
+            className="mr-2 flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 dark:bg-black"
             onPress={() => router.push('./dayoff/histories')}
           >
             <FontAwesome name="history" size={20} color="#2563eb" />
             <Text className="text-sm font-bold dark:text-white">휴가 내역</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg- flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-gray-50 px-5 py-3 dark:bg-gray-900">
+          <TouchableOpacity className="bg- flex h-12 flex-row items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 dark:bg-black">
             <MaterialIcons name="work" size={24} color="#6b7280" />
             <Text className="text-sm font-bold dark:text-white">근무 확인</Text>
           </TouchableOpacity>
@@ -182,10 +181,10 @@ export default function HomeIndex() {
                 )}
               </View>
 
-              <View className="w-full rounded-xl bg-gray-50 px-6 py-4 dark:bg-gray-900">
+              <View className="w-full rounded-xl bg-white px-6 py-4 dark:bg-black">
                 <View className="flex flex-col items-center gap-6">
                   {/* 출근 시간 */}
-                  <View className="w-full border-b-[1px] border-b-white dark:border-b-black">
+                  <View className="w-full border-b-[1px] border-b-gray-100 dark:border-b-gray-900">
                     <View className="flex h-12 flex-row items-center justify-between gap-4">
                       <View className="">
                         <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">출근 시간</Text>
@@ -208,7 +207,7 @@ export default function HomeIndex() {
                   </View>
 
                   {/* 목표 퇴근 시간 */}
-                  <View className="w-full border-b-[1px] border-b-white dark:border-b-black">
+                  <View className="w-full border-b-[1px] border-b-gray-100 dark:border-b-gray-900">
                     <View className="flex h-12 flex-row items-center justify-between gap-4">
                       <View className="flex flex-row items-center gap-3">
                         <Ionicons name="rocket" size={16} color="#10b981" />
@@ -231,7 +230,7 @@ export default function HomeIndex() {
 
                   {/* 퇴근 시간 or 남은 시간 */}
                   {today?.clockOutTime ? (
-                    <View className="w-full border-b-[1px] border-b-white dark:border-b-black">
+                    <View className="w-full border-b-[1px] border-b-gray-100 dark:border-b-gray-900">
                       <View className="flex h-12 flex-row items-center justify-between gap-4">
                         <View className="flex flex-row items-center gap-3">
                           <FontAwesome5 name="running" size={16} color={theme === 'light' ? 'black' : 'white'} />
@@ -248,7 +247,7 @@ export default function HomeIndex() {
                       </View>
                     </View>
                   ) : (
-                    <View className="w-full border-b-[1px] border-b-white dark:border-b-black">
+                    <View className="w-full border-b-[1px] border-b-gray-100 dark:border-b-gray-900">
                       <View className="flex h-12 flex-row items-center justify-between gap-4">
                         <View className="flex flex-row items-center gap-3">
                           <FontAwesome5 name="running" size={16} color={theme === 'light' ? 'black' : 'white'} />

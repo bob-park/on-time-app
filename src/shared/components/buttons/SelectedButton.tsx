@@ -17,7 +17,7 @@ export default function SelectedButton({ selected = false, label, onSelect }: Re
   return (
     <TouchableOpacity
       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-        'bg-gray-100 dark:bg-gray-800': !selected,
+        'bg-gray-200 dark:bg-gray-700': !selected,
         'bg-gray-700 dark:bg-gray-100': selected,
       })}
       disabled={selected}

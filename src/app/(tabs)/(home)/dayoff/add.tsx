@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DateTimePicker, { useDefaultClassNames, useDefaultStyles } from 'react-native-ui-datepicker';
+import DateTimePicker, { useDefaultClassNames } from 'react-native-ui-datepicker';
 
 import * as Device from 'expo-device';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome5, SimpleLineIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5 } from '@expo/vector-icons';
 
 import { useRequestDocument } from '@/domain/documents/queries/documents';
 import { useCreateVacation } from '@/domain/documents/queries/vacations';
@@ -76,7 +76,6 @@ export default function AddDayOff() {
   // hooks
   const router = useRouter();
   const defaultClassNames = useDefaultClassNames();
-  const defaultStyles = useDefaultStyles(theme);
 
   // useEffect
   useEffect(() => {
@@ -148,7 +147,7 @@ export default function AddDayOff() {
         <View className="mt-2 w-full">
           <View className="flex flex-col items-center justify-center gap-2">
             {/* 연차 */}
-            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4 dark:bg-gray-800">
+            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-white px-4 py-4 dark:bg-black">
               <View className="mx-4">
                 <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">전체 휴가</Text>
                 <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalLeaveDays}</Text>
@@ -174,7 +173,7 @@ export default function AddDayOff() {
             </View>
 
             {/* 보상 휴가 */}
-            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-gray-50 px-4 py-4 dark:bg-gray-800">
+            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-white px-4 py-4 dark:bg-black">
               <View className="mx-4">
                 <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">보상 휴가</Text>
                 <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalCompLeaveDays}</Text>
@@ -216,7 +215,7 @@ export default function AddDayOff() {
                   <View className="flex w-full flex-row items-center gap-3">
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationType !== 'GENERAL',
+                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'GENERAL',
                         'bg-gray-700 dark:bg-gray-100': vacationType === 'GENERAL',
                       })}
                       disabled={vacationType === 'GENERAL'}
@@ -233,7 +232,7 @@ export default function AddDayOff() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationType !== 'COMPENSATORY',
+                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'COMPENSATORY',
                         'bg-gray-700 dark:bg-gray-100': vacationType === 'COMPENSATORY',
                       })}
                       disabled={vacationType === 'COMPENSATORY'}
@@ -253,7 +252,7 @@ export default function AddDayOff() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationType !== 'OFFICIAL',
+                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'OFFICIAL',
                         'bg-gray-700 dark:bg-gray-100': vacationType === 'OFFICIAL',
                       })}
                       disabled={vacationType === 'OFFICIAL'}
@@ -280,7 +279,7 @@ export default function AddDayOff() {
                   <View className="flex w-full flex-row items-center gap-3">
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'all',
+                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'all',
                         'bg-gray-700 dark:bg-gray-100': vacationSubType === 'all',
                       })}
                       disabled={vacationSubType === 'all'}
@@ -297,7 +296,7 @@ export default function AddDayOff() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'AM_HALF_DAY_OFF',
+                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'AM_HALF_DAY_OFF',
                         'bg-gray-700 dark:bg-gray-100': vacationSubType === 'AM_HALF_DAY_OFF',
                       })}
                       disabled={vacationSubType === 'AM_HALF_DAY_OFF'}
@@ -314,7 +313,7 @@ export default function AddDayOff() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-100 dark:bg-gray-800': vacationSubType !== 'PM_HALF_DAY_OFF',
+                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'PM_HALF_DAY_OFF',
                         'bg-gray-700 dark:bg-gray-100': vacationSubType === 'PM_HALF_DAY_OFF',
                       })}
                       disabled={vacationSubType === 'PM_HALF_DAY_OFF'}
@@ -341,7 +340,7 @@ export default function AddDayOff() {
               </View>
               <View
                 className={cx(
-                  'flex w-full flex-row items-center justify-center gap-4 rounded-xl border-[1px] border-gray-50 bg-gray-50 px-3 dark:border-gray-900 dark:bg-gray-900',
+                  'flex w-full flex-row items-center justify-center gap-4 rounded-xl border-[1px] border-gray-50 bg-white px-3 dark:border-gray-900 dark:bg-black',
                 )}
               >
                 <TextInput
@@ -358,7 +357,7 @@ export default function AddDayOff() {
               </View>
             </View>
 
-            <View className="bg-blue mt-4 w-full rounded-xl bg-gray-50 p-3 dark:bg-gray-800">
+            <View className="bg-blue mt-4 w-full rounded-xl bg-white p-3 dark:bg-black">
               <DateTimePicker
                 classNames={{
                   ...defaultClassNames,

@@ -46,9 +46,9 @@ const VacationItem = ({
   mode = 'light',
 }: Readonly<{ vacation: DocumentVacation; mode?: 'light' | 'dark' }>) => {
   return (
-    <View className="relative mt-4 px-3">
+    <View className="relative mt-4 px-1">
       <View
-        className="flex w-full flex-row gap-3 rounded-2xl bg-gray-50 px-6 py-4 dark:bg-gray-900"
+        className="flex w-full flex-row gap-3 rounded-2xl bg-white px-6 py-4 dark:bg-black"
         style={{
           shadowColor: mode === 'light' ? '#000' : '#FFF',
           shadowOpacity: 0.15,
@@ -65,7 +65,6 @@ const VacationItem = ({
             </Text>
 
             <View className="flex w-full flex-row items-center gap-1">
-              <Text className="w-16 flex-none text-right text-xs text-gray-500 dark:text-gray-400">휴가일 : </Text>
               <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400">
                 <Text className="">{dayjs(vacation.startDate).format('YYYY-MM-DD (dd)')}</Text>
                 {dayjs(vacation.startDate).isBefore(vacation.endDate) && (
@@ -75,10 +74,7 @@ const VacationItem = ({
                   </>
                 )}
               </Text>
-            </View>
-            <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-16 flex-none text-right text-xs text-gray-500 dark:text-gray-400">휴가 사용일 : </Text>
-              <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400">
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
                 <Text className="">
                   <Text className="">{vacation.usedDays} 일</Text>
                 </Text>
@@ -118,7 +114,7 @@ export default function DayoffHistoriesPage() {
   newVacations.sort((o1, o2) => (dayjs(o1.startDate).isBefore(o2.startDate) ? 1 : -1));
 
   return (
-    <View className="flex size-full flex-col items-center pb-24">
+    <View className="flex size-full flex-col items-center">
       {/* headers */}
       <View className="w-full">
         <View className="flex flex-row items-center justify-between gap-4">
@@ -178,8 +174,9 @@ export default function DayoffHistoriesPage() {
           <FlashList
             className="w-full"
             data={newVacations}
+            showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <VacationItem vacation={item} mode={theme} />}
-            ListFooterComponent={newVacations.length > 0 ? <View className="h-2 w-full" /> : <NoVacation />}
+            ListFooterComponent={newVacations.length > 0 ? <View className="h-40 w-full" /> : <NoVacation />}
             onRefresh={() => reload()}
           />
         </SafeAreaView>

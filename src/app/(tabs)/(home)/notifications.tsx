@@ -2,6 +2,7 @@ import { useContext } from 'react';
 
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
+import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 
 import { Entypo } from '@expo/vector-icons';
@@ -22,7 +23,7 @@ const MessageItem = ({
   return (
     <View className="relative mt-4 px-3">
       <TouchableOpacity
-        className="flex flex-row items-center gap-3 rounded-2xl bg-gray-50 px-6 py-4 dark:bg-gray-900"
+        className="flex flex-row items-center gap-3 rounded-2xl bg-white px-6 py-4 dark:bg-black"
         style={{
           shadowColor: mode === 'light' ? '#000' : '#FFF',
           shadowOpacity: 0.15,
@@ -98,10 +99,10 @@ export default function NotificationsPage() {
   };
 
   return (
-    <View className="relative flex size-full flex-col items-center gap-4 bg-white dark:bg-black">
+    <View className="relative flex size-full flex-col items-center gap-2">
       {/* headers */}
-      <View className="absolute left-0 top-0 z-10 w-full bg-white/90 blur-md dark:bg-black/90">
-        <View className="flex flex-row items-center justify-between gap-4 pb-2">
+      <View className="w-full">
+        <View className="flex flex-row items-center justify-between gap-4">
           <View className="flex flex-row items-center gap-4">
             {/* backward */}
             <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
@@ -117,7 +118,7 @@ export default function NotificationsPage() {
           {/* clear action */}
           <View className="">
             <TouchableOpacity
-              className="h-10 w-20 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900"
+              className="h-10 w-20 items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-800"
               disabled={notifications.length === 0}
               onPress={() => {}}
             >
@@ -134,8 +135,7 @@ export default function NotificationsPage() {
           refreshing={isLoading}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={handleRead} />}
-          ListHeaderComponent={<View className="h-10 w-full" />}
-          ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
+          ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-20 w-full"></View>}
           onRefresh={() => refetch()}
         />
       </SafeAreaView>

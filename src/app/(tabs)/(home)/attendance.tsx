@@ -257,7 +257,7 @@ export default function Attendance() {
               <View className="flex flex-row items-center gap-3">
                 <TouchableOpacity
                   className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-100 dark:bg-gray-900': workType !== 'OFFICE',
+                    'bg-gray-200 dark:bg-gray-800': workType !== 'OFFICE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OFFICE',
                   })}
                   disabled={workType === 'OFFICE' || today?.status !== 'WAITING'}
@@ -288,7 +288,7 @@ export default function Attendance() {
 
                 <TouchableOpacity
                   className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-100 dark:bg-gray-900': workType !== 'OUTSIDE',
+                    'bg-gray-200 dark:bg-gray-800': workType !== 'OUTSIDE',
                     'bg-gray-700 dark:bg-gray-300': workType === 'OUTSIDE',
                   })}
                   disabled={workType === 'OUTSIDE' || today?.status !== 'WAITING'}
@@ -319,7 +319,7 @@ export default function Attendance() {
 
                 <TouchableOpacity
                   className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-100 dark:bg-gray-900': workType !== 'HOME',
+                    'bg-gray-200 dark:bg-gray-800': workType !== 'HOME',
                     'bg-gray-700 dark:bg-gray-300': workType === 'HOME',
                   })}
                   disabled={workType === 'HOME' || today?.status !== 'WAITING'}
