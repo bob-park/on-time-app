@@ -29,7 +29,7 @@ export function useUserNotification(
 
 export function useUserNotifications({ userUniqueId }: { userUniqueId?: string }) {
   const { data, isLoading } = useQuery<UserNotificationProvider[]>({
-    queryKey: ['users', userUniqueId, 'notifications'],
+    queryKey: ['users', userUniqueId, 'notifications', 'providers'],
     queryFn: () => getUserNotifications({ userUniqueId: userUniqueId || '' }),
     enabled: !!userUniqueId,
   });
