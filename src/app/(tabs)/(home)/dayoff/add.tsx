@@ -202,7 +202,7 @@ export default function AddDayOff() {
 
         {/* selected date picker */}
         <View className="mt-2 size-full">
-          <ScrollView className="h-full">
+          <ScrollView className="h-full" showsVerticalScrollIndicator={false}>
             {/* form */}
             <View className="mt-4 w-full">
               <View className="flex flex-col items-center gap-3">
