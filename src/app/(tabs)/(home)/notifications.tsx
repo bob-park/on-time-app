@@ -4,12 +4,11 @@ import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, MaterialIcons } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useNotificationHistories, useReadNotification } from '@/domain/notification/queries/userNotification';
 import dayjs from '@/shared/dayjs';
-import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
@@ -35,7 +34,13 @@ const MessageItem = ({
         <View className="flex-1">
           <View className="flex w-full flex-col items-center gap-1">
             <Text className="w-full text-lg font-semibold dark:text-white">{message.title}</Text>
-            <Text className="w-full text-sm text-gray-500 dark:text-gray-400">{message.contents}</Text>
+            <Text
+              className="w-full text-sm text-gray-500 dark:text-gray-400"
+              textBreakStrategy="balanced"
+              lineBreakStrategyIOS="hangul-word"
+            >
+              {message.contents}
+            </Text>
           </View>
         </View>
         <View className="w-16 flex-none">
@@ -93,28 +98,30 @@ export default function NotificationsPage() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center gap-4 bg-white dark:bg-black">
+    <View className="relative flex size-full flex-col items-center gap-4 bg-white dark:bg-black">
       {/* headers */}
-      <View className="w-full">
-        <View className="flex flex-row items-center gap-4">
-          {/* backward */}
-          <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
-            <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
-          </TouchableOpacity>
+      <View className="absolute left-0 top-0 z-10 w-full bg-white/90 blur-md dark:bg-black/90">
+        <View className="flex flex-row items-center justify-between gap-4 pb-2">
+          <View className="flex flex-row items-center gap-4">
+            {/* backward */}
+            <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
+              <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
+            </TouchableOpacity>
 
-          {/* today */}
-          <View className="flex flex-row items-end gap-1">
-            <Text className="text-xl font-bold dark:text-white">알림</Text>
+            {/* today */}
+            <View className="flex flex-row items-end gap-1">
+              <Text className="text-xl font-bold dark:text-white">알림</Text>
+            </View>
           </View>
 
           {/* clear action */}
-          <View className="absolute right-3 top-0">
+          <View className="">
             <TouchableOpacity
-              className="size-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-900"
+              className="h-10 w-20 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900"
               disabled={notifications.length === 0}
               onPress={() => {}}
             >
-              <MaterialIcons name="delete-outline" size={24} color={theme === 'light' ? 'black' : 'white'} />
+              <Text className="text-sm font-bold text-gray-900 dark:text-gray-100">모두 읽기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -127,6 +134,7 @@ export default function NotificationsPage() {
           refreshing={isLoading}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={handleRead} />}
+          ListHeaderComponent={<View className="h-10 w-full" />}
           ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
           onRefresh={() => refetch()}
         />

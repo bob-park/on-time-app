@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
+import DateTimePicker, { useDefaultClassNames, useDefaultStyles } from 'react-native-ui-datepicker';
 
 import * as Device from 'expo-device';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, SimpleLineIcons } from '@expo/vector-icons';
 
 import { useRequestDocument } from '@/domain/documents/queries/documents';
 import { useCreateVacation } from '@/domain/documents/queries/vacations';
@@ -75,6 +75,7 @@ export default function AddDayOff() {
 
   // hooks
   const router = useRouter();
+  const defaultClassNames = useDefaultClassNames();
   const defaultStyles = useDefaultStyles(theme);
 
   // useEffect
@@ -357,37 +358,46 @@ export default function AddDayOff() {
               </View>
             </View>
 
-            <View className="bg-blue mt-4 w-full border-b-[2px] border-gray-100">
+            <View className="bg-blue mt-4 w-full rounded-xl bg-gray-50 p-3 dark:bg-gray-800">
               <DateTimePicker
+                classNames={{
+                  ...defaultClassNames,
+                  today: 'bg-gray-200 dark:bg-gray-700 mx-[2px] rounded-full ',
+                  today_label: 'text-black dark:text-white',
+                  selected: 'bg-blue-500 mx-[2px] rounded-full',
+                  selected_label: 'text-white',
+                  range_fill: 'bg-gray-200 dark:bg-gray-700',
+                  range_start: 'bg-blue-500 mx-[2px] rounded-full',
+                  range_start_label: 'text-white',
+                  range_end: 'bg-blue-500 mx-[2px] rounded-full',
+                  range_end_label: 'text-white',
+                  outside_label: 'text-gray-300 dark:text-gray-600',
+                  weekday_label: 'text-black dark:text-white',
+                  day_label: 'text-black dark:text-white',
+                  year_selector_label: 'text-black dark:text-white font-bold',
+                  month_selector_label: 'text-black dark:text-white font-bold text-lg',
+                  button_next:
+                    'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
+                  button_prev:
+                    'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
+                }}
                 mode="range"
                 locale="ko"
+                showOutsideDays
+                disableYearPicker
+                disableMonthPicker
+                components={{
+                  IconNext: <FontAwesome5 name="angle-right" size={24} color={theme === 'light' ? 'black' : 'white'} />,
+                  IconPrev: <FontAwesome5 name="angle-left" size={24} color={theme === 'light' ? 'black' : 'white'} />,
+                }}
                 startDate={selectedDate.startDate}
                 endDate={selectedDate.endDate}
                 onChange={({ startDate, endDate }) =>
                   setSelectedDate({ startDate: dayjs(startDate).toDate(), endDate: dayjs(endDate).toDate() })
                 }
-                styles={{
-                  ...defaultStyles,
-                  today: {
-                    backgroundColor: theme === 'light' ? 'white' : 'black',
-                    borderColor: '#2563eb',
-                    borderWidth: 1,
-                    borderRadius: '100%',
-                  },
-                  selected: {
-                    backgroundColor: '#2563eb',
-                    borderRadius: '100%',
-                  },
-                  selected_label: { color: 'white', backgroundColor: '#2563eb' },
-                  range_start_label: {
-                    color: 'white',
-                  },
-                  range_end_label: {
-                    color: 'white',
-                  },
-                }}
               />
             </View>
+            <View className="h-[60px] w-full"></View>
           </ScrollView>
         </View>
       </View>
