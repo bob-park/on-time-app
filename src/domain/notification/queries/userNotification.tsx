@@ -67,7 +67,28 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
     onSuccess: (data) => {
       onSuccess && onSuccess(data);
 
-      queryClient.invalidateQueries({ queryKey: ['users', userDetail?.uniqueId, 'notifications'] });
+      const prevInfinitePages = queryClient.getQueryData<InfiniteData<Page<UserNotificationHistory>>>([
+        'users',
+        userDetail?.uniqueId,
+        'notifications',
+      ]);
+
+      const newPages = prevInfinitePages?.pages.map((page) => {
+        const newContent = page.content.map((item) => (item.id === data.id ? { ...data } : item));
+
+        return {
+          ...page,
+          content: newContent,
+        };
+      });
+
+      queryClient.setQueryData<InfiniteData<Page<UserNotificationHistory>>>(
+        ['users', userDetail?.uniqueId, 'notifications'],
+        {
+          pages: newPages || [],
+          pageParams: prevInfinitePages?.pageParams || [],
+        },
+      );
     },
   });
 
@@ -78,7 +99,7 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
   // context
   const { accessToken, userDetail } = useContext(AuthContext);
 
-  const { data, isLoading, fetchNextPage, refetch } = useInfiniteQuery<
+  const { data, isLoading, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery<
     Page<UserNotificationHistory>,
     unknown,
     InfiniteData<Page<UserNotificationHistory>>,
@@ -86,15 +107,15 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
     PageRequest
   >({
     enabled: !!userDetail?.uniqueId,
-    queryKey: ['users', userDetail?.uniqueId, 'notifications', params],
+    queryKey: ['users', userDetail?.uniqueId, 'notifications'],
     queryFn: async ({ pageParam }) =>
-      searchHistories(accessToken, { ...params, userUniqueId: userDetail?.uniqueId || '' }),
+      searchHistories(accessToken, { ...params, ...pageParam, userUniqueId: userDetail?.uniqueId || '' }),
     initialPageParam: {
       size: 25,
       page: 0,
     },
     getNextPageParam: (lastPage, allPages) => {
-      let totalPage = Math.ceil(lastPage.total / lastPage.pageable.pageSize);
+      let totalPage = Math.floor(lastPage.total / lastPage.pageable.pageSize);
 
       if (lastPage.total % lastPage.pageable.pageSize > 0) {
         totalPage = totalPage + 1;
@@ -106,7 +127,7 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
       };
       const nextPage = page.page + 1;
 
-      if (nextPage > totalPage) {
+      if (nextPage > totalPage - 1) {
         return null;
       }
 
@@ -119,5 +140,11 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
     gcTime: 5 * 60 * 1_000,
   });
 
-  return { pages: data?.pages || ([] as Page<UserNotificationHistory>[]), isLoading, fetchNextPage, refetch };
+  return {
+    pages: data?.pages || ([] as Page<UserNotificationHistory>[]),
+    isLoading,
+    refetch,
+    hasNextPage,
+    fetchNextPage,
+  };
 }

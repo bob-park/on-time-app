@@ -75,6 +75,8 @@ export async function searchHistories(
     isRead?: boolean;
   } & PageRequest,
 ) {
+  console.log('get notifications');
+
   return api
     .get(`api/v1/users/${userUniqueId}/notifications/histories`, {
       headers: generateAuthHeader(accessToken),

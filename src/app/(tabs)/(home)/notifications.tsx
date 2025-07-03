@@ -2,7 +2,6 @@ import { useContext } from 'react';
 
 import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 
-import { BlurView } from 'expo-blur';
 import { useRouter } from 'expo-router';
 
 import { Entypo } from '@expo/vector-icons';
@@ -87,7 +86,7 @@ export default function NotificationsPage() {
 
   // queries
   const { read } = useReadNotification({});
-  const { pages, refetch, isLoading } = useNotificationHistories({ page: 0, size: 25 });
+  const { pages, refetch, isLoading, hasNextPage, fetchNextPage } = useNotificationHistories({ page: 0, size: 25 });
   const notifications = pages.reduce(
     (current, value) => current.concat(value.content),
     [] as UserNotificationHistory[],
@@ -96,6 +95,10 @@ export default function NotificationsPage() {
   // handle
   const handleRead = (id: string) => {
     read(id);
+  };
+
+  const handleAllRead = () => {
+    notifications.filter((item) => !item.isRead).forEach((item) => read(item.id));
   };
 
   return (
@@ -120,7 +123,7 @@ export default function NotificationsPage() {
             <TouchableOpacity
               className="h-10 w-20 items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-800"
               disabled={notifications.length === 0}
-              onPress={() => {}}
+              onPress={handleAllRead}
             >
               <Text className="text-sm font-bold text-gray-900 dark:text-gray-100">모두 읽기</Text>
             </TouchableOpacity>
@@ -137,6 +140,7 @@ export default function NotificationsPage() {
           renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={handleRead} />}
           ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-20 w-full"></View>}
           onRefresh={() => refetch()}
+          onEndReached={() => hasNextPage && fetchNextPage()}
         />
       </SafeAreaView>
     </View>
