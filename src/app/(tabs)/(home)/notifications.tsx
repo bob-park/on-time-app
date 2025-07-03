@@ -125,6 +125,7 @@ export default function NotificationsPage() {
           className="w-full"
           data={notifications}
           refreshing={isLoading}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => <MessageItem mode={theme} message={item} onRead={handleRead} />}
           ListFooterComponent={notifications.length === 0 ? <NoMessage /> : <View className="h-2 w-full"></View>}
           onRefresh={() => refetch()}
