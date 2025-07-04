@@ -2,7 +2,7 @@
   "expo": {
     "name": "On Time",
     "slug": "on-time-app",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ontime",
