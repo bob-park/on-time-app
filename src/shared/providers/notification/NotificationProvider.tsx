@@ -73,10 +73,20 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       },
     },
   );
-  const { refetch } = useNotificationHistories({ page: 0, size: 25 });
+  const { pages, refetch } = useNotificationHistories({ page: 0, size: 25 });
+  const notifications = pages.reduce(
+    (current, value) => current.concat(value.content),
+    [] as UserNotificationHistory[],
+  );
 
   // useEffect
-  useEffect(() => {}, []);
+  useEffect(() => {
+    async function setBadgeCount(count: number) {
+      await Notifications.setBadgeCountAsync(count);
+    }
+
+    setBadgeCount(notifications.filter((item) => !item.isRead).length);
+  }, [notifications]);
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then((data) => {
@@ -124,7 +134,13 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
       });
     }
 
-    const { status } = await Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.requestPermissionsAsync({
+      ios: {
+        allowBadge: true,
+        allowAlert: true,
+        allowSound: true,
+      },
+    });
 
     if (status !== 'granted') {
       return Linking.openSettings();
