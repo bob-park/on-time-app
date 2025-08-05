@@ -62,14 +62,14 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
   const { accessToken, userDetail } = useContext(AuthContext);
 
   const { mutate, isPending } = useMutation({
-    mutationKey: ['users', userDetail?.uniqueId, 'notifications', 'read'],
-    mutationFn: (historyId: string) => read(accessToken, { userUniqueId: userDetail?.uniqueId || '', historyId }),
+    mutationKey: ['users', userDetail?.id, 'notifications', 'read'],
+    mutationFn: (historyId: string) => read(accessToken, { userUniqueId: userDetail?.id || '', historyId }),
     onSuccess: (data) => {
       onSuccess && onSuccess(data);
 
       const prevInfinitePages = queryClient.getQueryData<InfiniteData<Page<UserNotificationHistory>>>([
         'users',
-        userDetail?.uniqueId,
+        userDetail?.id,
         'notifications',
       ]);
 
@@ -83,7 +83,7 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
       });
 
       queryClient.setQueryData<InfiniteData<Page<UserNotificationHistory>>>(
-        ['users', userDetail?.uniqueId, 'notifications'],
+        ['users', userDetail?.id, 'notifications'],
         {
           pages: newPages || [],
           pageParams: prevInfinitePages?.pageParams || [],
@@ -106,10 +106,10 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
     QueryKey,
     PageRequest
   >({
-    enabled: !!userDetail?.uniqueId,
-    queryKey: ['users', userDetail?.uniqueId, 'notifications'],
+    enabled: !!userDetail?.id,
+    queryKey: ['users', userDetail?.id, 'notifications'],
     queryFn: async ({ pageParam }) =>
-      searchHistories(accessToken, { ...params, ...pageParam, userUniqueId: userDetail?.uniqueId || '' }),
+      searchHistories(accessToken, { ...params, ...pageParam, userUniqueId: userDetail?.id || '' }),
     initialPageParam: {
       size: 25,
       page: 0,

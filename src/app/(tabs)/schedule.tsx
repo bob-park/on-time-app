@@ -311,7 +311,7 @@ export default function Schedule() {
               {
                 vacations.filter(
                   (vacation) =>
-                    vacation.userUniqueId === userDetail?.uniqueId &&
+                    vacation.userUniqueId === userDetail?.id &&
                     includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
                 ).length
               }
@@ -322,7 +322,7 @@ export default function Schedule() {
             {vacations
               .filter(
                 (vacation) =>
-                  vacation.userUniqueId === userDetail?.uniqueId &&
+                  vacation.userUniqueId === userDetail?.id &&
                   includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
               )
               .map((vacation) => (
@@ -369,7 +369,7 @@ export default function Schedule() {
               {
                 vacations.filter(
                   (vacation) =>
-                    vacation.userUniqueId !== userDetail?.uniqueId &&
+                    vacation.userUniqueId !== userDetail?.id &&
                     includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
                 ).length
               }
@@ -381,7 +381,7 @@ export default function Schedule() {
               className="w-full"
               data={vacations.filter(
                 (vacation) =>
-                  vacation.userUniqueId !== userDetail?.uniqueId &&
+                  vacation.userUniqueId !== userDetail?.id &&
                   includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
               )}
               renderItem={({ item, index }) => (
@@ -443,7 +443,7 @@ const ColleagueSchedule = ({
         </View>
         <View className="w-full">
           <Text className="w-full text-sm dark:text-gray-400">
-            <Text>{user?.team?.name}</Text>
+            <Text>{user?.group?.name}</Text>
             <Text> - </Text>
             <Text>{user?.position?.name || ''}</Text>
           </Text>

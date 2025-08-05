@@ -41,7 +41,7 @@ export default function AddDayOff() {
   const { showToast } = useContext(NotificationContext);
 
   // queries
-  const { leaveEntry } = useUserLeaveEntry({ uniqueId: userDetail?.uniqueId, year: dayjs().year() });
+  const { leaveEntry } = useUserLeaveEntry({ uniqueId: userDetail?.id, year: dayjs().year() });
   const { requestDocument } = useRequestDocument();
   const { createVacation, isLoading } = useCreateVacation({
     onSuccess: (data) => {
@@ -96,7 +96,7 @@ export default function AddDayOff() {
     }
 
     createVacation({
-      userUniqueId: userDetail?.uniqueId || '',
+      userUniqueId: userDetail?.id || '',
       vacationType,
       vacationSubType: vacationSubType === 'all' ? undefined : vacationSubType,
       startDate: dayjs(selectedDate.startDate).format('YYYY-MM-DD'),

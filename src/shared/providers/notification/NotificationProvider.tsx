@@ -66,7 +66,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   // queries
   const { createUserNotification } = useUserNotification(
-    { userUniqueId: userDetail?.uniqueId || '' },
+    { userUniqueId: userDetail?.id || '' },
     {
       onSuccess: (data) => {
         handleUpdateUserProviderId(data.id);

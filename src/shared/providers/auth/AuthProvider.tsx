@@ -71,7 +71,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       return;
     }
 
-    getUserDetail(user.uniqueId)
+    getUserDetail(user.id)
       .then((data: UserDetail) => {
         setUserDetail(data);
         console.log('logged in');
@@ -132,7 +132,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     Promise.all([
       SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
         if (data && user) {
-          await deleteUserNotificationProvider({ userUniqueId: user.uniqueId, userProviderId: data });
+          await deleteUserNotificationProvider({ userUniqueId: user.id, userProviderId: data });
         }
 
         SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);

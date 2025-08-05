@@ -1,11 +1,11 @@
 interface UserRoleDetail {
-  id: number;
+  id: string;
   type: UserRole;
   description?: string;
 }
 
 interface Team {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   isLeader: boolean;
@@ -13,17 +13,17 @@ interface Team {
 }
 
 interface Position {
-  id: number;
+  id: string;
   name: string;
 }
 
 interface UserDetail {
-  uniqueId: string;
+  id: string;
   userId: string;
   username: string;
   role: UserRoleDetail;
   email?: string;
-  team?: Team;
+  group?: Team;
   position?: Position;
 }
 

@@ -24,7 +24,7 @@ export default function MoreIndex() {
   const router = useRouter();
 
   // queries
-  const { employment } = useUserEmployment(user?.uniqueId);
+  const { employment } = useUserEmployment(user?.id);
 
   // handle
   const handleLogout = () => {
@@ -39,7 +39,7 @@ export default function MoreIndex() {
           {/* avatar */}
           <View className="w-28 flex-none p-3">
             <UserAvatar
-              src={`${DEFAULT_API_HOST}/api/v1/users/${user?.uniqueId}/avatar`}
+              src={`${DEFAULT_API_HOST}/api/v1/users/${user?.id}/avatar`}
               username={user?.username}
               size="base"
             />
@@ -55,9 +55,9 @@ export default function MoreIndex() {
 
               <View className="flex w-full flex-row items-center gap-1">
                 <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{user?.position?.name}</Text>
-                {user?.team?.teamUserDescription && (
+                {user?.group?.teamUserDescription && (
                   <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                    ({user?.team?.teamUserDescription})
+                    ({user?.group?.teamUserDescription})
                   </Text>
                 )}
               </View>
@@ -65,7 +65,7 @@ export default function MoreIndex() {
               <View className="flex flex-row items-center gap-3">
                 {/* team - position */}
                 <View className="flex flex-row items-center gap-1">
-                  <Text className="font-semibold text-gray-500 dark:text-gray-400">{user?.team?.name}</Text>
+                  <Text className="font-semibold text-gray-500 dark:text-gray-400">{user?.group?.name}</Text>
                   <Text className="font-semibold text-gray-500 dark:text-gray-400">
                     <Text className="">| </Text>
                     <Text className="">

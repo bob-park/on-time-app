@@ -16,7 +16,7 @@ export function useTodayAttendance() {
     queryKey: ['attendances', now],
     queryFn: () =>
       getAttendanceRecords(accessToken || '', {
-        userUniqueId: userDetail?.uniqueId || '',
+        userUniqueId: userDetail?.id || '',
         startDate: now,
         endDate: now,
       }).then((data) => data[0]),
@@ -42,7 +42,7 @@ export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
       workType: AttendanceWorkType;
       latitude: number;
       longitude: number;
-    }) => clockIn(accessToken, { userUniqueId: userDetail?.uniqueId || '', workType, latitude, longitude }),
+    }) => clockIn(accessToken, { userUniqueId: userDetail?.id || '', workType, latitude, longitude }),
     onSuccess: (data) => {
       queryClient.setQueryData(['attendances', dayjs(data.workingDate).format('YYYY-MM-DD')], data);
 
@@ -69,7 +69,7 @@ export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
       attendanceRecordId: number;
       latitude: number;
       longitude: number;
-    }) => clockOut(accessToken, { userUniqueId: userDetail?.uniqueId || '', attendanceRecordId, latitude, longitude }),
+    }) => clockOut(accessToken, { userUniqueId: userDetail?.id || '', attendanceRecordId, latitude, longitude }),
     onSuccess: (data) => {
       queryClient.setQueryData(['attendances', dayjs(data.workingDate).format('YYYY-MM-DD')], data);
 

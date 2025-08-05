@@ -1,7 +1,7 @@
 type UserRole = 'ROLE_ADMIN' | 'ROLE_MANAGER' | 'ROLE_USER';
 
 interface User {
-  uniqueId: string;
+  id: string;
   userId: string;
   username: string;
   role: UserRole;

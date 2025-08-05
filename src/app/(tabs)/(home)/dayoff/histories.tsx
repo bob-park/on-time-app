@@ -97,7 +97,7 @@ export default function DayoffHistoriesPage() {
 
   // query
   const { vacations, reload } = useVacations({
-    userUniqueId: userDetail?.uniqueId,
+    userUniqueId: userDetail?.id,
     startDateFrom: dayjs().startOf('year').toDate(),
     endDateFrom: dayjs().endOf('year').toDate(),
     status: 'APPROVED',

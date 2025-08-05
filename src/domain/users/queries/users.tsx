@@ -21,7 +21,7 @@ export function useUserLeaveEntry({ uniqueId, year }: { uniqueId?: string; year:
 
   const { data, isLoading } = useQuery<UserLeaveEntry>({
     queryKey: ['users', uniqueId, 'leave', 'entries', year],
-    queryFn: () => getUserLeaveEntry(accessToken, { uniqueId: uniqueId || '', year }),
+    queryFn: () => getUserLeaveEntry(accessToken, { id: uniqueId || '', year }),
     enabled: !!uniqueId,
   });
 

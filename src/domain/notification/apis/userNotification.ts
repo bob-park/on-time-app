@@ -57,7 +57,7 @@ export async function read(
   },
 ) {
   return api
-    .post(`api/v1/users/${userUniqueId}/notifications/histories/${historyId}/read`, {
+    .post(`api/v1/users/${userUniqueId}/notification/histories/${historyId}/read`, {
       headers: generateAuthHeader(accessToken),
     })
     .json<UserNotificationHistory>();
@@ -76,7 +76,7 @@ export async function searchHistories(
   } & PageRequest,
 ) {
   return api
-    .get(`api/v1/users/${userUniqueId}/notifications/histories`, {
+    .get(`api/v1/users/${userUniqueId}/notification/histories`, {
       headers: generateAuthHeader(accessToken),
       searchParams: {
         isRead: isRead || '',

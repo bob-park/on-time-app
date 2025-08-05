@@ -49,8 +49,8 @@ export default function NotificationSettings() {
   const router = useRouter();
 
   // queries
-  const { notificationProviders } = useUserNotifications({ userUniqueId: userDetail?.uniqueId });
-  const { updateProvider } = useUpdateUserNotification({ userUniqueId: userDetail?.uniqueId || '' }, {});
+  const { notificationProviders } = useUserNotifications({ userUniqueId: userDetail?.id });
+  const { updateProvider } = useUpdateUserNotification({ userUniqueId: userDetail?.id || '' }, {});
 
   // handle
   const handleUpdateEnabled = ({ providerId, enabled }: { providerId: string; enabled: boolean }) => {
