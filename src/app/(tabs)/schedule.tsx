@@ -167,8 +167,6 @@ export default function Schedule() {
     } else if (position === 2) {
       handleNextWeeks();
     }
-
-    position !== 1 && ref.current.setPageWithoutAnimation(1);
   };
 
   const handlePrevWeeks = () => {
@@ -241,8 +239,13 @@ export default function Schedule() {
               ref={ref}
               initialPage={1}
               layoutDirection="ltr"
-              pageMargin={10}
+              pageMargin={3}
               orientation="horizontal"
+              onPageScrollStateChanged={(e) => {
+                if (e.nativeEvent.pageScrollState === 'idle') {
+                  ref.current.setPageWithoutAnimation(1);
+                }
+              }}
               onPageSelected={(e) => handlePageSelected(e.nativeEvent)}
             >
               {useMemo(
