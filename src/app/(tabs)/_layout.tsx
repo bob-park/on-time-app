@@ -1,11 +1,11 @@
-import { useContext, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { Animated, Pressable, Text, View } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
 import * as Haptics from 'expo-haptics';
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
 
@@ -14,7 +14,33 @@ import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import cx from 'classnames';
 
 function AnimatedTabBarButton({ children, onPress, style, ...restProps }: BottomTabBarButtonProps) {
+  // state
+  const [pressCount, setPressCount] = useState<number>(0);
+
+  // ref
   const scaleValue = useRef(new Animated.Value(1)).current;
+
+  // hooks
+  const router = useRouter();
+
+  console.log('pressCount', pressCount);
+
+  // useEffect
+  useEffect(() => {
+    if (pressCount > 4) {
+      router.push('/magical-conch');
+      setPressCount(0);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setPressCount(0);
+    }, 3_000);
+
+    return () => {
+      timeoutId && clearTimeout(timeoutId);
+    };
+  }, [pressCount]);
 
   // handle
   const handlePressOut = () => {
@@ -37,6 +63,7 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
       onPress={(e) => {
         onPress && onPress(e);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+        setPressCount(pressCount + 1);
       }}
       onPressOut={handlePressOut}
       style={[style]}
@@ -131,6 +158,7 @@ export default function TabLayout() {
               ),
           }}
         />
+        <Tabs.Screen name="magical-conch" options={{ href: null }} />
       </Tabs>
     </View>
   );
