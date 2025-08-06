@@ -5856,6 +5856,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-audio@npm:~0.4.8":
+  version: 0.4.8
+  resolution: "expo-audio@npm:0.4.8"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/23c16252856a7f32b3b707ee566ec2b0c9fb0324f2bf785e752174b8104b5850ce16de3f94723b6c84c2b86dfd3ae5e98aa885c4d2ac67d59382e13560ae325c
+  languageName: node
+  linkType: hard
+
 "expo-auth-session@npm:~6.2.0":
   version: 6.2.0
   resolution: "expo-auth-session@npm:6.2.0"
@@ -9666,6 +9677,7 @@ __metadata:
     classnames: "npm:^2.5.1"
     dayjs: "npm:^1.11.13"
     expo: "npm:~53.0.10"
+    expo-audio: "npm:~0.4.8"
     expo-auth-session: "npm:~6.2.0"
     expo-blur: "npm:~14.1.4"
     expo-build-properties: "npm:~0.14.6"

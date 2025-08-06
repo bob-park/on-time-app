@@ -23,8 +23,6 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
   // hooks
   const router = useRouter();
 
-  console.log('pressCount', pressCount);
-
   // useEffect
   useEffect(() => {
     if (pressCount > 4) {
@@ -35,7 +33,7 @@ function AnimatedTabBarButton({ children, onPress, style, ...restProps }: Bottom
 
     const timeoutId = setTimeout(() => {
       setPressCount(0);
-    }, 3_000);
+    }, 1_000);
 
     return () => {
       timeoutId && clearTimeout(timeoutId);
