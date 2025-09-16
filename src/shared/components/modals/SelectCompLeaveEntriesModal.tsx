@@ -45,7 +45,7 @@ export default function SelectCompLeaveEntriesModal({
   const [selectedEntries, setSelectedEntries] = useState<UserCompLeaveEntry[]>([]);
 
   // query
-  const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.uniqueId });
+  const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.id });
 
   // handle
   const handleSelect = () => {

@@ -2,7 +2,7 @@
   "expo": {
     "name": "On Time",
     "slug": "on-time-app",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ontime",
@@ -14,7 +14,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.bobpark.ontimeapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
