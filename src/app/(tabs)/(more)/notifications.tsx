@@ -4,7 +4,7 @@ import { Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useUpdateUserNotification, useUserNotifications } from '@/domain/notification/queries/userNotification';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -20,6 +20,10 @@ function parseNotificationType(type: NotificationType) {
       return 'SLACK';
     case 'SMTP':
       return '메일';
+    case 'FLOW':
+      return 'FLOW';
+    case 'FLOW_HOOKS':
+      return 'FLOW';
     default:
       return '';
   }
@@ -35,7 +39,7 @@ function parseNotificationIcon(type: NotificationType, theme: 'dark' | 'light') 
     case 'SMTP':
       return <MaterialIcons name="email" size={24} color={theme === 'light' ? 'black' : 'white'} />;
     default:
-      return '';
+      return <Ionicons name="notifications" size={24} color={theme === 'light' ? 'black' : 'white'} />;
   }
 }
 

@@ -1,4 +1,4 @@
-type NotificationType = 'IOS' | 'ANDROID' | 'SLACK' | 'SMTP';
+type NotificationType = 'IOS' | 'ANDROID' | 'SLACK' | 'SMTP' | 'FLOW' | 'FLOW_HOOKS';
 
 interface NotificationProvider {
   id: number;
