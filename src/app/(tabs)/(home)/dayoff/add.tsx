@@ -396,7 +396,7 @@ export default function AddDayOff() {
                 }
               />
             </View>
-            <View className="h-[60px] w-full"></View>
+            <View className="h-[150px] w-full"></View>
           </ScrollView>
         </View>
       </View>

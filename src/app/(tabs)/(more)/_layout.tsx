@@ -18,7 +18,7 @@ export default function MoreLayout() {
           contentStyle: {
             paddingLeft: 24,
             paddingRight: 24,
-            paddingTop: 12,
+            paddingTop: 68,
             paddingBottom: 12,
             backgroundColor: theme === 'light' ? '#f9fafb' : '#030712',
           },

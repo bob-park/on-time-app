@@ -115,7 +115,7 @@ export default function HomeIndex() {
         >
           <Ionicons name="search" size={24} color="gray" />
           <TextInput
-            className={cx('items-center text-sm dark:text-white', {
+            className={cx('w-full items-center text-sm dark:text-white', {
               'h-12': Device.osName !== 'iOS',
               'my-2 h-8': Device.osName === 'iOS',
             })}

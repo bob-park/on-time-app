@@ -6,6 +6,7 @@ import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
 import * as Haptics from 'expo-haptics';
 import { Tabs, useRouter } from 'expo-router';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { Ionicons, Octicons } from '@expo/vector-icons';
 
@@ -79,85 +80,23 @@ export default function TabLayout() {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <View className="relative size-full bg-gray-50 dark:bg-gray-950">
-      {/* header */}
-      <View className="mt-14 flex flex-col items-center justify-center gap-3"></View>
-
-      {/* tabs */}
-      <Tabs
-        backBehavior="history"
-        screenOptions={{
-          animation: 'fade',
-          headerShown: false,
-          tabBarButton: (props) => <AnimatedTabBarButton {...props} />,
-          tabBarStyle: {
-            borderTopColor: '#d1d5db',
-            borderStyle: 'solid',
-            borderTopWidth: 0.2,
-            backgroundColor: theme === 'light' ? '#fff' : '#000',
-          },
-          tabBarLabel: ({ focused, children }) => (
-            <Text
-              className={cx('text-xs', {
-                'font-semibold text-black dark:text-white': focused,
-                'text-gray-400 dark:text-gray-300': !focused,
-              })}
-            >
-              {children}
-            </Text>
-          ),
-        }}
-      >
-        <Tabs.Screen
-          name="(home)"
-          options={{
-            title: '오늘',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Ionicons name="calendar" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              ) : (
-                <Ionicons name="calendar-outline" size={24} color="gray" />
-              ),
-          }}
-        />
-        <Tabs.Screen
-          name="schedule"
-          options={{
-            title: '일정',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Ionicons name="menu" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              ) : (
-                <Ionicons name="menu-outline" size={24} color="gray" />
-              ),
-          }}
-        />
-        <Tabs.Screen
-          name="todo"
-          options={{
-            title: '할일',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Octicons name="check-circle-fill" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              ) : (
-                <Octicons name="check-circle" size={24} color="gray" />
-              ),
-          }}
-        />
-        <Tabs.Screen
-          name="(more)"
-          options={{
-            title: '더보기',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Ionicons name="grid" size={24} color={theme === 'light' ? 'black' : 'white'} />
-              ) : (
-                <Ionicons name="grid-outline" size={24} color="gray" />
-              ),
-          }}
-        />
-        <Tabs.Screen name="magical-conch" options={{ href: null }} />
-      </Tabs>
-    </View>
+    <NativeTabs backBehavior="history">
+      <NativeTabs.Trigger name="(home)">
+        <Label>오늘</Label>
+        <Icon sf="menubar.dock.rectangle" drawable="custom_android_drawable" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="schedule">
+        <Label>일정</Label>
+        <Icon sf="calendar" drawable="custom_android_drawable" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="todo">
+        <Label>할일</Label>
+        <Icon sf="checkmark.circle" drawable="custom_android_drawable" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(more)">
+        <Label>더보기</Label>
+        <Icon sf="circle.grid.2x2" drawable="custom_android_drawable" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

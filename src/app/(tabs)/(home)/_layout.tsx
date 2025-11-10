@@ -18,7 +18,7 @@ export default function HomeLayout() {
           contentStyle: {
             paddingLeft: 16,
             paddingRight: 16,
-            paddingTop: 12,
+            paddingTop: 68,
             paddingBottom: 2,
             backgroundColor: theme === 'light' ? '#f9fafb' : '#030712',
           },

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { usePagerView } from 'react-native-pager-view';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import uuid from 'react-native-uuid';
@@ -205,7 +205,7 @@ export default function Schedule() {
   };
 
   return (
-    <View className="flex size-full flex-col items-center bg-gray-50 px-4 pb-[360px] pt-2 dark:bg-gray-950">
+    <View className="pt-142 flex size-full flex-col items-center bg-gray-50 px-4 pb-[360px] pt-14 dark:bg-gray-950">
       {/* headers */}
       <View className="mt-3 w-full px-2">
         <View className="flex flex-row items-center justify-between gap-4">
@@ -229,9 +229,9 @@ export default function Schedule() {
       </View>
 
       {/* weeks */}
-      <SafeAreaView className="mt-5 h-28 w-full">
+      <View className="mt-5 h-28 w-full">
         <View className="h-24">
-          <SafeAreaView className="" style={{ flex: 1 }}>
+          <View className="" style={{ flex: 1 }}>
             <AnimatedPagerView
               {...rest}
               className="h-full"
@@ -243,7 +243,7 @@ export default function Schedule() {
               orientation="horizontal"
               onPageScrollStateChanged={(e) => {
                 if (e.nativeEvent.pageScrollState === 'idle') {
-                  ref.current.setPageWithoutAnimation(1);
+                  ref.current?.setPageWithoutAnimation(1);
                 }
               }}
               onPageSelected={(e) => handlePageSelected(e.nativeEvent)}
@@ -296,13 +296,13 @@ export default function Schedule() {
                 [weeks, selectedDate, vacations],
               )}
             </AnimatedPagerView>
-          </SafeAreaView>
+          </View>
         </View>
 
         <View className="absolute bottom-0 flex w-full flex-col items-center justify-center gap-3">
           <View className="h-[6px] w-24 rounded-2xl bg-gray-200"></View>
         </View>
-      </SafeAreaView>
+      </View>
 
       {/* 일정 */}
       <View className="mt-3 flex size-full flex-col items-center gap-2">
@@ -379,7 +379,7 @@ export default function Schedule() {
             </Text>
           </View>
 
-          <SafeAreaView className="size-full">
+          <View className="size-full">
             <FlashList
               className="w-full"
               data={vacations.filter(
@@ -398,7 +398,7 @@ export default function Schedule() {
               )}
               onRefresh={() => {}}
             />
-          </SafeAreaView>
+          </View>
         </View>
       </View>
     </View>
