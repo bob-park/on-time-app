@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -131,7 +131,7 @@ export default function NotificationsPage() {
         </View>
       </View>
 
-      <SafeAreaView className="size-full">
+      <View className="size-full">
         <FlashList
           className="w-full"
           data={notifications}
@@ -142,7 +142,9 @@ export default function NotificationsPage() {
           onRefresh={() => refetch()}
           onEndReached={() => hasNextPage && fetchNextPage()}
         />
-      </SafeAreaView>
+
+        <View className="h-24 w-full" />
+      </View>
     </View>
   );
 }

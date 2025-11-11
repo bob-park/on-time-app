@@ -1,7 +1,5 @@
 import { useContext } from 'react';
 
-import 'react-native-reanimated';
-
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 

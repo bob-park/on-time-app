@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 
-import { SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -170,7 +170,7 @@ export default function DayoffHistoriesPage() {
           </View>
         </View>
 
-        <SafeAreaView className="size-full">
+        <View className="size-full">
           <FlashList
             className="w-full"
             data={newVacations}
@@ -179,7 +179,9 @@ export default function DayoffHistoriesPage() {
             ListFooterComponent={newVacations.length > 0 ? <View className="h-40 w-full" /> : <NoVacation />}
             onRefresh={() => reload()}
           />
-        </SafeAreaView>
+
+          <View className="h-24 w-full" />
+        </View>
       </View>
     </View>
   );
