@@ -78,7 +78,7 @@ export default function TabLayout() {
   return (
     <NativeTabs
       backBehavior="history"
-      iconColor="#000000"
+      iconColor={theme === 'light' ? '#000000' : '#ffffff'}
       labelStyle={{
         default: { fontSize: 10 },
         selected: { fontSize: 10, fontWeight: '900' },
