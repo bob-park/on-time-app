@@ -1,18 +1,14 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
 import * as Haptics from 'expo-haptics';
-import { Tabs, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { Ionicons, Octicons } from '@expo/vector-icons';
-
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
-import cx from 'classnames';
 
 function AnimatedTabBarButton({ children, onPress, style, ...restProps }: BottomTabBarButtonProps) {
   // state
@@ -80,22 +76,49 @@ export default function TabLayout() {
   const { theme } = useContext(ThemeContext);
 
   return (
-    <NativeTabs backBehavior="history">
-      <NativeTabs.Trigger name="(home)">
+    <NativeTabs
+      backBehavior="history"
+      iconColor="#000000"
+      labelStyle={{
+        default: { fontSize: 10 },
+        selected: { fontSize: 10, fontWeight: '900' },
+      }}
+    >
+      <NativeTabs.Trigger
+        name="(home)"
+        options={{
+          icon: { sf: 'menubar.rectangle', drawable: 'custom_android_drawable' },
+          selectedIcon: { sf: 'menubar.dock.rectangle', drawable: 'custom_android_drawable' },
+        }}
+      >
         <Label>오늘</Label>
-        <Icon sf="menubar.dock.rectangle" drawable="custom_android_drawable" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="schedule">
+      <NativeTabs.Trigger
+        name="schedule"
+        options={{
+          icon: { sf: 'calendar', drawable: 'custom_android_drawable' },
+          selectedIcon: { sf: 'calendar.and.person', drawable: 'custom_android_drawable' },
+        }}
+      >
         <Label>일정</Label>
-        <Icon sf="calendar" drawable="custom_android_drawable" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="todo">
+      <NativeTabs.Trigger
+        name="todo"
+        options={{
+          icon: { sf: 'checkmark.circle', drawable: 'custom_android_drawable' },
+          selectedIcon: { sf: 'checkmark.circle.fill', drawable: 'custom_android_drawable' },
+        }}
+      >
         <Label>할일</Label>
-        <Icon sf="checkmark.circle" drawable="custom_android_drawable" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(more)">
+      <NativeTabs.Trigger
+        name="(more)"
+        options={{
+          icon: { sf: 'circle.grid.2x2', drawable: 'custom_android_drawable' },
+          selectedIcon: { sf: 'circle.grid.2x2.fill', drawable: 'custom_android_drawable' },
+        }}
+      >
         <Label>더보기</Label>
-        <Icon sf="circle.grid.2x2" drawable="custom_android_drawable" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );
