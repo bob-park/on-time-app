@@ -9,5 +9,8 @@ interface User {
 
 interface UserInfo {
   sub: string;
-  profile: User;
+  userId: string;
+  name: string;
+  email: string;
+  role: UserRole;
 }

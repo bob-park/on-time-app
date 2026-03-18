@@ -33,7 +33,7 @@ export const redirectUri = makeRedirectUri({
   path: 'callback',
 });
 
-interface AuthContext {
+interface AuthContextProps {
   userDetail?: UserDetail;
   accessToken: string;
   refreshToken?: string;
@@ -42,7 +42,7 @@ interface AuthContext {
   onLogout: () => void;
 }
 
-export const AuthContext = createContext<AuthContext>({
+export const AuthContext = createContext<AuthContextProps>({
   accessToken: '',
   isLoggedIn: false,
   onLoggedIn: () => {},
@@ -100,10 +100,15 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
           throw new Error('unauthorized');
         }
 
-        return data.profile as User;
+        return data as UserInfo;
       })
-      .then(async (user) => {
-        setUser(user);
+      .then(async (userinfo) => {
+        setUser({
+          id: userinfo.sub,
+          userId: userinfo.userId,
+          username: userinfo.name,
+          role: userinfo.role,
+        });
         loadAuth();
       })
       .catch((err) => {
@@ -216,7 +221,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   };
 
   // memorize
-  const memorizeValue = useMemo<AuthContext>(
+  const memorizeValue = useMemo<AuthContextProps>(
     () => ({
       isLoggedIn,
       userDetail,
