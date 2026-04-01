@@ -1,6 +1,6 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Animated, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -316,11 +316,87 @@ function ActionCard({
   );
 }
 
+// Skeleton shimmer block
+function SkeletonBlock({ width, height, rounded = 8 }: { width: number | `${number}%`; height: number; rounded?: number }) {
+  const opacity = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, []);
+
+  return (
+    <Animated.View
+      className="bg-gray-200 dark:bg-gray-700"
+      style={{ width, height, borderRadius: rounded, opacity }}
+    />
+  );
+}
+
+// Skeleton for Hero Card area
+function HeroSkeleton() {
+  return (
+    <View
+      className="rounded-[20px] bg-gray-100 p-5 dark:bg-gray-800"
+      style={{ minHeight: 200 }}
+    >
+      <SkeletonBlock width={80} height={24} rounded={12} />
+      <View className="mt-4">
+        <SkeletonBlock width={160} height={16} />
+      </View>
+      <View className="mt-2">
+        <SkeletonBlock width={200} height={28} rounded={6} />
+      </View>
+      <View className="mt-5 flex-row gap-4">
+        <View>
+          <SkeletonBlock width={60} height={12} />
+          <View className="mt-1">
+            <SkeletonBlock width={90} height={16} />
+          </View>
+        </View>
+        <View>
+          <SkeletonBlock width={60} height={12} />
+          <View className="mt-1">
+            <SkeletonBlock width={90} height={16} />
+          </View>
+        </View>
+      </View>
+      <View className="mt-5">
+        <SkeletonBlock width="100%" height={48} rounded={16} />
+      </View>
+    </View>
+  );
+}
+
+// Skeleton for Action Card
+function ActionCardSkeleton() {
+  return (
+    <View
+      className="flex-1 rounded-2xl bg-white p-3.5 dark:bg-gray-900"
+      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 }}
+    >
+      <SkeletonBlock width={36} height={36} rounded={8} />
+      <View className="mt-2">
+        <SkeletonBlock width={60} height={14} />
+      </View>
+      <View className="mt-1">
+        <SkeletonBlock width={80} height={12} />
+      </View>
+    </View>
+  );
+}
+
 export default function HomeIndex() {
   const { theme } = useContext(ThemeContext);
   const router = useRouter();
 
-  const { today, reloadToday } = useTodayAttendance();
+  const { today, isLoading, reloadToday } = useTodayAttendance();
   const { pages } = useNotificationHistories({ page: 0, size: 25 });
   const notifications = pages.reduce(
     (current, value) => current.concat(value.content),
@@ -383,44 +459,65 @@ export default function HomeIndex() {
 
       {/* Hero Card */}
       <View className="mx-4 mt-3">
-        {workState === 'before' && <HeroBeforeWork today={today} />}
-        {workState === 'working' && <HeroWorking today={today} remainingTime={remainingTime} />}
-        {workState === 'overtime' && <HeroOvertime today={today} remainingTime={remainingTime} />}
-        {workState === 'done' && <HeroDone today={today} />}
+        {isLoading && !today ? (
+          <HeroSkeleton />
+        ) : (
+          <>
+            {workState === 'before' && <HeroBeforeWork today={today} />}
+            {workState === 'working' && <HeroWorking today={today} remainingTime={remainingTime} />}
+            {workState === 'overtime' && <HeroOvertime today={today} remainingTime={remainingTime} />}
+            {workState === 'done' && <HeroDone today={today} />}
+          </>
+        )}
       </View>
 
       {/* Action Grid 2x2 */}
       <View className="mx-4 mt-3 flex-row gap-2.5">
-        <View className="flex-1 gap-2.5">
-          <ActionCard
-            icon={<MaterialCommunityIcons name="calendar-plus" size={18} color="#1A7A3A" />}
-            iconBg="#E8F8F0"
-            label="휴가 신청"
-            sub="연차·반차 신청"
-            onPress={() => router.push('./dayoff/add')}
-          />
-          <ActionCard
-            icon={<MaterialCommunityIcons name="file-document-outline" size={18} color="#7A00B0" />}
-            iconBg="#FEE8FF"
-            label="휴가 내역"
-            sub="사용·잔여 내역"
-            onPress={() => router.push('./dayoff/histories')}
-          />
-        </View>
-        <View className="flex-1 gap-2.5">
-          <ActionCard
-            icon={<MaterialCommunityIcons name="clock-outline" size={18} color="#0048B0" />}
-            iconBg="#E5F0FF"
-            label="근무 확인"
-            sub="이번 달 현황"
-          />
-          <ActionCard
-            icon={<MaterialIcons name="person-outline" size={18} color="#48484A" />}
-            iconBg="#F2F2F7"
-            label="내 정보"
-            sub="프로필·설정"
-          />
-        </View>
+        {isLoading && !today ? (
+          <>
+            <View className="flex-1 gap-2.5">
+              <ActionCardSkeleton />
+              <ActionCardSkeleton />
+            </View>
+            <View className="flex-1 gap-2.5">
+              <ActionCardSkeleton />
+              <ActionCardSkeleton />
+            </View>
+          </>
+        ) : (
+          <>
+            <View className="flex-1 gap-2.5">
+              <ActionCard
+                icon={<MaterialCommunityIcons name="calendar-plus" size={18} color="#1A7A3A" />}
+                iconBg="#E8F8F0"
+                label="휴가 신청"
+                sub="연차·반차 신청"
+                onPress={() => router.push('./dayoff/add')}
+              />
+              <ActionCard
+                icon={<MaterialCommunityIcons name="file-document-outline" size={18} color="#7A00B0" />}
+                iconBg="#FEE8FF"
+                label="휴가 내역"
+                sub="사용·잔여 내역"
+                onPress={() => router.push('./dayoff/histories')}
+              />
+            </View>
+            <View className="flex-1 gap-2.5">
+              <ActionCard
+                icon={<MaterialCommunityIcons name="clock-outline" size={18} color="#0048B0" />}
+                iconBg="#E5F0FF"
+                label="근무 확인"
+                sub="이번 달 현황"
+              />
+              <ActionCard
+                icon={<MaterialIcons name="person-outline" size={18} color="#48484A" />}
+                iconBg="#F2F2F7"
+                label="내 정보"
+                sub="프로필·설정"
+              />
+            </View>
+          </>
+        )}
       </View>
     </ScrollView>
   );
