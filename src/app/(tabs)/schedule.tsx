@@ -1,15 +1,14 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Text, TouchableOpacity, View } from 'react-native';
 import { usePagerView } from 'react-native-pager-view';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import uuid from 'react-native-uuid';
 
-import { Icon } from '@/shared/components/Icon';
-
 import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
+import { Icon } from '@/shared/components/Icon';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -137,6 +136,9 @@ const defaultWeeks = [
 ];
 
 export default function Schedule() {
+  // ref
+  const changePageRef = useRef<number>(1);
+
   // context
   const { userDetail } = useContext(AuthContext);
 
@@ -243,11 +245,23 @@ export default function Schedule() {
               pageMargin={3}
               orientation="horizontal"
               onPageScrollStateChanged={(e) => {
-                if (e.nativeEvent.pageScrollState === 'idle') {
-                  ref.current?.setPageWithoutAnimation(1);
+                if (e.nativeEvent.pageScrollState !== 'idle') {
+                  return;
+                }
+
+                ref.current?.setPageWithoutAnimation(1);
+
+                if (changePageRef.current === 0) {
+                  handlePrevWeeks();
+                }
+
+                if (changePageRef.current === 2) {
+                  handleNextWeeks();
                 }
               }}
-              onPageSelected={(e) => handlePageSelected(e.nativeEvent)}
+              onPageSelected={(e) => {
+                changePageRef.current = e.nativeEvent.position;
+              }}
             >
               {useMemo(
                 () =>
