@@ -83,7 +83,7 @@ export default function MoreIndex() {
       </View>
 
       {/* menu */}
-      <View className="sise-full mt-4">
+      <View className="size-full mt-4">
         <ScrollView className="size-full" contentContainerStyle={{ paddingBottom: 112 }}>
           {/* 계정 */}
           <View className="">
