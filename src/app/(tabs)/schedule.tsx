@@ -5,7 +5,7 @@ import { usePagerView } from 'react-native-pager-view';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import uuid from 'react-native-uuid';
 
-import { Fontisto, Octicons } from '@expo/vector-icons';
+import { Icon } from '@/shared/components/Icon';
 
 import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
@@ -105,8 +105,9 @@ const WeekDayItem = ({
       </Text>
       <View className="-mt-1 h-3 w-full items-center justify-center">
         {todo && (
-          <Octicons
-            name="dot-fill"
+          <Icon
+            sf="circle.fill"
+            fallback="•"
             size={10}
             color={theme === 'light' ? (today ? 'white' : 'black') : today ? 'black' : 'white'}
           />
@@ -334,7 +335,7 @@ export default function Schedule() {
                   className="m-2 flex w-full flex-row items-center justify-center gap-3"
                 >
                   <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-violet-500">
-                    <Fontisto name="parasol" size={24} color="white" />
+                    <Icon sf="umbrella.fill" fallback="☂" size={24} color="white" />
                   </View>
 
                   <View className="flex flex-1 flex-col items-center gap-2">
