@@ -4,7 +4,7 @@ import { ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { Icon } from '@/shared/components/Icon';
 
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
@@ -12,6 +12,7 @@ import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
@@ -82,27 +83,21 @@ export default function MoreIndex() {
       </View>
 
       {/* menu */}
-      <View className="sise-full mt-4">
-        <ScrollView className="size-full">
+      <View className="size-full mt-4">
+        <ScrollView className="size-full" contentContainerStyle={{ paddingBottom: 112 }}>
           {/* 계정 */}
           <View className="">
             <Menu title="계정">
               <MenuItem
                 text="로그아웃"
-                icon={<MaterialIcons name="logout" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
+                icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={handleLogout}
               />
 
               <MenuItem
                 text="알림 설정"
                 move
-                icon={
-                  <MaterialIcons
-                    name="notifications-none"
-                    size={24}
-                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
-                  />
-                }
+                icon={<Icon sf="bell" fallback="🔔" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={() => router.push('./notifications')}
               />
             </Menu>
@@ -114,7 +109,7 @@ export default function MoreIndex() {
               <MenuItem
                 move
                 text="화면 테마"
-                icon={<Entypo name="light-up" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
+                icon={<Icon sf="sun.max" fallback="☀" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
                 onPress={() => router.push('./theme')}
               />
             </Menu>
@@ -126,25 +121,17 @@ export default function MoreIndex() {
               <MenuItem
                 move
                 text="공지사항"
-                icon={<FontAwesome6 name="newspaper" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
+                icon={<Icon sf="newspaper" fallback="📰" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
               />
               <MenuItem
                 move
                 text="근무"
-                icon={
-                  <MaterialCommunityIcons
-                    name="timer-outline"
-                    size={24}
-                    color={theme === 'light' ? '#6b7280' : '#d1d5db'}
-                  />
-                }
+                icon={<Icon sf="timer" fallback="⏱" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
               />
               <MenuItem
                 move
                 text="구성원"
-                icon={
-                  <MaterialIcons name="people-outline" size={24} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />
-                }
+                icon={<Icon sf="person.2" fallback="👥" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
               />
             </Menu>
           </View>

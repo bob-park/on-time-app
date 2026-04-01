@@ -392,7 +392,7 @@ export default function AddDayOff() {
                 startDate={selectedDate.startDate}
                 endDate={selectedDate.endDate}
                 onChange={({ startDate, endDate }) =>
-                  setSelectedDate({ startDate: dayjs(startDate).toDate(), endDate: dayjs(endDate).toDate() })
+                  setSelectedDate({ startDate: dayjs(startDate as string).toDate(), endDate: dayjs(endDate as string).toDate() })
                 }
               />
             </View>

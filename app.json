@@ -2,7 +2,7 @@
   "expo": {
     "name": "On Time",
     "slug": "on-time-app",
-    "version": "0.1.2",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ontime",
@@ -52,12 +52,7 @@
           "imageWidth": 200
         }
       ],
-      [
-        "expo-web-browser",
-        {
-          "experimentalLauncherActivity": true
-        }
-      ],
+      "expo-web-browser",
       [
         "expo-build-properties",
         {

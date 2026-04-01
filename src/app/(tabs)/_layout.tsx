@@ -1,80 +1,68 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext } from 'react';
 
-import { Animated, Pressable } from 'react-native';
+import { Platform } from 'react-native';
 
-import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import { Tabs } from 'expo-router';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
-function AnimatedTabBarButton({ children, onPress, style, ...restProps }: BottomTabBarButtonProps) {
-  // state
-  const [pressCount, setPressCount] = useState<number>(0);
-
-  // ref
-  const scaleValue = useRef(new Animated.Value(1)).current;
-
-  // hooks
-  const router = useRouter();
-
-  // useEffect
-  useEffect(() => {
-    if (pressCount > 4) {
-      router.push('/magical-conch');
-      setPressCount(0);
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      setPressCount(0);
-    }, 1_000);
-
-    return () => {
-      timeoutId && clearTimeout(timeoutId);
-    };
-  }, [pressCount]);
-
-  // handle
-  const handlePressOut = () => {
-    Animated.sequence([
-      Animated.spring(scaleValue, {
-        toValue: 1.2,
-        useNativeDriver: true,
-        speed: 200,
-      }),
-      Animated.spring(scaleValue, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 200,
-      }),
-    ]).start();
-  };
+function AndroidTabs({ theme }: { theme: string }) {
+  const iconColor = theme === 'light' ? '#000000' : '#ffffff';
 
   return (
-    <Pressable
-      onPress={(e) => {
-        onPress && onPress(e);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-        setPressCount(pressCount + 1);
+    <Tabs
+      backBehavior="history"
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: iconColor,
+        tabBarInactiveTintColor: theme === 'light' ? '#9ca3af' : '#6b7280',
+        tabBarLabelStyle: { fontSize: 10 },
       }}
-      onPressOut={handlePressOut}
-      style={[style]}
-      android_ripple={{ borderless: false, radius: 0 }}
     >
-      <Animated.View className="items-center justify-center" style={{ transform: [{ scale: scaleValue }] }}>
-        {children}
-      </Animated.View>
-    </Pressable>
+      <Tabs.Screen
+        name="(home)"
+        options={{
+          title: '오늘',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="schedule"
+        options={{
+          title: '일정',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="todo"
+        options={{
+          title: '할일',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'checkmark-circle' : 'checkmark-circle-outline'} size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(more)"
+        options={{
+          title: '더보기',
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons name={focused ? 'apps' : 'apps-outline'} size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
 
-export default function TabLayout() {
-  // context
-  const { theme } = useContext(ThemeContext);
-
+function IOSTabs({ theme }: { theme: string }) {
   return (
     <NativeTabs
       backBehavior="history"
@@ -84,42 +72,44 @@ export default function TabLayout() {
         selected: { fontSize: 10, fontWeight: '900' },
       }}
     >
-      <NativeTabs.Trigger
-        name="(home)"
-        options={{
-          icon: { sf: 'menubar.rectangle', drawable: 'custom_android_drawable' },
-          selectedIcon: { sf: 'menubar.dock.rectangle', drawable: 'custom_android_drawable' },
-        }}
-      >
-        <Label>오늘</Label>
+      <NativeTabs.Trigger name="(home)">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'menubar.rectangle', selected: 'menubar.dock.rectangle' }}
+          drawable="custom_android_drawable"
+        />
+        <NativeTabs.Trigger.Label>오늘</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger
-        name="schedule"
-        options={{
-          icon: { sf: 'calendar', drawable: 'custom_android_drawable' },
-          selectedIcon: { sf: 'calendar.and.person', drawable: 'custom_android_drawable' },
-        }}
-      >
-        <Label>일정</Label>
+      <NativeTabs.Trigger name="schedule">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'calendar', selected: 'calendar.and.person' }}
+          drawable="custom_android_drawable"
+        />
+        <NativeTabs.Trigger.Label>일정</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger
-        name="todo"
-        options={{
-          icon: { sf: 'checkmark.circle', drawable: 'custom_android_drawable' },
-          selectedIcon: { sf: 'checkmark.circle.fill', drawable: 'custom_android_drawable' },
-        }}
-      >
-        <Label>할일</Label>
+      <NativeTabs.Trigger name="todo">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'checkmark.circle', selected: 'checkmark.circle.fill' }}
+          drawable="custom_android_drawable"
+        />
+        <NativeTabs.Trigger.Label>할일</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger
-        name="(more)"
-        options={{
-          icon: { sf: 'circle.grid.2x2', drawable: 'custom_android_drawable' },
-          selectedIcon: { sf: 'circle.grid.2x2.fill', drawable: 'custom_android_drawable' },
-        }}
-      >
-        <Label>더보기</Label>
+      <NativeTabs.Trigger name="(more)">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'circle.grid.2x2', selected: 'circle.grid.2x2.fill' }}
+          drawable="custom_android_drawable"
+        />
+        <NativeTabs.Trigger.Label>더보기</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
+}
+
+export default function TabLayout() {
+  const { theme } = useContext(ThemeContext);
+
+  if (Platform.OS === 'ios') {
+    return <IOSTabs theme={theme} />;
+  }
+
+  return <AndroidTabs theme={theme} />;
 }
