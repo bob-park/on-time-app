@@ -62,3 +62,8 @@ build-*.apk
 
 ### google ###
 google-services.json
+
+
+### AI ###
+.gstack
+.claude
