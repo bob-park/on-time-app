@@ -1,9 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@/shared/components/Icon';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 const CARD_SHADOW = Platform.select({
   ios: {
