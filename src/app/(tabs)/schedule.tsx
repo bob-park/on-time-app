@@ -1,10 +1,11 @@
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useMemo, useRef, useState } from 'react';
 
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { usePagerView } from 'react-native-pager-view';
-import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
-import uuid from 'react-native-uuid';
 
+import { VACATION_COLORS } from '@/domain/documents/components/constants';
+import ScheduleEmptyState from '@/domain/documents/components/ScheduleEmptyState';
+import ScheduleSkeleton from '@/domain/documents/components/ScheduleSkeleton';
 import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
@@ -19,10 +20,11 @@ import cx from 'classnames';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
+// --- Utilities ---
+
 function includeDate(targetDate: Date, { startDate, endDate }: { startDate: Date; endDate: Date }) {
   const startDay = dayjs(startDate).startOf('day');
   const endDay = dayjs(endDate).startOf('day');
-
   return (
     (startDay.isSame(targetDate) || startDay.isBefore(targetDate)) &&
     (endDay.isSame(targetDate) || endDay.isAfter(targetDate))
@@ -31,34 +33,28 @@ function includeDate(targetDate: Date, { startDate, endDate }: { startDate: Date
 
 function parseVacationName(type: VacationType, subType?: VacationSubType) {
   let name = '';
-
   switch (type) {
-    case 'GENERAL': {
+    case 'GENERAL':
       name = '연차';
       break;
-    }
-    case 'COMPENSATORY': {
+    case 'COMPENSATORY':
       name = '보상휴가';
       break;
-    }
-    case 'OFFICIAL': {
+    case 'OFFICIAL':
       name = '공가';
       break;
-    }
     default:
       break;
   }
 
   if (subType) {
     switch (subType) {
-      case 'AM_HALF_DAY_OFF': {
+      case 'AM_HALF_DAY_OFF':
         name += ' (오전)';
         break;
-      }
-      case 'PM_HALF_DAY_OFF': {
+      case 'PM_HALF_DAY_OFF':
         name += ' (오후)';
         break;
-      }
       default:
         break;
     }
@@ -67,54 +63,80 @@ function parseVacationName(type: VacationType, subType?: VacationSubType) {
   return name;
 }
 
+function getVacationIcon(type: VacationType) {
+  switch (type) {
+    case 'GENERAL':
+      return { sf: 'umbrella.fill' as const, fallback: '☂' };
+    case 'COMPENSATORY':
+      return { sf: 'gift.fill' as const, fallback: '🎁' };
+    case 'OFFICIAL':
+      return { sf: 'building.2.fill' as const, fallback: '🏛' };
+    default:
+      return { sf: 'umbrella.fill' as const, fallback: '☂' };
+  }
+}
+
+// --- WeekDayItem ---
+
 const WeekDayItem = ({
   date,
-  today,
-  todo = false,
+  selected,
+  isToday,
+  vacationTypes,
   onPress,
 }: {
   date: Date;
-  today: boolean;
-  todo?: boolean;
+  selected: boolean;
+  isToday: boolean;
+  vacationTypes: VacationType[];
   onPress: (date: Date) => void;
 }) => {
-  // context
-  const { theme } = useContext(ThemeContext);
+  const handlePress = () => onPress(date);
 
-  // handle
-  const handlePress = () => {
-    onPress(date);
-  };
+  const uniqueTypes = [...new Set(vacationTypes)].slice(0, 2);
 
   return (
     <TouchableOpacity
-      className={cx('flex h-11 w-full flex-col items-center justify-center rounded-lg', {
-        'bg-gray-900 dark:bg-gray-100': today,
+      className={cx('flex h-11 w-full flex-col items-center justify-center rounded-full', {
+        'bg-purple-500 dark:bg-purple-300': selected,
       })}
-      disabled={today}
       onPress={handlePress}
+      activeOpacity={0.7}
     >
       <Text
-        className={cx(
-          'text-lg font-bold',
-          today ? 'text-gray-300 dark:text-gray-800' : 'text-gray-800 dark:text-gray-300',
-        )}
+        className={cx('text-[15px] font-semibold', {
+          'text-white dark:text-gray-900': selected,
+          'text-gray-900 dark:text-gray-100': !selected,
+        })}
       >
         {dayjs(date).date()}
       </Text>
-      <View className="-mt-1 h-3 w-full items-center justify-center">
-        {todo && (
-          <Icon
-            sf="circle.fill"
-            fallback="•"
-            size={10}
-            color={theme === 'light' ? (today ? 'white' : 'black') : today ? 'black' : 'white'}
-          />
-        )}
+
+      {/* Vacation type dots */}
+      <View className="absolute -bottom-1 flex-row gap-[2px]">
+        {!selected &&
+          uniqueTypes.map((type, i) => (
+            <View
+              key={`dot-${i}`}
+              className="size-[5px] rounded-full"
+              style={{ backgroundColor: VACATION_COLORS[type].dot }}
+            />
+          ))}
+        {selected &&
+          uniqueTypes.map((_, i) => (
+            <View key={`dot-sel-${i}`} className="size-[5px] rounded-full bg-white dark:bg-gray-900" />
+          ))}
       </View>
+
+      {/* Today ring indicator */}
+      {isToday && !selected && (
+        <View className="absolute inset-0 rounded-full border-2 border-purple-500 dark:border-purple-300" />
+      )}
     </TouchableOpacity>
   );
 };
+
+// --- Default weeks ---
 
 const defaultWeeks = [
   {
@@ -135,6 +157,8 @@ const defaultWeeks = [
   },
 ];
 
+// --- Main Schedule Page ---
+
 export default function Schedule() {
   // ref
   const changePageRef = useRef<number>(1);
@@ -147,7 +171,7 @@ export default function Schedule() {
   const [weeks, setWeeks] = useState<{ startDate: Date; endDate: Date }[]>(defaultWeeks);
 
   // queries
-  const { vacations } = useVacations({
+  const { vacations, isLoading } = useVacations({
     startDateFrom: weeks[1].startDate,
     endDateFrom: weeks[1].endDate,
     page: 0,
@@ -158,83 +182,72 @@ export default function Schedule() {
   // hooks
   const { AnimatedPagerView, ref, ...rest } = usePagerView({ pagesAmount: 3 });
 
-  // useEffect
-  useEffect(() => {}, [rest.activePage]);
-
   // handle
-  const handlePageSelected = (e: OnPageSelectedEventData) => {
-    const position = e.position;
-
-    if (position === 0) {
-      handlePrevWeeks();
-    } else if (position === 2) {
-      handleNextWeeks();
-    }
-  };
-
   const handlePrevWeeks = () => {
     const startDate = getWeekStartDate(dayjs(weeks[0].startDate).add(-1, 'day').toDate());
-
     setWeeks([
-      {
-        startDate,
-        endDate: dayjs(startDate).add(6, 'day').toDate(),
-      },
+      { startDate, endDate: dayjs(startDate).add(6, 'day').toDate() },
       weeks[0],
       weeks[1],
     ]);
-
     setSelectedDate(dayjs(startDate).add(7, 'day').toDate());
   };
 
   const handleNextWeeks = () => {
     const startDate = getWeekStartDate(dayjs(weeks[2].endDate).add(1, 'day').toDate());
-
     setWeeks([
       weeks[1],
       weeks[2],
-      {
-        startDate,
-        endDate: dayjs(startDate).add(6, 'day').toDate(),
-      },
+      { startDate, endDate: dayjs(startDate).add(6, 'day').toDate() },
     ]);
-
     setSelectedDate(dayjs(startDate).add(-7, 'day').toDate());
   };
+
   const handleSelectToday = () => {
     setWeeks(defaultWeeks);
-
     setSelectedDate(dayjs().startOf('day').toDate());
   };
 
-  return (
-    <View className="pt-142 flex size-full flex-col items-center bg-gray-50 px-4 pb-[360px] pt-14 dark:bg-gray-950">
-      {/* headers */}
-      <View className="mt-3 w-full px-2">
-        <View className="flex flex-row items-center justify-between gap-4">
-          <View className="">
-            <View className="flex flex-row items-center justify-center gap-5">
-              <View className="">
-                <Text className="text-2xl font-bold dark:text-white">{dayjs(selectedDate).format('YYYY년 MM월')}</Text>
-              </View>
-            </View>
-          </View>
+  // filtered vacations
+  const myVacations = vacations.filter(
+    (v) => v.userUniqueId === userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+  );
 
-          <View>
-            <TouchableOpacity
-              className="h-8 w-14 flex-none items-center justify-center rounded-xl bg-gray-200 dark:bg-gray-700"
-              onPress={handleSelectToday}
-            >
-              <Text className="font-bold text-gray-700 dark:text-gray-100">오늘</Text>
-            </TouchableOpacity>
-          </View>
+  const colleagueVacations = vacations.filter(
+    (v) => v.userUniqueId !== userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+  );
+
+  return (
+    <View className="flex size-full flex-col bg-gray-50 pt-14 dark:bg-gray-950">
+      {/* Header */}
+      <View className="px-5 pb-2 pt-3">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-2xl font-bold text-gray-900 dark:text-white">
+            {dayjs(selectedDate).format('YYYY년 MM월')}
+          </Text>
+          <TouchableOpacity
+            className="h-8 items-center justify-center rounded-full bg-purple-100 px-4 dark:bg-purple-900/40"
+            onPress={handleSelectToday}
+            activeOpacity={0.7}
+          >
+            <Text className="text-sm font-bold text-purple-600 dark:text-purple-300">오늘</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* weeks */}
-      <View className="mt-5 h-28 w-full">
-        <View className="h-24">
-          <View className="" style={{ flex: 1 }}>
+      {/* Week Calendar Strip - M3 Surface */}
+      <View className="px-4">
+        <View
+          className="rounded-[20px] bg-white pb-2 pt-3 dark:bg-gray-900"
+          style={{
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.06,
+            shadowRadius: 3,
+            elevation: 2,
+          }}
+        >
+          <View className="h-[88px]" style={{ flex: 1 }}>
             <AnimatedPagerView
               {...rest}
               className="h-full"
@@ -245,19 +258,10 @@ export default function Schedule() {
               pageMargin={3}
               orientation="horizontal"
               onPageScrollStateChanged={(e) => {
-                if (e.nativeEvent.pageScrollState !== 'idle') {
-                  return;
-                }
-
+                if (e.nativeEvent.pageScrollState !== 'idle') return;
                 ref.current?.setPageWithoutAnimation(1);
-
-                if (changePageRef.current === 0) {
-                  handlePrevWeeks();
-                }
-
-                if (changePageRef.current === 2) {
-                  handleNextWeeks();
-                }
+                if (changePageRef.current === 0) handlePrevWeeks();
+                if (changePageRef.current === 2) handleNextWeeks();
               }}
               onPageSelected={(e) => {
                 changePageRef.current = e.nativeEvent.position;
@@ -268,159 +272,170 @@ export default function Schedule() {
                   weeks.map((week, pageIndex) => (
                     <View
                       key={`weeks-page-${pageIndex}`}
-                      className="flex w-full flex-row items-center justify-center gap-3"
+                      className="flex w-full flex-row items-center justify-around px-2"
                       collapsable={false}
                     >
-                      {new Array(7).fill('*').map((_, index) => (
-                        <View
-                          key={`schedule-item-${pageIndex}-${index}`}
-                          className="flex w-12 flex-col items-center justify-center gap-2"
-                        >
-                          <View className="w-full items-center justify-center">
+                      {new Array(7).fill('*').map((_, index) => {
+                        const date = dayjs(weeks[pageIndex].startDate).add(index, 'day');
+                        const dateObj = date.toDate();
+                        const dayOfWeek = date.day();
+
+                        const vacationTypesForDay = vacations
+                          .filter((v) => includeDate(dateObj, { startDate: v.startDate, endDate: v.endDate }))
+                          .map((v) => v.vacationType);
+
+                        return (
+                          <View key={`schedule-item-${pageIndex}-${index}`} className="w-10 items-center gap-1">
                             <Text
-                              className={cx('font-bold', {
-                                'text-blue-400': dayjs(weeks[pageIndex].startDate).add(index, 'day').day() === 6,
-                                'text-red-400': dayjs(weeks[pageIndex].startDate).add(index, 'day').day() === 0,
-                                'text-gray-400 dark:text-gray-300': ![0, 6].includes(
-                                  dayjs(weeks[pageIndex].startDate).add(index, 'day').day(),
-                                ),
+                              className={cx('text-[11px] font-semibold', {
+                                'text-red-400': dayOfWeek === 0,
+                                'text-blue-400': dayOfWeek === 6,
+                                'text-gray-400 dark:text-gray-500': ![0, 6].includes(dayOfWeek),
                               })}
                             >
-                              {getDaysOfWeek(dayjs(weeks[pageIndex].startDate).add(index, 'day').day())}
+                              {getDaysOfWeek(dayOfWeek)}
                             </Text>
+                            <WeekDayItem
+                              date={dateObj}
+                              selected={isSameDate(selectedDate, dateObj)}
+                              isToday={isSameDate(dayjs().startOf('day').toDate(), dateObj)}
+                              vacationTypes={vacationTypesForDay}
+                              onPress={(d) => setSelectedDate(d)}
+                            />
                           </View>
-
-                          <WeekDayItem
-                            date={dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate()}
-                            today={isSameDate(
-                              selectedDate,
-                              dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate(),
-                            )}
-                            todo={vacations.some((vacation) =>
-                              includeDate(dayjs(weeks[pageIndex].startDate).add(index, 'day').toDate(), {
-                                startDate: vacation.startDate,
-                                endDate: vacation.endDate,
-                              }),
-                            )}
-                            onPress={(date) => setSelectedDate(date)}
-                          />
-                        </View>
-                      ))}
+                        );
+                      })}
                     </View>
                   )),
                 [weeks, selectedDate, vacations],
               )}
             </AnimatedPagerView>
           </View>
-        </View>
 
-        <View className="absolute bottom-0 flex w-full flex-col items-center justify-center gap-3">
-          <View className="h-[6px] w-24 rounded-2xl bg-gray-200"></View>
+          {/* Swipe indicator */}
+          <View className="items-center pb-1 pt-2">
+            <View className="h-1 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
+          </View>
         </View>
       </View>
 
-      {/* 일정 */}
-      <View className="mt-3 flex size-full flex-col items-center gap-2">
+      {/* Schedule Content */}
+      <ScrollView className="mt-4 flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         {/* 내 일정 */}
-        <View className="flex w-full flex-col items-center gap-3 rounded-2xl border-t-[2px] border-gray-100 px-3 pt-3 dark:border-gray-700">
-          <View className="flex w-full flex-row items-center gap-3">
-            <Text className="text-base font-bold text-gray-400 dark:text-gray-500">내 일정</Text>
-            <Text className="font-extrabold text-blue-600 dark:text-blue-400">
-              {
-                vacations.filter(
-                  (vacation) =>
-                    vacation.userUniqueId === userDetail?.id &&
-                    includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
-                ).length
-              }
-            </Text>
+        <View className="mb-5">
+          <View className="mb-3 flex-row items-center gap-2 px-1">
+            <Text className="text-sm font-bold text-gray-400 dark:text-gray-500">내 일정</Text>
+            <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
+              <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
+                {isLoading ? '-' : myVacations.length}
+              </Text>
+            </View>
           </View>
 
-          <View className="ml-4 flex min-h-24 w-full flex-col items-center gap-3">
-            {vacations
-              .filter(
-                (vacation) =>
-                  vacation.userUniqueId === userDetail?.id &&
-                  includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
-              )
-              .map((vacation) => (
-                <View
-                  key={`my-schedules-item-${uuid.v4()}`}
-                  className="m-2 flex w-full flex-row items-center justify-center gap-3"
-                >
-                  <View className="flex size-16 flex-none flex-col items-center justify-center rounded-2xl bg-violet-500">
-                    <Icon sf="umbrella.fill" fallback="☂" size={24} color="white" />
-                  </View>
-
-                  <View className="flex flex-1 flex-col items-center gap-2">
-                    <View className="w-full">
-                      <Text className="text-lg font-bold text-gray-600 dark:text-gray-300">
-                        {parseVacationName(vacation.vacationType, vacation.vacationSubType)}
-                      </Text>
-                    </View>
-                    <View className="flex w-full flex-row items-center gap-2">
-                      <Text className="font-semibold text-gray-500">
-                        <Text className="">{dayjs(vacation.startDate).format('YYYY-MM-DD')}</Text>
-                        <Text className="">({getDaysOfWeek(dayjs(vacation.startDate).day())})</Text>
-                      </Text>
-                      {dayjs(vacation.startDate).isBefore(vacation.endDate) && (
-                        <>
-                          <Text className="font-semibold text-gray-500">-</Text>
-                          <Text className="font-semibold text-gray-500">
-                            <Text className="">{dayjs(vacation.endDate).format('YYYY-MM-DD')}</Text>
-                            <Text className="">({getDaysOfWeek(dayjs(vacation.endDate).day())})</Text>
-                          </Text>
-                        </>
-                      )}
-                    </View>
-                  </View>
-                </View>
+          {isLoading ? (
+            <ScheduleSkeleton variant="my" count={1} />
+          ) : myVacations.length === 0 ? (
+            <ScheduleEmptyState message="선택한 날짜에 내 일정이 없습니다" />
+          ) : (
+            <View className="gap-3">
+              {myVacations.map((vacation) => (
+                <MyVacationCard key={`my-schedule-${vacation.id}`} vacation={vacation} />
               ))}
-          </View>
+            </View>
+          )}
         </View>
 
         {/* 동료 일정 */}
-        <View className="mt-3 flex w-full flex-col items-center gap-3 border-t-[2px] border-gray-100 px-3 pt-3 dark:border-gray-700">
-          <View className="flex w-full flex-row items-center gap-3">
-            <Text className="text-base font-bold text-gray-400 dark:text-gray-500">동료 일정</Text>
-            <Text className="font-extrabold text-blue-600 dark:text-blue-400">
-              {
-                vacations.filter(
-                  (vacation) =>
-                    vacation.userUniqueId !== userDetail?.id &&
-                    includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
-                ).length
-              }
-            </Text>
+        <View>
+          <View className="mb-3 flex-row items-center gap-2 px-1">
+            <Text className="text-sm font-bold text-gray-400 dark:text-gray-500">동료 일정</Text>
+            <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
+              <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
+                {isLoading ? '-' : colleagueVacations.length}
+              </Text>
+            </View>
           </View>
 
-          <View className="size-full">
-            <FlashList
-              className="w-full"
-              data={vacations.filter(
-                (vacation) =>
-                  vacation.userUniqueId !== userDetail?.id &&
-                  includeDate(selectedDate, { startDate: vacation.startDate, endDate: vacation.endDate }),
-              )}
-              renderItem={({ item, index }) => (
-                <ColleagueSchedule
-                  userUniqueId={item.userUniqueId}
-                  type={item.vacationType}
-                  subType={item.vacationSubType}
-                  startDate={item.startDate}
-                  endDate={item.endDate}
-                />
-              )}
-              onRefresh={() => {}}
-            />
-          </View>
+          {isLoading ? (
+            <ScheduleSkeleton variant="colleague" count={2} />
+          ) : colleagueVacations.length === 0 ? (
+            <ScheduleEmptyState message="선택한 날짜에 동료 일정이 없습니다" />
+          ) : (
+            <View className="size-full" style={{ minHeight: colleagueVacations.length * 90 }}>
+              <FlashList
+                data={colleagueVacations}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item }) => (
+                  <ColleagueScheduleCard
+                    userUniqueId={item.userUniqueId}
+                    type={item.vacationType}
+                    subType={item.vacationSubType}
+                    startDate={item.startDate}
+                    endDate={item.endDate}
+                  />
+                )}
+                scrollEnabled={false}
+              />
+            </View>
+          )}
         </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+// --- My Vacation Card ---
+
+function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
+  const colors = VACATION_COLORS[vacation.vacationType];
+  const icon = getVacationIcon(vacation.vacationType);
+
+  return (
+    <View
+      className="flex-row items-center gap-3 overflow-hidden rounded-2xl bg-white p-4 dark:bg-gray-900"
+      style={{
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 3,
+        elevation: 2,
+      }}
+    >
+      {/* Left accent bar */}
+      <View className={cx('absolute bottom-2 left-0 top-2 w-1 rounded-r-full', colors.accent)} />
+
+      {/* Icon */}
+      <View className={cx('ml-2 size-12 items-center justify-center rounded-xl', colors.bg, colors.darkBg)}>
+        <Icon sf={icon.sf} fallback={icon.fallback} size={22} color={colors.iconColor} />
+      </View>
+
+      {/* Info */}
+      <View className="flex-1 gap-1">
+        <View className="flex-row items-center gap-2">
+          <Text className="text-[15px] font-bold text-gray-800 dark:text-gray-100">
+            {parseVacationName(vacation.vacationType)}
+          </Text>
+          {vacation.vacationSubType && (
+            <View className={cx('rounded-md px-1.5 py-0.5', colors.badge)}>
+              <Text className={cx('text-[10px] font-bold', colors.badge)}>
+                {vacation.vacationSubType === 'AM_HALF_DAY_OFF' ? '오전' : '오후'}
+              </Text>
+            </View>
+          )}
+        </View>
+        <Text className="text-xs font-medium text-gray-400 dark:text-gray-500">
+          {dayjs(vacation.startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(vacation.startDate).day())})
+          {dayjs(vacation.startDate).isBefore(vacation.endDate) &&
+            ` - ${dayjs(vacation.endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(vacation.endDate).day())})`}
+        </Text>
       </View>
     </View>
   );
 }
 
-const ColleagueSchedule = ({
+// --- Colleague Schedule Card ---
+
+function ColleagueScheduleCard({
   userUniqueId,
   type,
   subType,
@@ -432,17 +447,28 @@ const ColleagueSchedule = ({
   subType?: VacationSubType;
   startDate: Date;
   endDate: Date;
-}>) => {
-  // queries
+}>) {
   const { user } = useUser(userUniqueId);
+  const colors = VACATION_COLORS[type];
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <View className="m-2 flex w-full flex-row items-center gap-3">
-      <View className="size-16 flex-none">
+    <View
+      className="mb-3 flex-row items-center gap-3 overflow-hidden rounded-2xl bg-white p-4 dark:bg-gray-900"
+      style={{
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.06,
+        shadowRadius: 3,
+        elevation: 2,
+      }}
+    >
+      {/* Left accent bar */}
+      <View className={cx('absolute bottom-2 left-0 top-2 w-1 rounded-r-full', colors.accent)} />
+
+      {/* Avatar */}
+      <View className="ml-2 size-11 flex-none">
         <UserAvatar
           src={`${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar`}
           username={user?.username}
@@ -450,38 +476,23 @@ const ColleagueSchedule = ({
         />
       </View>
 
-      <View className="flex flex-1 flex-col items-center gap-1">
-        <View className="w-full">
-          <View className="flex flex-row items-center gap-2">
-            <Text className="text-lg font-semibold text-gray-800 dark:text-gray-300">{user?.username || ''}</Text>
-            <Text className="text-lg font-bold text-gray-600 dark:text-gray-300">
-              {parseVacationName(type, subType)}
-            </Text>
-          </View>
-        </View>
-        <View className="w-full">
-          <Text className="w-full text-sm dark:text-gray-400">
-            <Text>{user?.group?.name}</Text>
-            <Text> - </Text>
-            <Text>{user?.position?.name || ''}</Text>
-          </Text>
-        </View>
-        <View className="flex w-full flex-row items-center gap-2">
-          <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-            <Text className="">{dayjs(startDate).format('YYYY-MM-DD')}</Text>
-            <Text className="">({getDaysOfWeek(dayjs(startDate).day())})</Text>
-          </Text>
-          {dayjs(startDate).isBefore(endDate) && (
-            <>
-              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">-</Text>
-              <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                <Text className="">{dayjs(endDate).format('YYYY-MM-DD')}</Text>
-                <Text className="">({getDaysOfWeek(dayjs(endDate).day())})</Text>
-              </Text>
-            </>
-          )}
-        </View>
+      {/* Info */}
+      <View className="flex-1 gap-1">
+        <Text className="text-sm font-semibold text-gray-800 dark:text-gray-100">{user?.username || ''}</Text>
+        <Text className="text-[11px] text-gray-400 dark:text-gray-500">
+          {user?.group?.name} - {user?.position?.name || ''}
+        </Text>
+        <Text className="text-xs font-medium text-gray-400 dark:text-gray-500">
+          {dayjs(startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(startDate).day())})
+          {dayjs(startDate).isBefore(endDate) &&
+            ` - ${dayjs(endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(endDate).day())})`}
+        </Text>
+      </View>
+
+      {/* Type badge */}
+      <View className={cx('rounded-lg px-2 py-1', colors.badge)}>
+        <Text className={cx('text-[10px] font-bold', colors.badge)}>{parseVacationName(type, subType)}</Text>
       </View>
     </View>
   );
-};
+}
