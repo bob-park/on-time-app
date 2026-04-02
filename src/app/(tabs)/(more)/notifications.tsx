@@ -108,7 +108,13 @@ export default function NotificationSettings() {
       {/* header */}
       <View className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" />
+          <Icon
+            sf="chevron.left"
+            fallback="‹"
+            size={24}
+            weight="semibold"
+            color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
+          />
         </TouchableOpacity>
         <Text className="text-xl font-bold dark:text-white">알림 설정</Text>
       </View>

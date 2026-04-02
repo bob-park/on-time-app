@@ -57,7 +57,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export default function Theme() {
   // context
-  const { preference, onUpdatePreference } = useContext(ThemeContext);
+  const { theme, preference, onUpdatePreference } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -71,7 +71,13 @@ export default function Theme() {
       {/* header */}
       <View className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" />
+          <Icon
+            sf="chevron.left"
+            fallback="‹"
+            size={24}
+            weight="semibold"
+            color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
+          />
         </TouchableOpacity>
         <Text className="text-xl font-bold dark:text-white">화면 테마</Text>
       </View>

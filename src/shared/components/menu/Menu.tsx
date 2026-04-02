@@ -62,7 +62,12 @@ export function MenuItem({
   };
 
   return (
-    <TouchableOpacity className="flex flex-row items-center gap-3 px-4 py-3.5" onPress={handlePress}>
+    <TouchableOpacity
+      className="flex flex-row items-center gap-3 px-4 py-3.5"
+      onPress={handlePress}
+      disabled={!onPress}
+      activeOpacity={onPress ? 0.2 : 1}
+    >
       {/* icon container */}
       {icon && (
         <View
@@ -77,7 +82,7 @@ export function MenuItem({
       <Text className="flex-1 text-[15px] font-semibold dark:text-white">{text}</Text>
 
       {/* chevron */}
-      {move && <Icon sf="chevron.right" fallback="›" size={14} color="#d1d5db" weight="semibold" />}
+      {move && <Icon sf="chevron.right" fallback="›" size={14} color="#9ca3af" weight="semibold" />}
     </TouchableOpacity>
   );
 }
