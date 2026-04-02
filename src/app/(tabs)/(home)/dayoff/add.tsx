@@ -1,17 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DateTimePicker, { useDefaultClassNames } from 'react-native-ui-datepicker';
 
 import * as Device from 'expo-device';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 import { useRequestDocument } from '@/domain/documents/queries/documents';
 import { useCreateVacation } from '@/domain/documents/queries/vacations';
 import { useUserLeaveEntry } from '@/domain/users/queries/users';
+import { Icon } from '@/shared/components/Icon';
 import Loading from '@/shared/components/loading/Loading';
 import SelectCompLeaveEntriesModal from '@/shared/components/modals/SelectCompLeaveEntriesModal';
 import dayjs from '@/shared/dayjs';
@@ -20,6 +21,18 @@ import { NotificationContext } from '@/shared/providers/notification/Notificatio
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import cx from 'classnames';
+
+const CARD_SHADOW = Platform.select({
+  ios: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+  },
+  android: {
+    elevation: 2,
+  },
+});
 
 function parseVacationType(vacationType: VacationType) {
   switch (vacationType) {
@@ -33,6 +46,18 @@ function parseVacationType(vacationType: VacationType) {
       return '';
   }
 }
+
+const VACATION_TYPES: { key: VacationType; label: string }[] = [
+  { key: 'GENERAL', label: '연차' },
+  { key: 'COMPENSATORY', label: '보상 휴가' },
+  { key: 'OFFICIAL', label: '공가' },
+];
+
+const VACATION_SUB_TYPES: { key: VacationSubType | 'all'; label: string }[] = [
+  { key: 'all', label: '종일' },
+  { key: 'AM_HALF_DAY_OFF', label: '오전 반차' },
+  { key: 'PM_HALF_DAY_OFF', label: '오후 반차' },
+];
 
 export default function AddDayOff() {
   // context
@@ -116,55 +141,54 @@ export default function AddDayOff() {
 
   return (
     <>
-      <View className="flex size-full flex-col items-center pb-40">
-        {/* headers */}
-        <View className="w-full">
-          <View className="flex flex-row items-center justify-between gap-4">
-            <View className="flex flex-row items-center gap-3">
-              {/* backward */}
-              <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
-                <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
-              </TouchableOpacity>
+      <View className="flex size-full flex-col">
+        {/* header */}
+        <View className="relative mb-2 flex flex-row items-center justify-center">
+          <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
+            <Icon
+              sf="chevron.left"
+              fallback="‹"
+              size={24}
+              weight="semibold"
+              color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
+            />
+          </TouchableOpacity>
 
-              {/* today */}
-              <View className="flex flex-row items-end gap-1">
-                <Text className="text-xl font-bold dark:text-white">휴가 신청</Text>
-              </View>
-            </View>
+          <Text className="text-xl font-bold dark:text-white">휴가 신청</Text>
 
-            <View className="">
-              <TouchableOpacity
-                className="h-10 w-24 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800"
-                onPress={handleCreateVacation}
-              >
-                <Text className="font-bold text-gray-700 dark:text-gray-100">신청</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <TouchableOpacity className="absolute right-0" onPress={handleCreateVacation}>
+            <Text className="text-[14px] font-semibold text-blue-500">신청</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* contents */}
-        <View className="mt-2 w-full">
-          <View className="flex flex-col items-center justify-center gap-2">
-            {/* 연차 */}
-            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-white px-4 py-4 dark:bg-black">
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">전체 휴가</Text>
-                <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalLeaveDays}</Text>
+        {/* scrollable content */}
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: 112 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* leave info card (merged) */}
+          <View className="mt-2 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+            {/* 연차 row */}
+            <View className="flex flex-row items-center gap-3 px-4 py-3.5">
+              <View
+                className="size-9 flex-none items-center justify-center rounded-xl"
+                style={{ backgroundColor: 'rgba(34,197,94,0.12)' }}
+              >
+                <Icon sf="leaf" fallback="🌿" size={18} color="#22c55e" />
               </View>
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">사용 개수</Text>
-                <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.usedLeaveDays}</Text>
-              </View>
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">남은 개수</Text>
+              <Text className="flex-1 text-[15px] font-semibold dark:text-white">연차</Text>
+              <View className="flex flex-row items-center gap-1">
+                <Text className="text-xs text-gray-500 dark:text-gray-400">
+                  전체 {leaveEntry?.totalLeaveDays} · 사용 {leaveEntry?.usedLeaveDays} · 남은{' '}
+                </Text>
                 <Text
-                  className={cx('text-lg font-extrabold', {
+                  className={cx('text-xs font-bold', {
                     'text-black dark:text-white': remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.5,
                     'text-amber-600 dark:text-amber-400':
                       remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.3 &&
-                      remainingDays < (leaveEntry?.totalLeaveDays || 0) * 0.5,
-                    'text-red-600 dark:text-red-400': remainingDays < (leaveEntry?.totalLeaveDays || 0) * 0.3,
+                      remainingDays <= (leaveEntry?.totalLeaveDays || 0) * 0.5,
+                    'text-red-600 dark:text-red-400': remainingDays <= (leaveEntry?.totalLeaveDays || 0) * 0.3,
                   })}
                 >
                   {remainingDays}
@@ -172,25 +196,29 @@ export default function AddDayOff() {
               </View>
             </View>
 
-            {/* 보상 휴가 */}
-            <View className="flex w-full flex-row items-center justify-between gap-6 rounded-xl bg-white px-4 py-4 dark:bg-black">
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">보상 휴가</Text>
-                <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.totalCompLeaveDays}</Text>
+            {/* divider */}
+            <View className="ml-[48px] border-b border-gray-100 dark:border-gray-800" />
+
+            {/* 보상 휴가 row */}
+            <View className="flex flex-row items-center gap-3 px-4 py-3.5">
+              <View
+                className="size-9 flex-none items-center justify-center rounded-xl"
+                style={{ backgroundColor: 'rgba(245,158,11,0.12)' }}
+              >
+                <Icon sf="gift" fallback="🎁" size={18} color="#f59e0b" />
               </View>
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">사용 개수</Text>
-                <Text className="text-lg font-extrabold dark:text-white">{leaveEntry?.usedCompLeaveDays}</Text>
-              </View>
-              <View className="mx-4">
-                <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400">남은 개수</Text>
+              <Text className="flex-1 text-[15px] font-semibold dark:text-white">보상 휴가</Text>
+              <View className="flex flex-row items-center gap-1">
+                <Text className="text-xs text-gray-500 dark:text-gray-400">
+                  전체 {leaveEntry?.totalCompLeaveDays} · 사용 {leaveEntry?.usedCompLeaveDays} · 남은{' '}
+                </Text>
                 <Text
-                  className={cx('text-lg font-extrabold', {
+                  className={cx('text-xs font-bold', {
                     'text-black dark:text-white': remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
                     'text-amber-600 dark:text-amber-400':
                       remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.3 &&
-                      remainingCompDays < (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
-                    'text-red-600 dark:text-red-400': remainingCompDays < (leaveEntry?.totalCompLeaveDays || 0) * 0.3,
+                      remainingCompDays <= (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
+                    'text-red-600 dark:text-red-400': remainingCompDays <= (leaveEntry?.totalCompLeaveDays || 0) * 0.3,
                   })}
                 >
                   {remainingCompDays}
@@ -198,207 +226,122 @@ export default function AddDayOff() {
               </View>
             </View>
           </View>
-        </View>
 
-        {/* selected date picker */}
-        <View className="mt-2 size-full">
-          <ScrollView className="h-full" showsVerticalScrollIndicator={false}>
-            {/* form */}
-            <View className="mt-4 w-full">
-              <View className="flex flex-col items-center gap-3">
-                {/* vacation type */}
-                <View className="w-full">
-                  <View className="mb-2">
-                    <Text className="text-base font-bold text-gray-400 dark:text-gray-300">휴가 구분</Text>
-                  </View>
-
-                  <View className="flex w-full flex-row items-center gap-3">
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'GENERAL',
-                        'bg-gray-700 dark:bg-gray-100': vacationType === 'GENERAL',
-                      })}
-                      disabled={vacationType === 'GENERAL'}
-                      onPress={() => setVacationType('GENERAL')}
-                    >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationType !== 'GENERAL',
-                          'text-gray-100 dark:text-gray-800': vacationType === 'GENERAL',
-                        })}
-                      >
-                        연차
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'COMPENSATORY',
-                        'bg-gray-700 dark:bg-gray-100': vacationType === 'COMPENSATORY',
-                      })}
-                      disabled={vacationType === 'COMPENSATORY'}
-                      onPress={() => {
-                        setVacationType('COMPENSATORY');
+          {/* vacation type chips */}
+          <View className="mt-5">
+            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">휴가 구분</Text>
+            <View className="flex flex-row items-center gap-2">
+              {VACATION_TYPES.map((option) => {
+                const isActive = vacationType === option.key;
+                return (
+                  <TouchableOpacity
+                    key={option.key}
+                    className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
+                    disabled={isActive}
+                    onPress={() => {
+                      setVacationType(option.key);
+                      if (option.key === 'COMPENSATORY') {
                         setShowCompLeaveEntries(true);
-                      }}
+                      }
+                    }}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
                     >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationType !== 'COMPENSATORY',
-                          'text-gray-100 dark:text-gray-800': vacationType === 'COMPENSATORY',
-                        })}
-                      >
-                        보상 휴가
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationType !== 'OFFICIAL',
-                        'bg-gray-700 dark:bg-gray-100': vacationType === 'OFFICIAL',
-                      })}
-                      disabled={vacationType === 'OFFICIAL'}
-                      onPress={() => setVacationType('OFFICIAL')}
-                    >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationType !== 'OFFICIAL',
-                          'text-gray-100 dark:text-gray-800': vacationType === 'OFFICIAL',
-                        })}
-                      >
-                        공가
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* vacation sub type */}
-                <View className="mt-4 w-full">
-                  <View className="mb-2">
-                    <Text className="text-base font-bold text-gray-400 dark:text-gray-300">부가 구분</Text>
-                  </View>
-
-                  <View className="flex w-full flex-row items-center gap-3">
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'all',
-                        'bg-gray-700 dark:bg-gray-100': vacationSubType === 'all',
-                      })}
-                      disabled={vacationSubType === 'all'}
-                      onPress={() => setVacationSubType('all')}
-                    >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationSubType !== 'all',
-                          'text-gray-100 dark:text-gray-800': vacationSubType === 'all',
-                        })}
-                      >
-                        종일
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'AM_HALF_DAY_OFF',
-                        'bg-gray-700 dark:bg-gray-100': vacationSubType === 'AM_HALF_DAY_OFF',
-                      })}
-                      disabled={vacationSubType === 'AM_HALF_DAY_OFF'}
-                      onPress={() => setVacationSubType('AM_HALF_DAY_OFF')}
-                    >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationSubType !== 'AM_HALF_DAY_OFF',
-                          'text-gray-100 dark:text-gray-800': vacationSubType === 'AM_HALF_DAY_OFF',
-                        })}
-                      >
-                        오전 반차
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      className={cx('h-10 w-24 items-center justify-center rounded-xl', {
-                        'bg-gray-200 dark:bg-gray-700': vacationSubType !== 'PM_HALF_DAY_OFF',
-                        'bg-gray-700 dark:bg-gray-100': vacationSubType === 'PM_HALF_DAY_OFF',
-                      })}
-                      disabled={vacationSubType === 'PM_HALF_DAY_OFF'}
-                      onPress={() => setVacationSubType('PM_HALF_DAY_OFF')}
-                    >
-                      <Text
-                        className={cx('font-semibold', {
-                          'text-gray-700 dark:text-gray-100': vacationSubType !== 'PM_HALF_DAY_OFF',
-                          'text-gray-100 dark:text-gray-800': vacationSubType === 'PM_HALF_DAY_OFF',
-                        })}
-                      >
-                        오후 반차
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
+          </View>
 
-            {/* vacation sub type */}
-            <View className="mt-4 w-full">
-              <View className="mb-2">
-                <Text className="text-base font-bold text-gray-400 dark:text-gray-300">사유</Text>
-              </View>
-              <View
-                className={cx(
-                  'flex w-full flex-row items-center justify-center gap-4 rounded-xl border-[1px] border-gray-50 bg-white px-3 dark:border-gray-900 dark:bg-black',
-                )}
-              >
-                <TextInput
-                  className={cx('my-2 w-full dark:text-white', {
-                    'h-12': Device.osName !== 'iOS',
-                    'h-8': Device.osName === 'iOS',
-                  })}
-                  numberOfLines={1}
-                  placeholder="개인 사유"
-                  placeholderTextColor="gray"
-                  value={reason}
-                  onChangeText={(value) => setReason(value)}
-                />
-              </View>
+          {/* vacation sub type chips */}
+          <View className="mt-5">
+            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">부가 구분</Text>
+            <View className="flex flex-row items-center gap-2">
+              {VACATION_SUB_TYPES.map((option) => {
+                const isActive = vacationSubType === option.key;
+                return (
+                  <TouchableOpacity
+                    key={option.key}
+                    className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
+                    disabled={isActive}
+                    onPress={() => setVacationSubType(option.key)}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
+          </View>
 
-            <View className="bg-blue mt-4 w-full rounded-xl bg-white p-3 dark:bg-black">
-              <DateTimePicker
-                classNames={{
-                  ...defaultClassNames,
-                  today: 'bg-gray-200 dark:bg-gray-700 mx-[2px] rounded-full ',
-                  today_label: 'text-black dark:text-white',
-                  selected: 'bg-blue-500 mx-[2px] rounded-full',
-                  selected_label: 'text-white',
-                  range_fill: 'bg-gray-200 dark:bg-gray-700',
-                  range_start: 'bg-blue-500 mx-[2px] rounded-full',
-                  range_start_label: 'text-white',
-                  range_end: 'bg-blue-500 mx-[2px] rounded-full',
-                  range_end_label: 'text-white',
-                  outside_label: 'text-gray-300 dark:text-gray-600',
-                  weekday_label: 'text-black dark:text-white',
-                  day_label: 'text-black dark:text-white',
-                  year_selector_label: 'text-black dark:text-white font-bold',
-                  month_selector_label: 'text-black dark:text-white font-bold text-lg',
-                  button_next:
-                    'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
-                  button_prev:
-                    'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
-                }}
-                mode="range"
-                locale="ko"
-                showOutsideDays
-                disableYearPicker
-                disableMonthPicker
-                components={{
-                  IconNext: <FontAwesome5 name="angle-right" size={24} color={theme === 'light' ? 'black' : 'white'} />,
-                  IconPrev: <FontAwesome5 name="angle-left" size={24} color={theme === 'light' ? 'black' : 'white'} />,
-                }}
-                startDate={selectedDate.startDate}
-                endDate={selectedDate.endDate}
-                onChange={({ startDate, endDate }) =>
-                  setSelectedDate({ startDate: dayjs(startDate as string).toDate(), endDate: dayjs(endDate as string).toDate() })
-                }
+          {/* reason input */}
+          <View className="mt-5">
+            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">사유</Text>
+            <View className="rounded-2xl bg-white px-4 py-3 dark:bg-gray-900" style={CARD_SHADOW}>
+              <TextInput
+                className={cx('w-full text-[15px] dark:text-white', {
+                  'h-12': Device.osName !== 'iOS',
+                  'h-8': Device.osName === 'iOS',
+                })}
+                numberOfLines={1}
+                placeholder="개인 사유"
+                placeholderTextColor={theme === 'light' ? '#9ca3af' : '#6b7280'}
+                value={reason}
+                onChangeText={(value) => setReason(value)}
               />
             </View>
-            <View className="h-[150px] w-full"></View>
-          </ScrollView>
-        </View>
+          </View>
+
+          {/* calendar */}
+          <View className="mt-5 rounded-2xl bg-white p-3 dark:bg-gray-900" style={CARD_SHADOW}>
+            <DateTimePicker
+              classNames={{
+                ...defaultClassNames,
+                today: 'bg-gray-200 dark:bg-gray-700 mx-[2px] rounded-full ',
+                today_label: 'text-black dark:text-white',
+                selected: 'bg-blue-500 mx-[2px] rounded-full',
+                selected_label: 'text-white',
+                range_fill: 'bg-gray-200 dark:bg-gray-700',
+                range_start: 'bg-blue-500 mx-[2px] rounded-full',
+                range_start_label: 'text-white',
+                range_end: 'bg-blue-500 mx-[2px] rounded-full',
+                range_end_label: 'text-white',
+                outside_label: 'text-gray-300 dark:text-gray-600',
+                weekday_label: 'text-black dark:text-white',
+                day_label: 'text-black dark:text-white',
+                year_selector_label: 'text-black dark:text-white font-bold',
+                month_selector_label: 'text-black dark:text-white font-bold text-lg',
+                button_next:
+                  'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
+                button_prev:
+                  'size-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex flex-row items-center justify-center',
+              }}
+              mode="range"
+              locale="ko"
+              showOutsideDays
+              disableYearPicker
+              disableMonthPicker
+              components={{
+                IconNext: <FontAwesome5 name="angle-right" size={24} color={theme === 'light' ? 'black' : 'white'} />,
+                IconPrev: <FontAwesome5 name="angle-left" size={24} color={theme === 'light' ? 'black' : 'white'} />,
+              }}
+              startDate={selectedDate.startDate}
+              endDate={selectedDate.endDate}
+              onChange={({ startDate, endDate }) =>
+                setSelectedDate({
+                  startDate: dayjs(startDate as string).toDate(),
+                  endDate: dayjs(endDate as string).toDate(),
+                })
+              }
+            />
+          </View>
+        </ScrollView>
       </View>
       <SelectCompLeaveEntriesModal
         show={showCompLeaveEntries}
