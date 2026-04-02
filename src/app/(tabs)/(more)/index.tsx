@@ -4,10 +4,9 @@ import { Platform, ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Icon } from '@/shared/components/Icon';
-
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
+import { Icon } from '@/shared/components/Icon';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -74,9 +73,7 @@ export default function MoreIndex() {
                   {user?.group?.name} |{' '}
                   {employment?.effectiveDate
                     ? dayjs
-                        .duration(
-                          (dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000,
-                        )
+                        .duration((dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000)
                         .format('Y년 M개월 D일')
                     : ''}
                 </Text>

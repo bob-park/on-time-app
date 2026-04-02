@@ -1,4 +1,4 @@
-import React from 'react';
+import { Children } from 'react';
 
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 
@@ -17,7 +17,7 @@ const CARD_SHADOW = Platform.select({
 });
 
 export default function Menu({ title, children }: Readonly<{ title: string; children?: React.ReactNode }>) {
-  const validChildren = React.Children.toArray(children).filter(Boolean);
+  const validChildren = Children.toArray(children).filter(Boolean);
 
   return (
     <View className="flex flex-col gap-2">
@@ -77,9 +77,7 @@ export function MenuItem({
       <Text className="flex-1 text-[15px] font-semibold dark:text-white">{text}</Text>
 
       {/* chevron */}
-      {move && (
-        <Icon sf="chevron.right" fallback="›" size={14} color="#d1d5db" weight="semibold" />
-      )}
+      {move && <Icon sf="chevron.right" fallback="›" size={14} color="#d1d5db" weight="semibold" />}
     </TouchableOpacity>
   );
 }

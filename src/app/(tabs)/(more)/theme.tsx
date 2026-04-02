@@ -29,9 +29,30 @@ type ThemeOption = {
 };
 
 const THEME_OPTIONS: ThemeOption[] = [
-  { key: 'light', label: '밝은 모드', sf: 'sun.max', fallback: '☀', iconColor: '#f59e0b', iconBg: 'rgba(245,158,11,0.12)' },
-  { key: 'dark', label: '어두운 모드', sf: 'moon', fallback: '🌙', iconColor: '#6366f1', iconBg: 'rgba(99,102,241,0.12)' },
-  { key: 'system', label: '시스템 설정과 같이', sf: 'circle.lefthalf.filled', fallback: '◐', iconColor: '#6b7280', iconBg: 'rgba(107,114,128,0.12)' },
+  {
+    key: 'light',
+    label: '밝은 모드',
+    sf: 'sun.max',
+    fallback: '☀',
+    iconColor: '#f59e0b',
+    iconBg: 'rgba(245,158,11,0.12)',
+  },
+  {
+    key: 'dark',
+    label: '어두운 모드',
+    sf: 'moon',
+    fallback: '🌙',
+    iconColor: '#6366f1',
+    iconBg: 'rgba(99,102,241,0.12)',
+  },
+  {
+    key: 'system',
+    label: '시스템 설정과 같이',
+    sf: 'circle.lefthalf.filled',
+    fallback: '◐',
+    iconColor: '#6b7280',
+    iconBg: 'rgba(107,114,128,0.12)',
+  },
 ];
 
 export default function Theme() {
@@ -77,9 +98,7 @@ export default function Theme() {
               <Text className="flex-1 text-[15px] font-semibold dark:text-white">{option.label}</Text>
 
               {/* checkmark */}
-              {preference === option.key && (
-                <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />
-              )}
+              {preference === option.key && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />}
             </TouchableOpacity>
 
             {index < THEME_OPTIONS.length - 1 && (
