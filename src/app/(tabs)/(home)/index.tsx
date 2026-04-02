@@ -40,7 +40,7 @@ function HeroBeforeWork({ today }: { today: any }) {
       {/* badge */}
       <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-white/20 px-2.5 py-1">
         <View className="size-2.5 rounded-full bg-white" />
-        <Text className="text-xs font-semibold text-white/90">정상근무</Text>
+        <Text className="text-xs font-semibold text-white/90">정상 근무 예정</Text>
       </View>
 
       <Text className="mb-1 text-[15px] text-white/75">아직 출근 전이에요</Text>
@@ -65,7 +65,7 @@ function HeroBeforeWork({ today }: { today: any }) {
         className="items-center rounded-2xl border-[1.5px] border-white/35 bg-white/20 px-4 py-3.5"
         onPress={() => router.push('./attendance')}
       >
-        <Text className="text-[15px] font-bold text-white">출근 입력 →</Text>
+        <Text className="text-[15px] font-bold text-white">→ 출근 입력</Text>
       </Pressable>
     </LinearGradient>
   );
@@ -92,7 +92,7 @@ function HeroWorking({
   }, [clockInTime, leaveWorkAt, remainingTime]);
 
   const remainingLabel = remainingTime.time
-    ? `${remainingTime.time.formatHours.padStart(2, '0')}h ${remainingTime.time.formatMinutes.padStart(2, '0')}m`
+    ? `${remainingTime.time.formatHours.padStart(2, '0')}:${remainingTime.time.formatMinutes.padStart(2, '0')}`
     : '';
 
   return (
@@ -134,10 +134,10 @@ function HeroWorking({
       <View className="mb-4 flex-row items-center gap-3.5">
         <View className="flex-row items-center gap-1.5">
           <View
-            className="size-[7px] rounded-full bg-[#34C759]"
+            className="size-[7px] animate-pulse rounded-full bg-[#34C759]"
             style={{ shadowColor: '#34C759', shadowRadius: 6, shadowOpacity: 1 }}
           />
-          <Text className="text-xs font-medium text-white/75">Active Shift</Text>
+          <Text className="text-xs font-medium text-white/75">근무중</Text>
         </View>
       </View>
 
@@ -146,7 +146,7 @@ function HeroWorking({
         className="items-center rounded-2xl border-[1.5px] border-white/35 bg-white/20 px-4 py-3.5"
         onPress={() => router.push('./attendance')}
       >
-        <Text className="text-[15px] font-bold text-white">퇴근 입력 🚀</Text>
+        <Text className="text-[15px] font-bold text-white">🚀 퇴근 입력</Text>
       </Pressable>
     </LinearGradient>
   );
@@ -317,7 +317,15 @@ function ActionCard({
 }
 
 // Skeleton shimmer block
-function SkeletonBlock({ width, height, rounded = 8 }: { width: number | `${number}%`; height: number; rounded?: number }) {
+function SkeletonBlock({
+  width,
+  height,
+  rounded = 8,
+}: {
+  width: number | `${number}%`;
+  height: number;
+  rounded?: number;
+}) {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -332,20 +340,14 @@ function SkeletonBlock({ width, height, rounded = 8 }: { width: number | `${numb
   }, []);
 
   return (
-    <Animated.View
-      className="bg-gray-200 dark:bg-gray-700"
-      style={{ width, height, borderRadius: rounded, opacity }}
-    />
+    <Animated.View className="bg-gray-200 dark:bg-gray-700" style={{ width, height, borderRadius: rounded, opacity }} />
   );
 }
 
 // Skeleton for Hero Card area
 function HeroSkeleton() {
   return (
-    <View
-      className="rounded-[20px] bg-gray-100 p-5 dark:bg-gray-800"
-      style={{ minHeight: 200 }}
-    >
+    <View className="rounded-[20px] bg-gray-100 p-5 dark:bg-gray-800" style={{ minHeight: 200 }}>
       <SkeletonBlock width={80} height={24} rounded={12} />
       <View className="mt-4">
         <SkeletonBlock width={160} height={16} />
