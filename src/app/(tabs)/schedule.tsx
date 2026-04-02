@@ -12,7 +12,6 @@ import { useUser } from '@/domain/users/queries/users';
 import { Icon } from '@/shared/components/Icon';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 
 import { FlashList } from '@shopify/flash-list';
