@@ -3,9 +3,9 @@ import { useContext, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { usePagerView } from 'react-native-pager-view';
 
-import { VACATION_COLORS } from '@/domain/documents/components/constants';
 import ScheduleEmptyState from '@/domain/documents/components/ScheduleEmptyState';
 import ScheduleSkeleton from '@/domain/documents/components/ScheduleSkeleton';
+import { VACATION_COLORS } from '@/domain/documents/components/constants';
 import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
@@ -97,7 +97,7 @@ const WeekDayItem = ({
 
   return (
     <TouchableOpacity
-      className={cx('flex h-11 w-full flex-col items-center justify-center rounded-full', {
+      className={cx('flex size-10 flex-col items-center justify-center rounded-full', {
         'bg-purple-500 dark:bg-purple-300': selected,
       })}
       onPress={handlePress}
@@ -113,7 +113,7 @@ const WeekDayItem = ({
       </Text>
 
       {/* Vacation type dots */}
-      <View className="absolute -bottom-1 flex-row gap-[2px]">
+      <View className="absolute bottom-1 flex-row gap-[2px]">
         {!selected &&
           uniqueTypes.map((type, i) => (
             <View
@@ -185,21 +185,13 @@ export default function Schedule() {
   // handle
   const handlePrevWeeks = () => {
     const startDate = getWeekStartDate(dayjs(weeks[0].startDate).add(-1, 'day').toDate());
-    setWeeks([
-      { startDate, endDate: dayjs(startDate).add(6, 'day').toDate() },
-      weeks[0],
-      weeks[1],
-    ]);
+    setWeeks([{ startDate, endDate: dayjs(startDate).add(6, 'day').toDate() }, weeks[0], weeks[1]]);
     setSelectedDate(dayjs(startDate).add(7, 'day').toDate());
   };
 
   const handleNextWeeks = () => {
     const startDate = getWeekStartDate(dayjs(weeks[2].endDate).add(1, 'day').toDate());
-    setWeeks([
-      weeks[1],
-      weeks[2],
-      { startDate, endDate: dayjs(startDate).add(6, 'day').toDate() },
-    ]);
+    setWeeks([weeks[1], weeks[2], { startDate, endDate: dayjs(startDate).add(6, 'day').toDate() }]);
     setSelectedDate(dayjs(startDate).add(-7, 'day').toDate());
   };
 
@@ -210,11 +202,13 @@ export default function Schedule() {
 
   // filtered vacations
   const myVacations = vacations.filter(
-    (v) => v.userUniqueId === userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+    (v) =>
+      v.userUniqueId === userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
   );
 
   const colleagueVacations = vacations.filter(
-    (v) => v.userUniqueId !== userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+    (v) =>
+      v.userUniqueId !== userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
   );
 
   return (
@@ -247,7 +241,7 @@ export default function Schedule() {
             elevation: 2,
           }}
         >
-          <View className="h-[88px]" style={{ flex: 1 }}>
+          <View className="h-[88px]">
             <AnimatedPagerView
               {...rest}
               className="h-full"
@@ -320,7 +314,11 @@ export default function Schedule() {
       </View>
 
       {/* Schedule Content */}
-      <ScrollView className="mt-4 flex-1 px-4" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView
+        className="mt-4 flex-1 px-4"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
         {/* 내 일정 */}
         <View className="mb-5">
           <View className="mb-3 flex-row items-center gap-2 px-1">
@@ -468,7 +466,7 @@ function ColleagueScheduleCard({
       <View className={cx('absolute bottom-2 left-0 top-2 w-1 rounded-r-full', colors.accent)} />
 
       {/* Avatar */}
-      <View className="ml-2 size-11 flex-none">
+      <View className="ml-2 size-16 flex-none">
         <UserAvatar
           src={`${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar`}
           username={user?.username}
