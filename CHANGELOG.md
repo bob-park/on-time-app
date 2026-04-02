@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-04-03
+
+### Changed
+- Full M3 (Material You) redesign for (more) tab: profile card, settings menu, theme picker, and notification preferences
+- Dayoff add page: merged two separate leave info cards into one unified card with divider, replaced 6 repetitive toggle buttons with data-driven chip/pill components
+- Dayoff histories page: M3 card style for vacation items, chip-based filter replacing SelectedButton component
+- Notifications page (home): M3 card surfaces with icon containers and proper dark mode shadows
+- Header pattern unified across all subpages: center title + left back button using Icon component
+- Android tab bar now has explicit background color for dark mode consistency
+- (more) layout padding reduced from 24px to 16px for better content density
+
+### Added
+- CLAUDE.md with gstack skill routing rules
+
+### Removed
+- Magical conch feature (tab, sound assets, and all references)
+- Legacy icon imports (Entypo, MaterialCommunityIcons, MaterialIcons) replaced by unified Icon component
+
 ## [1.0.3] - 2026-04-02
 
 ### Changed
