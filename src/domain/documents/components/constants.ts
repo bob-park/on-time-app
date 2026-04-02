@@ -5,7 +5,8 @@ export const VACATION_COLORS: Record<
     darkBg: string;
     accent: string;
     iconColor: string;
-    badge: string;
+    badgeBg: string;
+    badgeText: string;
     dot: string;
   }
 > = {
@@ -14,7 +15,8 @@ export const VACATION_COLORS: Record<
     darkBg: 'dark:bg-violet-900/30',
     accent: 'bg-violet-500',
     iconColor: '#7C3AED',
-    badge: 'bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300',
+    badgeBg: 'bg-violet-100 dark:bg-violet-900/50',
+    badgeText: 'text-violet-700 dark:text-violet-300',
     dot: '#7C3AED',
   },
   COMPENSATORY: {
@@ -22,7 +24,8 @@ export const VACATION_COLORS: Record<
     darkBg: 'dark:bg-amber-900/30',
     accent: 'bg-amber-500',
     iconColor: '#D97706',
-    badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
+    badgeBg: 'bg-amber-100 dark:bg-amber-900/50',
+    badgeText: 'text-amber-700 dark:text-amber-300',
     dot: '#D97706',
   },
   OFFICIAL: {
@@ -30,7 +33,8 @@ export const VACATION_COLORS: Record<
     darkBg: 'dark:bg-teal-900/30',
     accent: 'bg-teal-500',
     iconColor: '#0D9488',
-    badge: 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300',
+    badgeBg: 'bg-teal-100 dark:bg-teal-900/50',
+    badgeText: 'text-teal-700 dark:text-teal-300',
     dot: '#0D9488',
   },
 };

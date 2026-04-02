@@ -14,7 +14,6 @@ import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 
-import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
@@ -101,6 +100,7 @@ const WeekDayItem = ({
       })}
       onPress={handlePress}
       activeOpacity={0.7}
+      hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
     >
       <Text
         className={cx('text-[15px] font-semibold', {
@@ -137,24 +137,26 @@ const WeekDayItem = ({
 
 // --- Default weeks ---
 
-const defaultWeeks = [
-  {
-    startDate: getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()),
-    endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()))
-      .add(6, 'day')
-      .toDate(),
-  },
-  {
-    startDate: getWeekStartDate(dayjs().startOf('day').toDate()),
-    endDate: dayjs(getWeekStartDate(dayjs().toDate())).add(6, 'day').toDate(),
-  },
-  {
-    startDate: getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()),
-    endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()))
-      .add(6, 'day')
-      .toDate(),
-  },
-];
+function getDefaultWeeks() {
+  return [
+    {
+      startDate: getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()),
+      endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(-7, 'day').toDate()))
+        .add(6, 'day')
+        .toDate(),
+    },
+    {
+      startDate: getWeekStartDate(dayjs().startOf('day').toDate()),
+      endDate: dayjs(getWeekStartDate(dayjs().toDate())).add(6, 'day').toDate(),
+    },
+    {
+      startDate: getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()),
+      endDate: dayjs(getWeekStartDate(dayjs().startOf('day').add(7, 'day').toDate()))
+        .add(6, 'day')
+        .toDate(),
+    },
+  ];
+}
 
 // --- Main Schedule Page ---
 
@@ -167,12 +169,12 @@ export default function Schedule() {
 
   // state
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().startOf('day').toDate());
-  const [weeks, setWeeks] = useState<{ startDate: Date; endDate: Date }[]>(defaultWeeks);
+  const [weeks, setWeeks] = useState<{ startDate: Date; endDate: Date }[]>(getDefaultWeeks);
 
-  // queries
+  // queries — fetch all 3 visible weeks so prev/next pages have correct dots
   const { vacations, isLoading } = useVacations({
-    startDateFrom: weeks[1].startDate,
-    endDateFrom: weeks[1].endDate,
+    startDateFrom: weeks[0].startDate,
+    endDateFrom: weeks[2].endDate,
     page: 0,
     size: 100,
     status: 'APPROVED',
@@ -180,6 +182,26 @@ export default function Schedule() {
 
   // hooks
   const { AnimatedPagerView, ref, ...rest } = usePagerView({ pagesAmount: 3 });
+
+  // pre-build vacation type lookup by date string for O(1) access in week strip
+  const vacationsByDate = useMemo(() => {
+    const map = new Map<string, VacationType[]>();
+    for (const v of vacations) {
+      let cur = dayjs(v.startDate).startOf('day');
+      const end = dayjs(v.endDate).startOf('day');
+      while (cur.isSame(end) || cur.isBefore(end)) {
+        const key = cur.format('YYYY-MM-DD');
+        const arr = map.get(key);
+        if (arr) {
+          arr.push(v.vacationType);
+        } else {
+          map.set(key, [v.vacationType]);
+        }
+        cur = cur.add(1, 'day');
+      }
+    }
+    return map;
+  }, [vacations]);
 
   // handle
   const handlePrevWeeks = () => {
@@ -195,19 +217,29 @@ export default function Schedule() {
   };
 
   const handleSelectToday = () => {
-    setWeeks(defaultWeeks);
+    setWeeks(getDefaultWeeks());
     setSelectedDate(dayjs().startOf('day').toDate());
   };
 
   // filtered vacations
-  const myVacations = vacations.filter(
-    (v) =>
-      v.userUniqueId === userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+  const myVacations = useMemo(
+    () =>
+      vacations.filter(
+        (v) =>
+          v.userUniqueId === userDetail?.id &&
+          includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+      ),
+    [vacations, selectedDate, userDetail?.id],
   );
 
-  const colleagueVacations = vacations.filter(
-    (v) =>
-      v.userUniqueId !== userDetail?.id && includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+  const colleagueVacations = useMemo(
+    () =>
+      vacations.filter(
+        (v) =>
+          v.userUniqueId !== userDetail?.id &&
+          includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
+      ),
+    [vacations, selectedDate, userDetail?.id],
   );
 
   return (
@@ -273,9 +305,7 @@ export default function Schedule() {
                         const dateObj = date.toDate();
                         const dayOfWeek = date.day();
 
-                        const vacationTypesForDay = vacations
-                          .filter((v) => includeDate(dateObj, { startDate: v.startDate, endDate: v.endDate }))
-                          .map((v) => v.vacationType);
+                        const vacationTypesForDay = vacationsByDate.get(date.format('YYYY-MM-DD')) ?? [];
 
                         return (
                           <View key={`schedule-item-${pageIndex}-${index}`} className="w-10 items-center gap-1">
@@ -300,7 +330,7 @@ export default function Schedule() {
                       })}
                     </View>
                   )),
-                [weeks, selectedDate, vacations],
+                [weeks, selectedDate, vacationsByDate],
               )}
             </AnimatedPagerView>
           </View>
@@ -358,21 +388,17 @@ export default function Schedule() {
           ) : colleagueVacations.length === 0 ? (
             <ScheduleEmptyState message="선택한 날짜에 동료 일정이 없습니다" />
           ) : (
-            <View className="size-full" style={{ minHeight: colleagueVacations.length * 90 }}>
-              <FlashList
-                data={colleagueVacations}
-                keyExtractor={(item) => String(item.id)}
-                renderItem={({ item }) => (
-                  <ColleagueScheduleCard
-                    userUniqueId={item.userUniqueId}
-                    type={item.vacationType}
-                    subType={item.vacationSubType}
-                    startDate={item.startDate}
-                    endDate={item.endDate}
-                  />
-                )}
-                scrollEnabled={false}
-              />
+            <View className="gap-3">
+              {colleagueVacations.map((item) => (
+                <ColleagueScheduleCard
+                  key={`colleague-${item.id}`}
+                  userUniqueId={item.userUniqueId}
+                  type={item.vacationType}
+                  subType={item.vacationSubType}
+                  startDate={item.startDate}
+                  endDate={item.endDate}
+                />
+              ))}
             </View>
           )}
         </View>
@@ -413,9 +439,13 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
             {parseVacationName(vacation.vacationType)}
           </Text>
           {vacation.vacationSubType && (
-            <View className={cx('rounded-md px-1.5 py-0.5', colors.badge)}>
-              <Text className={cx('text-[10px] font-bold', colors.badge)}>
-                {vacation.vacationSubType === 'AM_HALF_DAY_OFF' ? '오전' : '오후'}
+            <View className={cx('rounded-md px-1.5 py-0.5', colors.badgeBg)}>
+              <Text className={cx('text-xs font-bold', colors.badgeText)}>
+                {vacation.vacationSubType === 'AM_HALF_DAY_OFF'
+                  ? '오전'
+                  : vacation.vacationSubType === 'PM_HALF_DAY_OFF'
+                    ? '오후'
+                    : vacation.vacationSubType}
               </Text>
             </View>
           )}
@@ -487,8 +517,8 @@ function ColleagueScheduleCard({
       </View>
 
       {/* Type badge */}
-      <View className={cx('rounded-lg px-2 py-1', colors.badge)}>
-        <Text className={cx('text-[10px] font-bold', colors.badge)}>{parseVacationName(type, subType)}</Text>
+      <View className={cx('rounded-lg px-2 py-1', colors.badgeBg)}>
+        <Text className={cx('text-xs font-bold', colors.badgeText)}>{parseVacationName(type, subType)}</Text>
       </View>
     </View>
   );
