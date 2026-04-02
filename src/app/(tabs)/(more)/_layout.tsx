@@ -16,8 +16,8 @@ export default function MoreLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            paddingLeft: 24,
-            paddingRight: 24,
+            paddingLeft: 16,
+            paddingRight: 16,
             paddingTop: 68,
             paddingBottom: 12,
             backgroundColor: theme === 'light' ? '#f9fafb' : '#030712',

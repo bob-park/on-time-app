@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, Text, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -11,15 +11,24 @@ import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
+
+const CARD_SHADOW = Platform.select({
+  ios: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+  },
+  android: {
+    elevation: 2,
+  },
+});
 
 export default function MoreIndex() {
   // context
   const { userDetail: user, onLogout } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -33,110 +42,102 @@ export default function MoreIndex() {
   };
 
   return (
-    <View className="flex size-full flex-col gap-3">
-      {/* user */}
-      <View className="w-full border-gray-200 pb-3 dark:border-gray-500" style={{ borderBottomWidth: 0.2 }}>
-        <View className="flex w-full flex-row items-center gap-2">
+    <ScrollView
+      className="size-full"
+      contentContainerStyle={{ paddingBottom: 112 }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Profile Card */}
+      <View className="overflow-hidden rounded-[20px] bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+        <View className="flex flex-row items-center gap-4 p-5">
           {/* avatar */}
-          <View className="w-28 flex-none p-3">
+          <View className="flex-none">
             <UserAvatar
               src={`${DEFAULT_API_HOST}/api/v1/users/${user?.id}/avatar`}
               username={user?.username}
-              size="base"
+              size="sm"
             />
           </View>
 
-          {/* name */}
-          <View className="">
-            <View className="flex flex-col items-center gap-2">
-              {/* name */}
-              <View className="w-full">
-                <Text className="text-2xl font-bold dark:text-white">{user?.username}</Text>
-              </View>
+          {/* info */}
+          <View className="flex flex-1 flex-col gap-1.5">
+            <Text className="text-xl font-bold dark:text-white">{user?.username}</Text>
 
-              <View className="flex w-full flex-row items-center gap-1">
-                <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{user?.position?.name}</Text>
-                {user?.group?.teamUserDescription && (
-                  <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                    ({user?.group?.teamUserDescription})
-                  </Text>
-                )}
-              </View>
+            <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+              {user?.position?.name}
+              {user?.group?.teamUserDescription ? ` (${user?.group?.teamUserDescription})` : ''}
+            </Text>
 
-              <View className="flex flex-row items-center gap-3">
-                {/* team - position */}
-                <View className="flex flex-row items-center gap-1">
-                  <Text className="font-semibold text-gray-500 dark:text-gray-400">{user?.group?.name}</Text>
-                  <Text className="font-semibold text-gray-500 dark:text-gray-400">
-                    <Text className="">| </Text>
-                    <Text className="">
-                      {dayjs
-                        .duration((dayjs().startOf('day').unix() - dayjs(employment?.effectiveDate).unix()) * 1_000)
-                        .format('Y년 M개월 D일')}
-                    </Text>
-                  </Text>
-                </View>
+            <View className="flex flex-row items-center gap-2">
+              <View className="rounded-full bg-gray-100 px-2.5 py-1 dark:bg-white/10">
+                <Text className="text-xs text-gray-500 dark:text-gray-400">
+                  {user?.group?.name} |{' '}
+                  {employment?.effectiveDate
+                    ? dayjs
+                        .duration(
+                          (dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000,
+                        )
+                        .format('Y년 M개월 D일')
+                    : ''}
+                </Text>
               </View>
             </View>
           </View>
         </View>
       </View>
 
-      {/* menu */}
-      <View className="size-full mt-4">
-        <ScrollView className="size-full" contentContainerStyle={{ paddingBottom: 112 }}>
-          {/* 계정 */}
-          <View className="">
-            <Menu title="계정">
-              <MenuItem
-                text="로그아웃"
-                icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-                onPress={handleLogout}
-              />
+      {/* Menu Groups */}
+      <View className="mt-6 flex flex-col gap-6">
+        {/* 계정 */}
+        <Menu title="계정">
+          <MenuItem
+            text="로그아웃"
+            iconBg="rgba(239,68,68,0.12)"
+            icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color="#ef4444" />}
+            onPress={handleLogout}
+          />
+          <MenuItem
+            text="알림 설정"
+            move
+            iconBg="rgba(59,130,246,0.12)"
+            icon={<Icon sf="bell" fallback="🔔" size={18} color="#3b82f6" />}
+            onPress={() => router.push('./notifications')}
+          />
+        </Menu>
 
-              <MenuItem
-                text="알림 설정"
-                move
-                icon={<Icon sf="bell" fallback="🔔" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-                onPress={() => router.push('./notifications')}
-              />
-            </Menu>
-          </View>
+        {/* 설정 */}
+        <Menu title="설정">
+          <MenuItem
+            move
+            text="화면 테마"
+            iconBg="rgba(245,158,11,0.12)"
+            icon={<Icon sf="sun.max" fallback="☀" size={18} color="#f59e0b" />}
+            onPress={() => router.push('./theme')}
+          />
+        </Menu>
 
-          {/* 설정 */}
-          <View className="mt-6">
-            <Menu title="설정">
-              <MenuItem
-                move
-                text="화면 테마"
-                icon={<Icon sf="sun.max" fallback="☀" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-                onPress={() => router.push('./theme')}
-              />
-            </Menu>
-          </View>
-
-          {/* 더보기 */}
-          <View className="mt-6">
-            <Menu title="더보기">
-              <MenuItem
-                move
-                text="공지사항"
-                icon={<Icon sf="newspaper" fallback="📰" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-              />
-              <MenuItem
-                move
-                text="근무"
-                icon={<Icon sf="timer" fallback="⏱" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-              />
-              <MenuItem
-                move
-                text="구성원"
-                icon={<Icon sf="person.2" fallback="👥" size={22} color={theme === 'light' ? '#6b7280' : '#d1d5db'} />}
-              />
-            </Menu>
-          </View>
-        </ScrollView>
+        {/* 더보기 */}
+        <Menu title="더보기">
+          <MenuItem
+            move
+            text="공지사항"
+            iconBg="rgba(99,102,241,0.12)"
+            icon={<Icon sf="newspaper" fallback="📰" size={18} color="#6366f1" />}
+          />
+          <MenuItem
+            move
+            text="근무"
+            iconBg="rgba(59,130,246,0.08)"
+            icon={<Icon sf="timer" fallback="⏱" size={18} color="#3b82f6" />}
+          />
+          <MenuItem
+            move
+            text="구성원"
+            iconBg="rgba(168,85,247,0.12)"
+            icon={<Icon sf="person.2" fallback="👥" size={18} color="#a855f7" />}
+          />
+        </Menu>
       </View>
-    </View>
+    </ScrollView>
   );
 }

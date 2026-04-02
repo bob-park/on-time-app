@@ -1,15 +1,28 @@
 import { useContext } from 'react';
 
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 import { useUpdateUserNotification, useUserNotifications } from '@/domain/notification/queries/userNotification';
+import { Icon } from '@/shared/components/Icon';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+
+const CARD_SHADOW = Platform.select({
+  ios: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+  },
+  android: {
+    elevation: 2,
+  },
+});
 
 function parseNotificationType(type: NotificationType) {
   switch (type) {
@@ -21,7 +34,6 @@ function parseNotificationType(type: NotificationType) {
     case 'SMTP':
       return '메일';
     case 'FLOW':
-      return 'FLOW';
     case 'FLOW_HOOKS':
       return 'FLOW';
     default:
@@ -29,17 +41,39 @@ function parseNotificationType(type: NotificationType) {
   }
 }
 
-function parseNotificationIcon(type: NotificationType, theme: 'dark' | 'light') {
+function NotificationIcon({ type, theme }: { type: NotificationType; theme: 'dark' | 'light' }) {
+  const iconColor = theme === 'light' ? '#3b82f6' : '#60a5fa';
+
   switch (type) {
     case 'ANDROID':
     case 'IOS':
-      return <Entypo name="mobile" size={24} color={theme === 'light' ? 'black' : 'white'} />;
+      return <Icon sf="iphone" fallback="📱" size={18} color={iconColor} />;
     case 'SLACK':
-      return <FontAwesome5 name="slack" size={24} color={theme === 'light' ? 'black' : 'white'} />;
+      return <FontAwesome5 name="slack" size={18} color={theme === 'light' ? '#611f69' : '#e0b0ff'} />;
     case 'SMTP':
-      return <MaterialIcons name="email" size={24} color={theme === 'light' ? 'black' : 'white'} />;
+      return <Icon sf="envelope" fallback="📧" size={18} color={iconColor} />;
+    case 'FLOW':
+    case 'FLOW_HOOKS':
+      return <Icon sf="bolt" fallback="⚡" size={18} color="#f59e0b" />;
     default:
-      return <Ionicons name="notifications" size={24} color={theme === 'light' ? 'black' : 'white'} />;
+      return <Icon sf="bell" fallback="🔔" size={18} color={iconColor} />;
+  }
+}
+
+function getIconBg(type: NotificationType): string {
+  switch (type) {
+    case 'ANDROID':
+    case 'IOS':
+      return 'rgba(59,130,246,0.12)';
+    case 'SLACK':
+      return 'rgba(168,85,247,0.12)';
+    case 'SMTP':
+      return 'rgba(99,102,241,0.12)';
+    case 'FLOW':
+    case 'FLOW_HOOKS':
+      return 'rgba(245,158,11,0.12)';
+    default:
+      return 'rgba(59,130,246,0.12)';
   }
 }
 
@@ -61,48 +95,55 @@ export default function NotificationSettings() {
     updateProvider({ userProviderId: providerId, enabled });
   };
 
+  const filteredProviders = notificationProviders.filter((provider) =>
+    ['IOS', 'ANDROID'].includes(provider.provider.type) ? provider.id === userProviderId : true,
+  );
+
   return (
-    <View className="flex size-full flex-col items-center gap-4">
+    <ScrollView
+      className="size-full"
+      contentContainerStyle={{ paddingBottom: 112 }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* header */}
-      <View className="relative flex w-full flex-row items-center justify-center gap-4">
-        {/* backward */}
+      <View className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
+          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" />
         </TouchableOpacity>
-
-        <View className="flex flex-row items-end gap-1">
-          <Text className="text-xl font-bold dark:text-white">알림 설정</Text>
-        </View>
+        <Text className="text-xl font-bold dark:text-white">알림 설정</Text>
       </View>
 
-      {/* contents */}
-      <View className="mt-5 w-full px-3">
-        <View className="flex flex-col items-center gap-1">
-          {notificationProviders
-            .filter((provider) =>
-              ['IOS', 'ANDROID'].includes(provider.provider.type) ? provider.id === userProviderId : true,
-            )
-            .map((provider) => (
+      {/* notification providers card */}
+      <View className="mt-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+        {filteredProviders.map((provider, index) => (
+          <View key={`notification-providers-item-${provider.id}`}>
+            <View className="flex flex-row items-center gap-3 px-4 py-3.5">
+              {/* icon */}
               <View
-                key={`notification-providers-item-${provider.id}`}
-                className="flex h-16 w-full flex-row items-center gap-3"
+                className="size-9 flex-none items-center justify-center rounded-xl"
+                style={{ backgroundColor: getIconBg(provider.provider.type) }}
               >
-                <View className="w-10 flex-none">{parseNotificationIcon(provider.provider.type, theme)}</View>
-                <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                    {parseNotificationType(provider.provider.type)}
-                  </Text>
-                </View>
-                <View className="w-14 flex-none">
-                  <Switch
-                    value={provider.enabled}
-                    onValueChange={(value) => handleUpdateEnabled({ providerId: provider.id, enabled: value })}
-                  />
-                </View>
+                <NotificationIcon type={provider.provider.type} theme={theme} />
               </View>
-            ))}
-        </View>
+
+              {/* label */}
+              <Text className="flex-1 text-[15px] font-semibold dark:text-white">
+                {parseNotificationType(provider.provider.type)}
+              </Text>
+
+              {/* toggle */}
+              <Switch
+                value={provider.enabled}
+                onValueChange={(value) => handleUpdateEnabled({ providerId: provider.id, enabled: value })}
+              />
+            </View>
+
+            {index < filteredProviders.length - 1 && (
+              <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
+            )}
+          </View>
+        ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
