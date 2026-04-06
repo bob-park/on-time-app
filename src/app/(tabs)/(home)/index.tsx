@@ -272,6 +272,11 @@ function HeroOvertime({
 function HeroDone({ today }: { today: any }) {
   const clockInTime = today?.clockInTime ? dayjs(today.clockInTime) : null;
   const clockOutTime = today?.clockOutTime ? dayjs(today.clockOutTime) : null;
+  const leaveWorkAt = today?.leaveWorkAt ? dayjs(today.leaveWorkAt) : null;
+
+  const isOvertime = !!(clockOutTime && leaveWorkAt && clockOutTime.unix() > leaveWorkAt.unix());
+  const overtimeSec = isOvertime ? clockOutTime!.unix() - leaveWorkAt!.unix() : 0;
+  const overtimeText = isOvertime ? new TimeCode(overtimeSec) : null;
 
   const workDurations = today?.clockInTime && today?.clockOutTime && getDuration(today.clockInTime, today.clockOutTime);
   const durationText = workDurations
@@ -289,6 +294,48 @@ function HeroDone({ today }: { today: any }) {
             : 0),
       )
     : '';
+
+  if (isOvertime) {
+    return (
+      <LinearGradient
+        colors={['#1A1A2E', '#16213E']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          borderRadius: 20,
+          padding: 20,
+          minHeight: 160,
+          overflow: 'hidden',
+          borderWidth: 1.5,
+          borderColor: 'rgba(255,107,107,0.3)',
+        }}
+      >
+        {/* badge */}
+        <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-[#FF6B6B]/20 px-2.5 py-1">
+          <Text className="text-xs">🔥</Text>
+          <Text className="text-[11px] font-semibold text-[#FF6B6B]">초과근무 후 퇴근</Text>
+        </View>
+
+        <Text className="mb-1 text-[17px] font-bold text-white">퇴근 완료</Text>
+
+        {/* times */}
+        <View className="mb-1 mt-2.5 flex-row items-center gap-2">
+          <Text className="text-xl font-bold text-white">{clockInTime?.format('HH:mm')}</Text>
+          <Text className="text-[15px] text-white/40">→</Text>
+          <Text className="text-xl font-bold text-[#FF6B6B]">{clockOutTime?.format('HH:mm')}</Text>
+        </View>
+
+        <View className="mt-1 flex-row items-center gap-2">
+          <Text className="text-[13px] text-white/50">총 근무 {durationText}</Text>
+          {overtimeText && (
+            <Text className="text-[13px] font-semibold text-[#FF6B6B]">
+              (+{overtimeText.formatHours.padStart(2, '0')}:{overtimeText.formatMinutes.padStart(2, '0')} 초과)
+            </Text>
+          )}
+        </View>
+      </LinearGradient>
+    );
+  }
 
   return (
     <View
