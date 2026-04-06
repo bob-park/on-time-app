@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2026-04-06
+
+### Added
+- Weekend hero card on home screen: shows "오늘은 주말이에요" message with gray gradient when it's Saturday or Sunday, while keeping the clock-in button accessible for weekend work
+
 ## [1.0.4] - 2026-04-03
 
 ### Changed
