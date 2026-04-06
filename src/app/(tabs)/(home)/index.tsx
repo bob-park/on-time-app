@@ -16,6 +16,7 @@ import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
 import { TimeCode } from '@/utils/timecode/TimeCode';
 
 const ONE_HOUR = 3_600;
+const WEEKEND_DAYS = [0, 6];
 
 type WorkState = 'before' | 'working' | 'overtime' | 'done';
 
@@ -59,6 +60,39 @@ function HeroBeforeWork({ today }: { today: any }) {
           </Text>
         </View>
       </View>
+
+      {/* CTA */}
+      <Pressable
+        className="items-center rounded-2xl border-[1.5px] border-white/35 bg-white/20 px-4 py-3.5"
+        onPress={() => router.push('./attendance')}
+      >
+        <Text className="text-[15px] font-bold text-white">→ 출근 입력</Text>
+      </Pressable>
+    </LinearGradient>
+  );
+}
+
+// Hero Card - Weekend: 주말 (출근 가능)
+function HeroWeekend() {
+  const router = useRouter();
+
+  return (
+    <LinearGradient
+      colors={['#6B7280', '#4B5563', '#374151']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ borderRadius: 20, padding: 20, minHeight: 200, overflow: 'hidden' }}
+    >
+      {/* badge */}
+      <View className="mb-3 flex-row items-center gap-1.5 self-start rounded-full bg-white/20 px-2.5 py-1">
+        <Text className="text-xs">🌙</Text>
+        <Text className="text-xs font-semibold text-white/90">주말</Text>
+      </View>
+
+      <Text className="mb-1 text-[15px] text-white/75">오늘은 주말이에요</Text>
+      <Text className="mb-4 text-[26px] font-bold text-white">푹 쉬세요!</Text>
+
+      <Text className="mb-5 text-[13px] text-white/50">출근이 필요하면 아래 버튼을 눌러주세요</Text>
 
       {/* CTA */}
       <Pressable
@@ -431,6 +465,7 @@ export default function HomeIndex() {
   };
 
   const workState = getWorkState(today);
+  const isWeekend = WEEKEND_DAYS.includes(dayjs().day());
 
   return (
     <ScrollView
@@ -463,6 +498,8 @@ export default function HomeIndex() {
       <View className="mx-4 mt-3">
         {isLoading && !today ? (
           <HeroSkeleton />
+        ) : isWeekend && workState === 'before' ? (
+          <HeroWeekend />
         ) : (
           <>
             {workState === 'before' && <HeroBeforeWork today={today} />}
