@@ -168,7 +168,10 @@ export default function AddDayOff() {
           showsVerticalScrollIndicator={false}
         >
           {/* leave info card (merged) */}
-          <View className="mt-2 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+          <Text className="mb-3 mt-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            잔여 현황
+          </Text>
+          <View className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
             {/* 연차 row */}
             <View className="flex flex-row items-center gap-3 px-4 py-3.5">
               <View
@@ -228,8 +231,10 @@ export default function AddDayOff() {
           </View>
 
           {/* vacation type chips */}
-          <View className="mt-5">
-            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">휴가 구분</Text>
+          <View className="mt-8">
+            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              휴가 구분
+            </Text>
             <View className="flex flex-row items-center gap-2">
               {VACATION_TYPES.map((option) => {
                 const isActive = vacationType === option.key;
@@ -257,8 +262,10 @@ export default function AddDayOff() {
           </View>
 
           {/* vacation sub type chips */}
-          <View className="mt-5">
-            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">부가 구분</Text>
+          <View className="mt-6">
+            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              부가 구분
+            </Text>
             <View className="flex flex-row items-center gap-2">
               {VACATION_SUB_TYPES.map((option) => {
                 const isActive = vacationSubType === option.key;
@@ -281,8 +288,10 @@ export default function AddDayOff() {
           </View>
 
           {/* reason input */}
-          <View className="mt-5">
-            <Text className="mb-2 text-sm font-semibold text-gray-500 dark:text-gray-400">사유</Text>
+          <View className="mt-6">
+            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              사유
+            </Text>
             <View className="rounded-2xl bg-white px-4 py-3 dark:bg-gray-900" style={CARD_SHADOW}>
               <TextInput
                 className={cx('w-full text-[15px] dark:text-white', {
@@ -299,7 +308,11 @@ export default function AddDayOff() {
           </View>
 
           {/* calendar */}
-          <View className="mt-5 rounded-2xl bg-white p-3 dark:bg-gray-900" style={CARD_SHADOW}>
+          <View className="mt-6">
+            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              기간
+            </Text>
+            <View className="rounded-2xl bg-white p-3 dark:bg-gray-900" style={CARD_SHADOW}>
             <DateTimePicker
               classNames={{
                 ...defaultClassNames,
@@ -340,6 +353,7 @@ export default function AddDayOff() {
                 })
               }
             />
+            </View>
           </View>
         </ScrollView>
       </View>

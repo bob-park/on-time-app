@@ -46,8 +46,13 @@ export default function MoreIndex() {
       contentContainerStyle={{ paddingBottom: 112 }}
       showsVerticalScrollIndicator={false}
     >
+      {/* section header */}
+      <Text className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        프로필
+      </Text>
+
       {/* Profile Card */}
-      <View className="overflow-hidden rounded-[20px] bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+      <View className="overflow-hidden rounded-3xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
         <View className="flex flex-row items-center gap-4 p-5">
           {/* avatar */}
           <View className="flex-none">
@@ -59,18 +64,18 @@ export default function MoreIndex() {
           </View>
 
           {/* info */}
-          <View className="flex flex-1 flex-col gap-1.5">
-            <Text className="text-xl font-bold dark:text-white">{user?.username}</Text>
+          <View className="flex flex-1 flex-col gap-1">
+            <Text className="text-xl font-bold text-gray-900 dark:text-white">{user?.username}</Text>
 
             <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
               {user?.position?.name}
               {user?.group?.teamUserDescription ? ` (${user?.group?.teamUserDescription})` : ''}
             </Text>
 
-            <View className="flex flex-row items-center gap-2">
+            <View className="mt-1 flex flex-row items-center gap-2">
               <View className="rounded-full bg-gray-100 px-2.5 py-1 dark:bg-white/10">
                 <Text className="text-xs text-gray-500 dark:text-gray-400">
-                  {user?.group?.name} |{' '}
+                  {user?.group?.name} ·{' '}
                   {employment?.effectiveDate
                     ? dayjs
                         .duration((dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000)
@@ -84,7 +89,7 @@ export default function MoreIndex() {
       </View>
 
       {/* Menu Groups */}
-      <View className="mt-6 flex flex-col gap-6">
+      <View className="mt-10 flex flex-col gap-8">
         {/* 계정 */}
         <Menu title="계정">
           <MenuItem

@@ -74,7 +74,15 @@ const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) =>
 
         {/* days */}
         <View className="items-end justify-center pt-1">
-          <Text className="text-sm font-semibold text-blue-500">{vacation.usedDays}일</Text>
+          <View className="flex-row items-baseline gap-0.5">
+            <Text
+              className="text-lg font-bold text-blue-500"
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {vacation.usedDays}
+            </Text>
+            <Text className="text-xs font-semibold text-blue-500/80">일</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -135,16 +143,29 @@ export default function DayoffHistoriesPage() {
         <Text className="text-xl font-bold dark:text-white">휴가 내역</Text>
       </View>
 
-      {/* year + total */}
-      <View className="mt-2 flex flex-row items-center gap-2">
-        <Text className="text-base font-bold text-gray-500">{dayjs().format('YYYY')}</Text>
-        <Text className="text-sm text-gray-500">
-          (총 사용: {newVacations.reduce((current, vacation) => vacation.usedDays + current, 0)}일)
-        </Text>
+      {/* year + total — 숫자가 주인공 */}
+      <View className="mt-4 flex-row items-end justify-between">
+        <View>
+          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            {dayjs().format('YYYY')}년 사용 내역
+          </Text>
+          <View className="mt-1 flex-row items-baseline gap-1.5">
+            <Text
+              className="text-[40px] font-bold leading-none text-gray-900 dark:text-white"
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {newVacations.reduce((current, vacation) => vacation.usedDays + current, 0)}
+            </Text>
+            <Text className="text-base font-semibold text-gray-500 dark:text-gray-400">일</Text>
+          </View>
+        </View>
+        <View className="items-end">
+          <Text className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">총 {newVacations.length}건</Text>
+        </View>
       </View>
 
       {/* filter chips */}
-      <View className="mt-3 flex flex-row items-center gap-2">
+      <View className="mt-6 flex flex-row items-center gap-2">
         {FILTER_OPTIONS.map((option) => {
           const isActive = selectedVacationType === option.key;
           return (
@@ -163,7 +184,7 @@ export default function DayoffHistoriesPage() {
       </View>
 
       {/* list */}
-      <View className="mt-2 flex-1">
+      <View className="mt-3 flex-1">
         <FlashList
           data={newVacations}
           refreshing={false}

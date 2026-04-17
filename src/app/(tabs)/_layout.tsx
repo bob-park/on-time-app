@@ -19,10 +19,11 @@ function AndroidTabs({ theme }: { theme: string }) {
         headerShown: false,
         tabBarActiveTintColor: iconColor,
         tabBarInactiveTintColor: theme === 'light' ? '#9ca3af' : '#6b7280',
-        tabBarItemStyle: {
-          backgroundColor: theme === 'light' ? '#ffffff' : '#111111',
-        },
         tabBarLabelStyle: { fontSize: 10 },
+        tabBarStyle: {
+          backgroundColor: theme !== 'light' ? '#111111' : '#ffffff',
+          borderTopColor: theme !== 'light' ? '#111111' : '#ffffff',
+        },
       }}
     >
       <Tabs.Screen

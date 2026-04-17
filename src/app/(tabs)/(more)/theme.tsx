@@ -57,7 +57,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export default function Theme() {
   // context
-  const { theme, preference, onUpdatePreference } = useContext(ThemeContext);
+  const { theme, preference, onUpdateTheme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -90,7 +90,7 @@ export default function Theme() {
               className={`flex flex-row items-center gap-3 px-4 py-4 ${
                 preference === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               }`}
-              onPress={() => onUpdatePreference(option.key)}
+              onPress={() => onUpdateTheme(option.key)}
             >
               {/* icon */}
               <View

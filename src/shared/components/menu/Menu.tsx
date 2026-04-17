@@ -20,13 +20,11 @@ export default function Menu({ title, children }: Readonly<{ title: string; chil
   const validChildren = Children.toArray(children).filter(Boolean);
 
   return (
-    <View className="flex flex-col gap-2">
+    <View className="flex flex-col gap-3">
       {/* section title */}
-      <View className="ml-1">
-        <Text className="text-[13px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-          {title}
-        </Text>
-      </View>
+      <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        {title}
+      </Text>
 
       {/* card container */}
       <View className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>

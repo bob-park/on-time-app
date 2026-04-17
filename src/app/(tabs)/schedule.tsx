@@ -243,17 +243,21 @@ export default function Schedule() {
   );
 
   return (
-    <View className="flex size-full flex-col bg-gray-50 pt-14 dark:bg-gray-950">
+    <View className="flex size-full flex-col bg-gray-50 pt-[68px] dark:bg-gray-950">
       {/* Header */}
-      <View className="px-5 pb-2 pt-3">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-            {dayjs(selectedDate).format('YYYY년 MM월')}
+      <View className="px-4 pb-3">
+        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          일정
+        </Text>
+        <View className="mt-1 flex-row items-end justify-between">
+          <Text className="text-[28px] font-bold leading-none text-gray-900 dark:text-white">
+            {dayjs(selectedDate).format('YYYY년 M월')}
           </Text>
           <TouchableOpacity
-            className="h-8 items-center justify-center rounded-full bg-purple-100 px-4 dark:bg-purple-900/40"
+            className="h-9 items-center justify-center rounded-full bg-purple-100 px-4 dark:bg-purple-900/40"
             onPress={handleSelectToday}
             activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text className="text-sm font-bold text-purple-600 dark:text-purple-300">오늘</Text>
           </TouchableOpacity>
@@ -261,7 +265,7 @@ export default function Schedule() {
       </View>
 
       {/* Week Calendar Strip - M3 Surface */}
-      <View className="px-4">
+      <View className="mt-2 px-4">
         <View
           className="rounded-[20px] bg-white pb-2 pt-3 dark:bg-gray-900"
           style={{
@@ -344,14 +348,16 @@ export default function Schedule() {
 
       {/* Schedule Content */}
       <ScrollView
-        className="mt-4 flex-1 px-4"
+        className="mt-6 flex-1 px-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* 내 일정 */}
-        <View className="mb-5">
-          <View className="mb-3 flex-row items-center gap-2 px-1">
-            <Text className="text-sm font-bold text-gray-400 dark:text-gray-500">내 일정</Text>
+        <View className="mb-8">
+          <View className="mb-3 flex-row items-center gap-2">
+            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              내 일정
+            </Text>
             <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
               <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
                 {isLoading ? '-' : myVacations.length}
@@ -374,8 +380,10 @@ export default function Schedule() {
 
         {/* 동료 일정 */}
         <View>
-          <View className="mb-3 flex-row items-center gap-2 px-1">
-            <Text className="text-sm font-bold text-gray-400 dark:text-gray-500">동료 일정</Text>
+          <View className="mb-3 flex-row items-center gap-2">
+            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              동료 일정
+            </Text>
             <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
               <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
                 {isLoading ? '-' : colleagueVacations.length}
@@ -415,7 +423,7 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
 
   return (
     <View
-      className="flex-row items-center gap-3 overflow-hidden rounded-2xl bg-white p-4 dark:bg-gray-900"
+      className="flex-row items-center gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900"
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -424,18 +432,15 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
         elevation: 2,
       }}
     >
-      {/* Left accent bar */}
-      <View className={cx('absolute bottom-2 left-0 top-2 w-1 rounded-r-full', colors.accent)} />
-
-      {/* Icon */}
-      <View className={cx('ml-2 size-12 items-center justify-center rounded-xl', colors.bg, colors.darkBg)}>
+      {/* Icon tile — type identity comes from the tile, not a stripe */}
+      <View className={cx('size-12 items-center justify-center rounded-2xl', colors.bg, colors.darkBg)}>
         <Icon sf={icon.sf} fallback={icon.fallback} size={22} color={colors.iconColor} />
       </View>
 
       {/* Info */}
       <View className="flex-1 gap-1">
         <View className="flex-row items-center gap-2">
-          <Text className="text-[15px] font-bold text-gray-800 dark:text-gray-100">
+          <Text className="text-base font-bold text-gray-900 dark:text-gray-100">
             {parseVacationName(vacation.vacationType)}
           </Text>
           {vacation.vacationSubType && (
@@ -482,7 +487,7 @@ function ColleagueScheduleCard({
 
   return (
     <View
-      className="mb-3 flex-row items-center gap-3 overflow-hidden rounded-2xl bg-white p-4 dark:bg-gray-900"
+      className="flex-row items-center gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900"
       style={{
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
@@ -491,11 +496,8 @@ function ColleagueScheduleCard({
         elevation: 2,
       }}
     >
-      {/* Left accent bar */}
-      <View className={cx('absolute bottom-2 left-0 top-2 w-1 rounded-r-full', colors.accent)} />
-
       {/* Avatar */}
-      <View className="ml-2 size-16 flex-none">
+      <View className="size-14 flex-none">
         <UserAvatar
           src={`${DEFAULT_API_HOST}/api/v1/users/${userUniqueId}/avatar`}
           username={user?.username}
@@ -504,12 +506,12 @@ function ColleagueScheduleCard({
       </View>
 
       {/* Info */}
-      <View className="flex-1 gap-1">
-        <Text className="text-sm font-semibold text-gray-800 dark:text-gray-100">{user?.username || ''}</Text>
-        <Text className="text-[11px] text-gray-400 dark:text-gray-500">
-          {user?.group?.name} - {user?.position?.name || ''}
+      <View className="flex-1 gap-0.5">
+        <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">{user?.username || ''}</Text>
+        <Text className="text-xs text-gray-400 dark:text-gray-500">
+          {user?.group?.name} · {user?.position?.name || ''}
         </Text>
-        <Text className="text-xs font-medium text-gray-400 dark:text-gray-500">
+        <Text className="mt-1 text-xs font-medium text-gray-400 dark:text-gray-500">
           {dayjs(startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(startDate).day())})
           {dayjs(startDate).isBefore(endDate) &&
             ` - ${dayjs(endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(endDate).day())})`}
@@ -517,7 +519,7 @@ function ColleagueScheduleCard({
       </View>
 
       {/* Type badge */}
-      <View className={cx('rounded-lg px-2 py-1', colors.badgeBg)}>
+      <View className={cx('rounded-lg px-2.5 py-1', colors.badgeBg)}>
         <Text className={cx('text-xs font-bold', colors.badgeText)}>{parseVacationName(type, subType)}</Text>
       </View>
     </View>
