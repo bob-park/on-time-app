@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
@@ -8,8 +9,6 @@ import { Icon } from '@/shared/components/Icon';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
-import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -61,7 +60,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export default function Theme() {
   // context
-  const { theme, preference, onUpdateTheme } = useContext(ThemeContext);
+  const { theme, onUpdateTheme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -93,7 +92,7 @@ export default function Theme() {
             <AnimatedPressable
               scaleTo={0.98}
               className={`flex flex-row items-center gap-3 px-4 py-4 ${
-                preference === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                theme === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               }`}
               onPress={() => onUpdateTheme(option.key)}
             >
@@ -109,7 +108,7 @@ export default function Theme() {
               <Text className="flex-1 text-[15px] font-semibold dark:text-white">{option.label}</Text>
 
               {/* checkmark */}
-              {preference === option.key && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />}
+              {theme === option.key && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />}
             </AnimatedPressable>
 
             {index < THEME_OPTIONS.length - 1 && (

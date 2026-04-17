@@ -1,7 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
 
-import { useColorScheme } from 'react-native';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useColorScheme as useNativewindColorSchema } from 'nativewind';
@@ -9,51 +7,45 @@ import { useColorScheme as useNativewindColorSchema } from 'nativewind';
 const KEY_THEME_PREFERENCE = 'theme.preference';
 
 interface ThemeContextType {
-  /** Resolved theme actually displayed — always 'light' or 'dark'. Use this for inline color branches. */
-  theme: 'light' | 'dark';
-  /** User's saved preference — 'light' | 'dark' | 'system'. Only settings UI should read this. */
-  preference: ThemePreference;
-  onUpdateTheme: (preference: ThemePreference) => void;
+  theme: ThemePreference;
+  onUpdateTheme: (theme: ThemePreference) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
-  preference: 'system',
-  onUpdateTheme: () => {},
+  onUpdateTheme: (preference: ThemePreference) => {},
 });
 
 export default function ThemeProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  // state — what the user picked
-  const [preference, setPreference] = useState<ThemePreference>('system');
+  // state
+  const [theme, setTheme] = useState<ThemePreference>('system');
 
   // hooks
   const { setColorScheme } = useNativewindColorSchema();
-  const systemColorScheme = useColorScheme();
 
-  // load persisted preference
+  // useEffect
   useEffect(() => {
     AsyncStorage.getItem(KEY_THEME_PREFERENCE)
       .then((data) => (data as ThemePreference) || 'system')
-      .then((p) => setPreference(p));
+      .then((preference) => setTheme(preference));
   }, []);
 
-  // NativeWind v4 accepts 'light' | 'dark' | 'system' directly
   useEffect(() => {
-    setColorScheme(preference);
-    AsyncStorage.setItem(KEY_THEME_PREFERENCE, preference);
-  }, [preference]);
+    setColorScheme(theme);
 
-  // resolve preference → concrete light/dark
-  const theme: 'light' | 'dark' =
-    preference === 'system' ? (systemColorScheme === 'dark' ? 'dark' : 'light') : preference;
+    // save
+    AsyncStorage.setItem(KEY_THEME_PREFERENCE, theme);
+  }, [theme]);
 
+  // memorize
   const contextValue = useMemo<ThemeContextType>(
     () => ({
       theme,
-      preference,
-      onUpdateTheme: (next: ThemePreference) => setPreference(next),
+      onUpdateTheme: (theme: ThemePreference) => {
+        setTheme(theme);
+      },
     }),
-    [theme, preference],
+    [theme],
   );
 
   return <ThemeContext value={contextValue}>{children}</ThemeContext>;
