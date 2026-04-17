@@ -12,6 +12,10 @@ import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import LottieView from 'lottie-react-native';
+import Reanimated from 'react-native-reanimated';
+
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -31,12 +35,13 @@ const MessageItem = ({
 }: Readonly<{ message: UserNotificationHistory; onRead: (id: string) => void }>) => {
   return (
     <View className="mt-3 px-1">
-      <TouchableOpacity
+      <AnimatedPressable
         className={`flex flex-row items-start gap-3 rounded-2xl bg-white px-4 py-4 dark:bg-gray-900 ${
           message.isRead ? 'opacity-60' : ''
         }`}
         style={CARD_SHADOW}
         disabled={message.isRead}
+        scaleTo={0.99}
         onPress={() => onRead(message.id)}
       >
         {/* icon container */}
@@ -66,7 +71,7 @@ const MessageItem = ({
             {dayjs(message.createdDate).fromNow()}
           </Text>
         </View>
-      </TouchableOpacity>
+      </AnimatedPressable>
     </View>
   );
 };
@@ -112,7 +117,7 @@ export default function NotificationsPage() {
   return (
     <View className="flex size-full flex-col">
       {/* header */}
-      <View className="relative mb-2 flex flex-row items-center justify-center">
+      <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon
             sf="chevron.left"
@@ -132,7 +137,7 @@ export default function NotificationsPage() {
             모두 읽기
           </Text>
         </TouchableOpacity>
-      </View>
+      </Reanimated.View>
 
       {/* list */}
       <View className="flex-1">
@@ -141,7 +146,11 @@ export default function NotificationsPage() {
           refreshing={isLoading}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 112 }}
-          renderItem={({ item }) => <MessageItem message={item} onRead={handleRead} />}
+          renderItem={({ item, index }) => (
+            <Reanimated.View entering={enterListItem(index, 80)}>
+              <MessageItem message={item} onRead={handleRead} />
+            </Reanimated.View>
+          )}
           ListFooterComponent={notifications.length === 0 ? <NoMessage /> : null}
           onRefresh={() => refetch()}
           onEndReached={() => hasNextPage && fetchNextPage()}

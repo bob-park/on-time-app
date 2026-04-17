@@ -19,7 +19,7 @@ export default function HomeLayout() {
             paddingLeft: 16,
             paddingRight: 16,
             paddingTop: 68,
-            paddingBottom: 2,
+            paddingBottom: 12,
             backgroundColor: theme === 'light' ? '#f9fafb' : '#030712',
           },
         }}

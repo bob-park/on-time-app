@@ -5,7 +5,11 @@ import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native
 import { useRouter } from 'expo-router';
 
 import { Icon } from '@/shared/components/Icon';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+
+import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -57,7 +61,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export default function Theme() {
   // context
-  const { theme, preference, onUpdatePreference } = useContext(ThemeContext);
+  const { theme, preference, onUpdateTheme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
@@ -69,7 +73,7 @@ export default function Theme() {
       showsVerticalScrollIndicator={false}
     >
       {/* header */}
-      <View className="relative mb-6 flex flex-row items-center justify-center">
+      <Reanimated.View entering={enterPage(0)} className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon
             sf="chevron.left"
@@ -80,17 +84,18 @@ export default function Theme() {
           />
         </TouchableOpacity>
         <Text className="text-xl font-bold dark:text-white">화면 테마</Text>
-      </View>
+      </Reanimated.View>
 
       {/* theme options card */}
       <View className="mt-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
         {THEME_OPTIONS.map((option, index) => (
-          <View key={option.key}>
-            <TouchableOpacity
+          <Reanimated.View key={option.key} entering={enterListItem(index, 80)}>
+            <AnimatedPressable
+              scaleTo={0.98}
               className={`flex flex-row items-center gap-3 px-4 py-4 ${
                 preference === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               }`}
-              onPress={() => onUpdatePreference(option.key)}
+              onPress={() => onUpdateTheme(option.key)}
             >
               {/* icon */}
               <View
@@ -105,12 +110,12 @@ export default function Theme() {
 
               {/* checkmark */}
               {preference === option.key && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />}
-            </TouchableOpacity>
+            </AnimatedPressable>
 
             {index < THEME_OPTIONS.length - 1 && (
               <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
             )}
-          </View>
+          </Reanimated.View>
         ))}
       </View>
     </ScrollView>

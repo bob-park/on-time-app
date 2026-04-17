@@ -23,6 +23,10 @@ import { getDaysOfWeek, round } from '@/utils/parse';
 
 import cx from 'classnames';
 import LottieView from 'lottie-react-native';
+import Reanimated from 'react-native-reanimated';
+
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterHero, enterPage } from '@/shared/components/motion/entering';
 
 const WEEKEND_DAYS = [0, 6];
 
@@ -220,251 +224,188 @@ export default function Attendance() {
     return <Loading />;
   }
 
+  const weekdayColor =
+    dayjs().day() === 0 ? 'text-red-500 dark:text-red-300' : dayjs().day() === 6 ? 'text-blue-500 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500';
+
+  const isBeforeClockIn = !today?.clockInTime;
+  const isAfterClockOut = !!today?.clockOutTime;
+
+  const WORK_TYPES: { key: AttendanceWorkType; label: string; icon: React.ReactNode }[] = [
+    {
+      key: 'OFFICE',
+      label: '사무실',
+      icon: (
+        <MaterialCommunityIcons
+          name="office-building-outline"
+          size={18}
+          color={workType === 'OFFICE' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+        />
+      ),
+    },
+    {
+      key: 'OUTSIDE',
+      label: '외근',
+      icon: (
+        <FontAwesome
+          name="car"
+          size={18}
+          color={workType === 'OUTSIDE' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+        />
+      ),
+    },
+    {
+      key: 'HOME',
+      label: '재택근무',
+      icon: (
+        <Ionicons
+          name="home-sharp"
+          size={18}
+          color={workType === 'HOME' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+        />
+      ),
+    },
+  ];
+
   return (
     <>
-      <View className="flex size-full flex-col items-center">
-        {/* headers */}
-        <View className="w-full">
-          <View className="flex flex-row items-center gap-4">
-            {/* backward */}
-            <TouchableOpacity className="items-center justify-center" onPress={() => router.back()}>
-              <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
-            </TouchableOpacity>
-
-            {/* today */}
-            <View className="flex flex-row items-end gap-1">
-              <Text className="text-xl font-bold dark:text-white">{dayjs().format('MM월 DD일')}</Text>
-              <Text
-                className={cx('text-base font-bold', {
-                  'text-black dark:text-white': !WEEKEND_DAYS.includes(dayjs().day()),
-                  'text-blue-500 dark:text-blue-300': dayjs().day() === 6,
-                  'text-red-600 dark:text-red-300': dayjs().day() === 0,
-                })}
-              >
-                ({getDaysOfWeek(dayjs().day())})
-              </Text>
-            </View>
-          </View>
+      <View className="flex-1">
+        {/* header — 다른 서브페이지와 동일 패턴 */}
+        <View className="relative mb-2 flex flex-row items-center justify-center">
+          <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
+            <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
+          </TouchableOpacity>
+          <Text className="text-xl font-bold dark:text-white">
+            {isBeforeClockIn ? '출근' : isAfterClockOut ? '근무 완료' : '퇴근'}
+          </Text>
         </View>
+
+        {/* today — 숫자가 주인공 */}
+        <Reanimated.View entering={enterHero(40)} className="mt-2">
+          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            오늘
+          </Text>
+          <View className="mt-1 flex flex-row items-baseline gap-2">
+            <Text
+              className="text-[32px] font-bold leading-none text-gray-900 dark:text-white"
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {dayjs().format('M월 D일')}
+            </Text>
+            <Text className={cx('text-lg font-semibold', weekdayColor)}>
+              {getDaysOfWeek(dayjs().day())}
+            </Text>
+          </View>
+        </Reanimated.View>
 
         {/* select work type */}
-        <View className="mt-8 w-full">
-          <View className="flex flex-col items-center gap-3">
-            <View className="w-full">
-              <Text className="text-base font-bold text-gray-400">근무 위치</Text>
-            </View>
-            <View className="w-full">
-              <View className="flex flex-row items-center gap-3">
+        <Reanimated.View entering={enterPage(140)} className="mt-8">
+          <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            근무 위치
+          </Text>
+          <View className="flex flex-row items-center gap-2">
+            {WORK_TYPES.map((option) => {
+              const isActive = workType === option.key;
+              const disabled = today?.status !== 'WAITING';
+
+              return (
                 <TouchableOpacity
-                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-200 dark:bg-gray-800': workType !== 'OFFICE',
-                    'bg-gray-700 dark:bg-gray-300': workType === 'OFFICE',
-                  })}
-                  disabled={workType === 'OFFICE' || today?.status !== 'WAITING'}
-                  onPress={() => setWorkType('OFFICE')}
-                >
-                  <MaterialCommunityIcons
-                    name="office-building-outline"
-                    size={18}
-                    color={
-                      workType === 'OFFICE'
-                        ? theme === 'light'
-                          ? '#f3f4f6'
-                          : 'black'
-                        : theme === 'light'
-                          ? 'black'
-                          : '#f3f4f6'
-                    }
-                  />
-                  <Text
-                    className={cx('text-sm font-bold', {
-                      'text-gray-600 dark:text-white': workType !== 'OFFICE',
-                      'text-gray-100 dark:text-gray-800': workType === 'OFFICE',
-                    })}
-                  >
-                    사무실
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-200 dark:bg-gray-800': workType !== 'OUTSIDE',
-                    'bg-gray-700 dark:bg-gray-300': workType === 'OUTSIDE',
-                  })}
-                  disabled={workType === 'OUTSIDE' || today?.status !== 'WAITING'}
-                  onPress={() => setWorkType('OUTSIDE')}
-                >
-                  <FontAwesome
-                    name="car"
-                    size={18}
-                    color={
-                      workType === 'OUTSIDE'
-                        ? theme === 'light'
-                          ? '#f3f4f6'
-                          : 'black'
-                        : theme === 'light'
-                          ? 'black'
-                          : '#f3f4f6'
-                    }
-                  />
-                  <Text
-                    className={cx('text-sm font-bold', {
-                      'text-gray-600 dark:text-white': workType !== 'OUTSIDE',
-                      'text-gray-100 dark:text-gray-800': workType === 'OUTSIDE',
-                    })}
-                  >
-                    외근
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  className={cx('flex h-12 w-24 flex-row items-center justify-center gap-1 rounded-xl', {
-                    'bg-gray-200 dark:bg-gray-800': workType !== 'HOME',
-                    'bg-gray-700 dark:bg-gray-300': workType === 'HOME',
-                  })}
-                  disabled={workType === 'HOME' || today?.status !== 'WAITING'}
-                  onPress={() => setWorkType('HOME')}
-                >
-                  <Ionicons
-                    name="home-sharp"
-                    size={18}
-                    color={
-                      workType === 'HOME'
-                        ? theme === 'light'
-                          ? '#f3f4f6'
-                          : 'black'
-                        : theme === 'light'
-                          ? 'black'
-                          : '#f3f4f6'
-                    }
-                  />
-                  <Text
-                    className={cx('text-sm font-bold', {
-                      'text-gray-600 dark:text-white': workType !== 'HOME',
-                      'text-gray-100 dark:text-gray-800': workType === 'HOME',
-                    })}
-                  >
-                    재택근무
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* 출근 or 퇴근 */}
-        <View className="mt-10 w-full">
-          {/* 출근 */}
-          {!today?.clockInTime && (
-            <View className="">
-              <View className="flew flex-col items-center justify-center gap-3">
-                {/* 달리기 */}
-                <View className="flex w-full items-center justify-center">
-                  <LottieView style={{ width: 130, height: 130 }} source={SplashLottie} autoPlay loop />
-                </View>
-
-                <View className="">
-                  <TouchableOpacity
-                    className={cx(
-                      'flex h-14 w-48 flex-row items-center justify-center gap-3 rounded-xl',
-                      isClockInLoading || !currentLocation || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
-                    )}
-                    disabled={isClockInLoading || invalidLocation || !currentLocation}
-                    onPress={handleClockIn}
-                  >
-                    {isClockInLoading ? (
-                      <ActivityIndicator size="small" color={theme === 'light' ? '#d1d5db' : '#4b5563'} />
-                    ) : (
-                      <MaterialCommunityIcons name="video-input-antenna" size={24} color="white" />
-                    )}
-                    <Text className="text-lg font-bold text-white">출근하기</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          )}
-
-          {/* 퇴근 */}
-          {today?.clockInTime && (
-            <View className="flew flex-col items-center justify-center gap-3">
-              {/* 일하기 */}
-              <View className="flex w-full items-center justify-center">
-                {today?.clockOutTime ? (
-                  <LottieView style={{ width: 130, height: 130 }} source={WalkLottie} autoPlay loop />
-                ) : (
-                  <LottieView style={{ width: 130, height: 130 }} source={WorkingLottie} autoPlay loop />
-                )}
-              </View>
-
-              <View className="">
-                <TouchableOpacity
+                  key={option.key}
                   className={cx(
-                    'flex h-14 w-48 flex-row items-center justify-center gap-3 rounded-xl',
-                    isClockOutLoading || !currentLocation || invalidLocation || !!today?.clockOutTime
-                      ? 'bg-gray-500'
-                      : 'bg-gray-800',
+                    'h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-2xl',
+                    isActive ? 'bg-gray-900 dark:bg-gray-100' : 'bg-gray-100 dark:bg-gray-800',
+                    disabled && !isActive && 'opacity-50',
                   )}
-                  disabled={isClockOutLoading || !currentLocation || invalidLocation || !!today?.clockOutTime}
-                  onPress={handleClockOut}
+                  disabled={isActive || disabled}
+                  onPress={() => setWorkType(option.key)}
                 >
-                  {isClockOutLoading ? (
-                    <ActivityIndicator size="small" color={theme === 'light' ? '#d1d5db' : '#4b5563'} />
-                  ) : today?.clockOutTime ? (
-                    <FontAwesome6 name="dragon" size={24} color="white" />
-                  ) : (
-                    <Ionicons name="bus-outline" size={24} color="white" />
-                  )}
-
-                  <Text className="text-lg font-bold text-white">{today?.clockOutTime ? '퇴근' : '퇴근하기'}</Text>
+                  {option.icon}
+                  <Text
+                    className={cx('text-sm font-bold', {
+                      'text-white dark:text-gray-900': isActive,
+                      'text-gray-700 dark:text-gray-200': !isActive,
+                    })}
+                  >
+                    {option.label}
+                  </Text>
                 </TouchableOpacity>
-              </View>
+              );
+            })}
+          </View>
+        </Reanimated.View>
 
-              <View className="mt-5 w-full">
-                <View className="flex flex-row items-center gap-4">
-                  <View className="w-32 flex-none">
-                    <Text className="text-right text-lg font-bold text-gray-500">출근 시간: </Text>
-                  </View>
+        {/* animation + time info */}
+        <Reanimated.View entering={enterPage(220)} className="mt-6 flex-1">
+          {/* Lottie */}
+          <View className="items-center">
+            {isBeforeClockIn ? (
+              <LottieView style={{ width: 160, height: 160 }} source={SplashLottie} autoPlay loop />
+            ) : isAfterClockOut ? (
+              <LottieView style={{ width: 160, height: 160 }} source={WalkLottie} autoPlay loop />
+            ) : (
+              <LottieView style={{ width: 160, height: 160 }} source={WorkingLottie} autoPlay loop />
+            )}
+          </View>
 
-                  <View className="">
-                    <Text className="text-lg font-bold text-gray-500">
-                      {dayjs(today?.clockInTime).format('YYYY-MM-DD A hh:mm')}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              <View className="w-full">
-                <View className="flex flex-row items-center gap-4">
-                  <View className="w-32 flex-none">
-                    <Text className="text-right text-lg font-bold text-gray-500">목표 퇴근 시간: </Text>
-                  </View>
-
-                  <View className="">
-                    <Text className="text-lg font-bold text-gray-500">
-                      {dayjs(today?.leaveWorkAt).format('YYYY-MM-DD A hh:mm')}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {today?.clockOutTime && (
-                <View className="w-full">
-                  <View className="flex flex-row items-center gap-4">
-                    <View className="w-32 flex-none">
-                      <Text className="text-right text-lg font-bold text-gray-500">퇴근 시간: </Text>
-                    </View>
-
-                    <View className="">
-                      <Text className="text-lg font-bold text-gray-500">
-                        {dayjs(today.clockOutTime).format('YYYY-MM-DD A hh:mm')}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
+          {/* time info — 라벨 ↔ 값 정렬, 억지 고정폭 대신 flex */}
+          {!isBeforeClockIn && (
+            <View className="mt-2 overflow-hidden rounded-2xl bg-white dark:bg-gray-900">
+              <TimeInfoRow label="출근 시간" value={dayjs(today?.clockInTime).format('YYYY.M.D · A hh:mm')} />
+              <View className="ml-4 border-b border-gray-100 dark:border-gray-800" />
+              <TimeInfoRow label="목표 퇴근" value={dayjs(today?.leaveWorkAt).format('YYYY.M.D · A hh:mm')} />
+              {isAfterClockOut && (
+                <>
+                  <View className="ml-4 border-b border-gray-100 dark:border-gray-800" />
+                  <TimeInfoRow label="퇴근 시간" value={dayjs(today?.clockOutTime).format('YYYY.M.D · A hh:mm')} />
+                </>
               )}
             </View>
           )}
-        </View>
+        </Reanimated.View>
+
+        {/* CTA — 썸-존 하단 배치, 전체 폭 */}
+        <Reanimated.View entering={enterPage(320)} className="pb-4 pt-4">
+          {isBeforeClockIn ? (
+            <AnimatedPressable
+              className={cx(
+                'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
+                isClockInLoading || !currentLocation || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
+              )}
+              disabled={isClockInLoading || invalidLocation || !currentLocation}
+              onPress={handleClockIn}
+            >
+              {isClockInLoading ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <MaterialCommunityIcons name="video-input-antenna" size={22} color="white" />
+              )}
+              <Text className="text-base font-bold text-white">출근하기</Text>
+            </AnimatedPressable>
+          ) : (
+            <AnimatedPressable
+              className={cx(
+                'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
+                isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut
+                  ? 'bg-gray-500'
+                  : 'bg-gray-900 dark:bg-gray-100',
+              )}
+              disabled={isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut}
+              onPress={handleClockOut}
+            >
+              {isClockOutLoading ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : isAfterClockOut ? (
+                <FontAwesome6 name="dragon" size={22} color={theme === 'light' ? 'white' : '#111827'} />
+              ) : (
+                <Ionicons name="bus-outline" size={22} color={theme === 'light' ? 'white' : '#111827'} />
+              )}
+              <Text
+                className={cx('text-base font-bold', isAfterClockOut ? 'text-white' : 'text-white dark:text-gray-900')}
+              >
+                {isAfterClockOut ? '퇴근' : '퇴근하기'}
+              </Text>
+            </AnimatedPressable>
+          )}
+        </Reanimated.View>
       </View>
       <InvalidLocationModal
         show={showInvalidModal}
@@ -472,6 +413,20 @@ export default function Attendance() {
         onClose={() => setShowInalidModal(false)}
       />
     </>
+  );
+}
+
+function TimeInfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="flex-row items-center justify-between px-4 py-3.5">
+      <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{label}</Text>
+      <Text
+        className="text-sm font-bold text-gray-900 dark:text-white"
+        style={{ fontVariant: ['tabular-nums'] }}
+      >
+        {value}
+      </Text>
+    </View>
   );
 }
 

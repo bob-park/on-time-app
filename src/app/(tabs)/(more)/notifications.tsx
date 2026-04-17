@@ -8,9 +8,12 @@ import { FontAwesome5 } from '@expo/vector-icons';
 
 import { useUpdateUserNotification, useUserNotifications } from '@/domain/notification/queries/userNotification';
 import { Icon } from '@/shared/components/Icon';
+import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+
+import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -106,7 +109,7 @@ export default function NotificationSettings() {
       showsVerticalScrollIndicator={false}
     >
       {/* header */}
-      <View className="relative mb-6 flex flex-row items-center justify-center">
+      <Reanimated.View entering={enterPage(0)} className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon
             sf="chevron.left"
@@ -117,12 +120,12 @@ export default function NotificationSettings() {
           />
         </TouchableOpacity>
         <Text className="text-xl font-bold dark:text-white">알림 설정</Text>
-      </View>
+      </Reanimated.View>
 
       {/* notification providers card */}
       <View className="mt-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
         {filteredProviders.map((provider, index) => (
-          <View key={`notification-providers-item-${provider.id}`}>
+          <Reanimated.View key={`notification-providers-item-${provider.id}`} entering={enterListItem(index, 80)}>
             <View className="flex flex-row items-center gap-3 px-4 py-3.5">
               {/* icon */}
               <View
@@ -147,7 +150,7 @@ export default function NotificationSettings() {
             {index < filteredProviders.length - 1 && (
               <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
             )}
-          </View>
+          </Reanimated.View>
         ))}
       </View>
     </ScrollView>
