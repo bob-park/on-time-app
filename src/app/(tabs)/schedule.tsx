@@ -15,6 +15,9 @@ import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 
 import cx from 'classnames';
+import Reanimated from 'react-native-reanimated';
+
+import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
@@ -245,7 +248,7 @@ export default function Schedule() {
   return (
     <View className="flex size-full flex-col bg-gray-50 pt-[68px] dark:bg-gray-950">
       {/* Header */}
-      <View className="px-4 pb-3">
+      <Reanimated.View entering={enterPage(0)} className="px-4 pb-3">
         <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           일정
         </Text>
@@ -262,10 +265,10 @@ export default function Schedule() {
             <Text className="text-sm font-bold text-purple-600 dark:text-purple-300">오늘</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Reanimated.View>
 
       {/* Week Calendar Strip - M3 Surface */}
-      <View className="mt-2 px-4">
+      <Reanimated.View entering={enterHero(100)} className="mt-2 px-4">
         <View
           className="rounded-[20px] bg-white pb-2 pt-3 dark:bg-gray-900"
           style={{
@@ -344,7 +347,7 @@ export default function Schedule() {
             <View className="h-1 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
           </View>
         </View>
-      </View>
+      </Reanimated.View>
 
       {/* Schedule Content */}
       <ScrollView
@@ -371,8 +374,10 @@ export default function Schedule() {
             <ScheduleEmptyState message="선택한 날짜에 내 일정이 없습니다" />
           ) : (
             <View className="gap-3">
-              {myVacations.map((vacation) => (
-                <MyVacationCard key={`my-schedule-${vacation.id}`} vacation={vacation} />
+              {myVacations.map((vacation, i) => (
+                <Reanimated.View key={`my-schedule-${vacation.id}`} entering={enterListItem(i)}>
+                  <MyVacationCard vacation={vacation} />
+                </Reanimated.View>
               ))}
             </View>
           )}
@@ -397,15 +402,16 @@ export default function Schedule() {
             <ScheduleEmptyState message="선택한 날짜에 동료 일정이 없습니다" />
           ) : (
             <View className="gap-3">
-              {colleagueVacations.map((item) => (
-                <ColleagueScheduleCard
-                  key={`colleague-${item.id}`}
-                  userUniqueId={item.userUniqueId}
-                  type={item.vacationType}
-                  subType={item.vacationSubType}
-                  startDate={item.startDate}
-                  endDate={item.endDate}
-                />
+              {colleagueVacations.map((item, i) => (
+                <Reanimated.View key={`colleague-${item.id}`} entering={enterListItem(i)}>
+                  <ColleagueScheduleCard
+                    userUniqueId={item.userUniqueId}
+                    type={item.vacationType}
+                    subType={item.vacationSubType}
+                    startDate={item.startDate}
+                    endDate={item.endDate}
+                  />
+                </Reanimated.View>
               ))}
             </View>
           )}

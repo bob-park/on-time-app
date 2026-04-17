@@ -1,8 +1,9 @@
 import { Children } from 'react';
 
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import { Icon } from '@/shared/components/Icon';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -60,11 +61,11 @@ export function MenuItem({
   };
 
   return (
-    <TouchableOpacity
+    <AnimatedPressable
       className="flex flex-row items-center gap-3 px-4 py-3.5"
       onPress={handlePress}
       disabled={!onPress}
-      activeOpacity={onPress ? 0.2 : 1}
+      scaleTo={0.98}
     >
       {/* icon container */}
       {icon && (
@@ -81,6 +82,6 @@ export function MenuItem({
 
       {/* chevron */}
       {move && <Icon sf="chevron.right" fallback="›" size={14} color="#9ca3af" weight="semibold" />}
-    </TouchableOpacity>
+    </AnimatedPressable>
   );
 }

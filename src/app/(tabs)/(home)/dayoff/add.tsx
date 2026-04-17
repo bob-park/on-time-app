@@ -21,6 +21,10 @@ import { NotificationContext } from '@/shared/providers/notification/Notificatio
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import cx from 'classnames';
+import Reanimated from 'react-native-reanimated';
+
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterPage } from '@/shared/components/motion/entering';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -168,6 +172,7 @@ export default function AddDayOff() {
           showsVerticalScrollIndicator={false}
         >
           {/* leave info card (merged) */}
+          <Reanimated.View entering={enterPage(0)}>
           <Text className="mb-3 mt-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             잔여 현황
           </Text>
@@ -229,9 +234,10 @@ export default function AddDayOff() {
               </View>
             </View>
           </View>
+          </Reanimated.View>
 
           {/* vacation type chips */}
-          <View className="mt-8">
+          <Reanimated.View entering={enterPage(80)} className="mt-8">
             <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               휴가 구분
             </Text>
@@ -239,7 +245,7 @@ export default function AddDayOff() {
               {VACATION_TYPES.map((option) => {
                 const isActive = vacationType === option.key;
                 return (
-                  <TouchableOpacity
+                  <AnimatedPressable
                     key={option.key}
                     className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
                     disabled={isActive}
@@ -255,14 +261,14 @@ export default function AddDayOff() {
                     >
                       {option.label}
                     </Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 );
               })}
             </View>
-          </View>
+          </Reanimated.View>
 
           {/* vacation sub type chips */}
-          <View className="mt-6">
+          <Reanimated.View entering={enterPage(140)} className="mt-6">
             <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               부가 구분
             </Text>
@@ -270,7 +276,7 @@ export default function AddDayOff() {
               {VACATION_SUB_TYPES.map((option) => {
                 const isActive = vacationSubType === option.key;
                 return (
-                  <TouchableOpacity
+                  <AnimatedPressable
                     key={option.key}
                     className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
                     disabled={isActive}
@@ -281,14 +287,14 @@ export default function AddDayOff() {
                     >
                       {option.label}
                     </Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 );
               })}
             </View>
-          </View>
+          </Reanimated.View>
 
           {/* reason input */}
-          <View className="mt-6">
+          <Reanimated.View entering={enterPage(200)} className="mt-6">
             <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               사유
             </Text>
@@ -305,10 +311,10 @@ export default function AddDayOff() {
                 onChangeText={(value) => setReason(value)}
               />
             </View>
-          </View>
+          </Reanimated.View>
 
           {/* calendar */}
-          <View className="mt-6">
+          <Reanimated.View entering={enterPage(260)} className="mt-6">
             <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               기간
             </Text>
@@ -354,7 +360,7 @@ export default function AddDayOff() {
               }
             />
             </View>
-          </View>
+          </Reanimated.View>
         </ScrollView>
       </View>
       <SelectCompLeaveEntriesModal

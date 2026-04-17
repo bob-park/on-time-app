@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 
@@ -6,6 +6,8 @@ import { useRouter } from 'expo-router';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useVacations } from '@/domain/documents/queries/vacations';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { Icon } from '@/shared/components/Icon';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -13,6 +15,7 @@ import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import LottieView from 'lottie-react-native';
+import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -45,6 +48,29 @@ const FILTER_OPTIONS: { key: VacationType | 'ALL'; label: string }[] = [
   { key: 'COMPENSATORY', label: '보상 휴가' },
   { key: 'OFFICIAL', label: '공가' },
 ];
+
+/** Smoothly ease a number from 0 to `value` using requestAnimationFrame. */
+function useCountUp(value: number, durationMs = 800) {
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    if (value === 0) {
+      setDisplay(0);
+      return;
+    }
+    const start = Date.now();
+    let rafId: number;
+    const tick = () => {
+      const t = Math.min((Date.now() - start) / durationMs, 1);
+      // ease-out-quart
+      const eased = 1 - Math.pow(1 - t, 4);
+      setDisplay(Math.round(eased * value));
+      if (t < 1) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [value, durationMs]);
+  return display;
+}
 
 const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) => {
   return (
@@ -127,10 +153,13 @@ export default function DayoffHistoriesPage() {
 
   newVacations.sort((o1, o2) => (dayjs(o1.startDate).isBefore(o2.startDate) ? 1 : -1));
 
+  const totalDays = newVacations.reduce((current, vacation) => vacation.usedDays + current, 0);
+  const animatedTotal = useCountUp(totalDays, 900);
+
   return (
     <View className="flex size-full flex-col">
       {/* header */}
-      <View className="relative mb-2 flex flex-row items-center justify-center">
+      <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon
             sf="chevron.left"
@@ -141,10 +170,10 @@ export default function DayoffHistoriesPage() {
           />
         </TouchableOpacity>
         <Text className="text-xl font-bold dark:text-white">휴가 내역</Text>
-      </View>
+      </Reanimated.View>
 
-      {/* year + total — 숫자가 주인공 */}
-      <View className="mt-4 flex-row items-end justify-between">
+      {/* year + total — 숫자가 주인공, count-up */}
+      <Reanimated.View entering={enterHero(80)} className="mt-4 flex-row items-end justify-between">
         <View>
           <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             {dayjs().format('YYYY')}년 사용 내역
@@ -154,7 +183,7 @@ export default function DayoffHistoriesPage() {
               className="text-[40px] font-bold leading-none text-gray-900 dark:text-white"
               style={{ fontVariant: ['tabular-nums'] }}
             >
-              {newVacations.reduce((current, vacation) => vacation.usedDays + current, 0)}
+              {animatedTotal}
             </Text>
             <Text className="text-base font-semibold text-gray-500 dark:text-gray-400">일</Text>
           </View>
@@ -162,14 +191,14 @@ export default function DayoffHistoriesPage() {
         <View className="items-end">
           <Text className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">총 {newVacations.length}건</Text>
         </View>
-      </View>
+      </Reanimated.View>
 
       {/* filter chips */}
-      <View className="mt-6 flex flex-row items-center gap-2">
+      <Reanimated.View entering={enterPage(180)} className="mt-6 flex flex-row items-center gap-2">
         {FILTER_OPTIONS.map((option) => {
           const isActive = selectedVacationType === option.key;
           return (
-            <TouchableOpacity
+            <AnimatedPressable
               key={option.key}
               className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
               disabled={isActive}
@@ -178,23 +207,27 @@ export default function DayoffHistoriesPage() {
               <Text className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
                 {option.label}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           );
         })}
-      </View>
+      </Reanimated.View>
 
       {/* list */}
-      <View className="mt-3 flex-1">
+      <Reanimated.View entering={enterPage(260)} className="mt-3 flex-1">
         <FlashList
           data={newVacations}
           refreshing={false}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 112 }}
-          renderItem={({ item }) => <VacationItem vacation={item} />}
+          renderItem={({ item, index }) => (
+            <Reanimated.View entering={enterListItem(index, 260)}>
+              <VacationItem vacation={item} />
+            </Reanimated.View>
+          )}
           ListFooterComponent={newVacations.length === 0 ? <NoVacation /> : null}
           onRefresh={() => reload()}
         />
-      </View>
+      </Reanimated.View>
     </View>
   );
 }

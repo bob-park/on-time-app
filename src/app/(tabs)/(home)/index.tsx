@@ -9,11 +9,22 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-ic
 
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterHero, enterPage } from '@/shared/components/motion/entering';
 import dayjs from '@/shared/dayjs';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isIncludeTime } from '@/utils/dataUtils';
 import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
 import { TimeCode } from '@/utils/timecode/TimeCode';
+
+import Reanimated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 const ONE_HOUR = 3_600;
 const WEEKEND_DAYS = [0, 6];
@@ -64,12 +75,12 @@ function HeroBeforeWork({ today }: { today: any }) {
       </View>
 
       {/* CTA */}
-      <Pressable
+      <AnimatedPressable
         className="mt-6 items-center rounded-2xl border border-white/30 bg-white/20 py-3.5"
         onPress={() => router.push('./attendance')}
       >
         <Text className="text-base font-bold text-white">출근 입력</Text>
-      </Pressable>
+      </AnimatedPressable>
     </LinearGradient>
   );
 }
@@ -99,12 +110,12 @@ function HeroWeekend() {
       </Text>
 
       {/* CTA */}
-      <Pressable
+      <AnimatedPressable
         className="mt-6 items-center rounded-2xl border border-white/30 bg-white/20 py-3.5"
         onPress={() => router.push('./attendance')}
       >
         <Text className="text-base font-bold text-white">출근 입력</Text>
-      </Pressable>
+      </AnimatedPressable>
     </LinearGradient>
   );
 }
@@ -128,6 +139,27 @@ function HeroWorking({
     const elapsed = dayjs().unix() - clockInTime.unix();
     return Math.min(Math.max((elapsed / total) * 100, 0), 100);
   }, [clockInTime, leaveWorkAt, remainingTime]);
+
+  // smoothly animate the progress bar width instead of snapping on every tick
+  const progressSv = useSharedValue(0);
+  useEffect(() => {
+    progressSv.value = withTiming(progress, { duration: 600, easing: Easing.bezier(0.25, 1, 0.5, 1) });
+  }, [progress, progressSv]);
+  const progressStyle = useAnimatedStyle(() => ({ width: `${progressSv.value}%` }));
+
+  // subtle breathing pulse on the "working" status dot
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withSequence(
+        withTiming(0.6, { duration: 900, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 900, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      false,
+    );
+  }, [pulse]);
+  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
 
   const remainingLabel = remainingTime.time
     ? `${remainingTime.time.formatHours.padStart(2, '0')}:${remainingTime.time.formatMinutes.padStart(2, '0')}`
@@ -162,10 +194,10 @@ function HeroWorking({
         </View>
       </View>
 
-      {/* progress */}
+      {/* progress — width animated smoothly across ticks */}
       <View className="mt-6">
         <View className="h-1.5 overflow-hidden rounded-full bg-white/20">
-          <View className="h-full rounded-full bg-white/85" style={{ width: `${progress}%` }} />
+          <Reanimated.View className="h-full rounded-full bg-white/85" style={progressStyle} />
         </View>
         <View className="mt-2 flex-row justify-between">
           <Text className="text-[11px] text-white/55" style={{ fontVariant: ['tabular-nums'] }}>
@@ -179,20 +211,20 @@ function HeroWorking({
 
       {/* footer */}
       <View className="mt-4 flex-row items-center gap-2">
-        <View
-          className="size-2 animate-pulse rounded-full bg-[#34C759]"
-          style={{ shadowColor: '#34C759', shadowRadius: 6, shadowOpacity: 1 }}
+        <Reanimated.View
+          className="size-2 rounded-full bg-[#34C759]"
+          style={[{ shadowColor: '#34C759', shadowRadius: 6, shadowOpacity: 1 }, pulseStyle]}
         />
         <Text className="text-xs font-semibold text-white/80">근무중</Text>
       </View>
 
       {/* CTA */}
-      <Pressable
+      <AnimatedPressable
         className="mt-5 items-center rounded-2xl border border-white/30 bg-white/20 py-3.5"
         onPress={() => router.push('./attendance')}
       >
         <Text className="text-base font-bold text-white">퇴근 입력</Text>
-      </Pressable>
+      </AnimatedPressable>
     </LinearGradient>
   );
 }
@@ -275,12 +307,12 @@ function HeroOvertime({
       </View>
 
       {/* CTA */}
-      <Pressable
+      <AnimatedPressable
         className="mt-5 items-center rounded-2xl border border-[#FF6B6B]/40 bg-[#FF6B6B]/20 py-3.5"
         onPress={() => router.push('./attendance')}
       >
         <Text className="text-base font-bold text-white">퇴근 입력</Text>
-      </Pressable>
+      </AnimatedPressable>
     </LinearGradient>
   );
 }
@@ -411,7 +443,7 @@ function PrimaryActionCard({
   onPress?: () => void;
 }) {
   return (
-    <Pressable
+    <AnimatedPressable
       className="flex-1 rounded-2xl bg-white p-4 dark:bg-gray-900"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 }}
       onPress={onPress}
@@ -421,7 +453,7 @@ function PrimaryActionCard({
       </View>
       <Text className="mt-3 text-sm font-bold text-gray-900 dark:text-white">{label}</Text>
       <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{sub}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -440,7 +472,7 @@ function SecondaryActionRow({
   onPress?: () => void;
 }) {
   return (
-    <Pressable className="flex-row items-center gap-3 px-4 py-3.5" onPress={onPress}>
+    <AnimatedPressable className="flex-row items-center gap-3 px-4 py-3.5" onPress={onPress} scaleTo={0.98}>
       <View className="size-9 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg }}>
         {icon}
       </View>
@@ -449,7 +481,7 @@ function SecondaryActionRow({
         <Text className="text-xs text-gray-500 dark:text-gray-400">{sub}</Text>
       </View>
       <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -578,14 +610,14 @@ export default function HomeIndex() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       {/* Page Header */}
-      <View className="flex-row items-center justify-between px-4 pb-1">
+      <Reanimated.View entering={enterPage(0)} className="flex-row items-center justify-between px-4 pb-1">
         <View>
           <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             {dayjs().format('YYYY.M.D')} · {getDaysOfWeek(dayjs().day())}
           </Text>
           <Text className="mt-1 text-[28px] font-bold leading-none text-gray-900 dark:text-white">오늘</Text>
         </View>
-        <Pressable
+        <AnimatedPressable
           className="size-10 items-center justify-center rounded-full bg-white dark:bg-gray-800"
           style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 }}
           onPress={() => router.push('./notifications')}
@@ -594,11 +626,11 @@ export default function HomeIndex() {
           {notifications.some((n) => !n.isRead) && (
             <View className="absolute right-0 top-0 size-2.5 rounded-full bg-red-500" />
           )}
-        </Pressable>
-      </View>
+        </AnimatedPressable>
+      </Reanimated.View>
 
       {/* Hero Card */}
-      <View className="mt-5 px-4">
+      <Reanimated.View entering={enterHero(80)} className="mt-5 px-4">
         {isLoading && !today ? (
           <HeroSkeleton />
         ) : isWeekend && workState === 'before' ? (
@@ -611,10 +643,10 @@ export default function HomeIndex() {
             {workState === 'done' && <HeroDone today={today} />}
           </>
         )}
-      </View>
+      </Reanimated.View>
 
       {/* Primary actions — 자주 쓰는 휴가 바로가기 2개 */}
-      <View className="mt-8 px-4">
+      <Reanimated.View entering={enterPage(180)} className="mt-8 px-4">
         <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           휴가
         </Text>
@@ -643,10 +675,10 @@ export default function HomeIndex() {
             </>
           )}
         </View>
-      </View>
+      </Reanimated.View>
 
       {/* Secondary actions — 덜 자주 쓰는 건 리스트로 (리듬 변화) */}
-      <View className="mt-6 px-4">
+      <Reanimated.View entering={enterPage(260)} className="mt-6 px-4">
         <Text className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           바로가기
         </Text>
@@ -673,7 +705,7 @@ export default function HomeIndex() {
             sub="프로필·설정"
           />
         </View>
-      </View>
+      </Reanimated.View>
     </ScrollView>
   );
 }

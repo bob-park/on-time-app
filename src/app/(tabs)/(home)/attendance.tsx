@@ -23,6 +23,10 @@ import { getDaysOfWeek, round } from '@/utils/parse';
 
 import cx from 'classnames';
 import LottieView from 'lottie-react-native';
+import Reanimated from 'react-native-reanimated';
+
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterHero, enterPage } from '@/shared/components/motion/entering';
 
 const WEEKEND_DAYS = [0, 6];
 
@@ -276,7 +280,7 @@ export default function Attendance() {
         </View>
 
         {/* today — 숫자가 주인공 */}
-        <View className="mt-2">
+        <Reanimated.View entering={enterHero(40)} className="mt-2">
           <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             오늘
           </Text>
@@ -291,10 +295,10 @@ export default function Attendance() {
               {getDaysOfWeek(dayjs().day())}
             </Text>
           </View>
-        </View>
+        </Reanimated.View>
 
         {/* select work type */}
-        <View className="mt-8">
+        <Reanimated.View entering={enterPage(140)} className="mt-8">
           <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             근무 위치
           </Text>
@@ -327,10 +331,10 @@ export default function Attendance() {
               );
             })}
           </View>
-        </View>
+        </Reanimated.View>
 
         {/* animation + time info */}
-        <View className="mt-6 flex-1">
+        <Reanimated.View entering={enterPage(220)} className="mt-6 flex-1">
           {/* Lottie */}
           <View className="items-center">
             {isBeforeClockIn ? (
@@ -356,12 +360,12 @@ export default function Attendance() {
               )}
             </View>
           )}
-        </View>
+        </Reanimated.View>
 
         {/* CTA — 썸-존 하단 배치, 전체 폭 */}
-        <View className="pb-4 pt-4">
+        <Reanimated.View entering={enterPage(320)} className="pb-4 pt-4">
           {isBeforeClockIn ? (
-            <TouchableOpacity
+            <AnimatedPressable
               className={cx(
                 'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
                 isClockInLoading || !currentLocation || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
@@ -375,9 +379,9 @@ export default function Attendance() {
                 <MaterialCommunityIcons name="video-input-antenna" size={22} color="white" />
               )}
               <Text className="text-base font-bold text-white">출근하기</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           ) : (
-            <TouchableOpacity
+            <AnimatedPressable
               className={cx(
                 'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
                 isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut
@@ -399,9 +403,9 @@ export default function Attendance() {
               >
                 {isAfterClockOut ? '퇴근' : '퇴근하기'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           )}
-        </View>
+        </Reanimated.View>
       </View>
       <InvalidLocationModal
         show={showInvalidModal}
