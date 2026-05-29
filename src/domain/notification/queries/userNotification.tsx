@@ -59,17 +59,17 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
   const queryClient = useQueryClient();
 
   // context
-  const { accessToken, userDetail } = useContext(AuthContext);
+  const { accessToken, userinfo: userDetail } = useContext(AuthContext);
 
   const { mutate, isPending } = useMutation({
-    mutationKey: ['users', userDetail?.id, 'notifications', 'read'],
-    mutationFn: (historyId: string) => read(accessToken, { userUniqueId: userDetail?.id || '', historyId }),
+    mutationKey: ['users', userDetail?.sub, 'notifications', 'read'],
+    mutationFn: (historyId: string) => read(accessToken, { userUniqueId: userDetail?.sub || '', historyId }),
     onSuccess: (data) => {
       onSuccess && onSuccess(data);
 
       const prevInfinitePages = queryClient.getQueryData<InfiniteData<Page<UserNotificationHistory>>>([
         'users',
-        userDetail?.id,
+        userDetail?.sub,
         'notifications',
       ]);
 
@@ -83,7 +83,7 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
       });
 
       queryClient.setQueryData<InfiniteData<Page<UserNotificationHistory>>>(
-        ['users', userDetail?.id, 'notifications'],
+        ['users', userDetail?.sub, 'notifications'],
         {
           pages: newPages || [],
           pageParams: prevInfinitePages?.pageParams || [],
@@ -97,7 +97,7 @@ export function useReadNotification({ onSuccess }: QueryHandler<UserNotification
 
 export function useNotificationHistories(params: { isRead?: boolean } & PageRequest) {
   // context
-  const { accessToken, userDetail } = useContext(AuthContext);
+  const { accessToken, userinfo: userDetail } = useContext(AuthContext);
 
   const { data, isLoading, fetchNextPage, hasNextPage, refetch } = useInfiniteQuery<
     Page<UserNotificationHistory>,
@@ -106,10 +106,10 @@ export function useNotificationHistories(params: { isRead?: boolean } & PageRequ
     QueryKey,
     PageRequest
   >({
-    enabled: !!userDetail?.id,
-    queryKey: ['users', userDetail?.id, 'notifications'],
+    enabled: !!userDetail?.sub,
+    queryKey: ['users', userDetail?.sub, 'notifications'],
     queryFn: async ({ pageParam }) =>
-      searchHistories(accessToken, { ...params, ...pageParam, userUniqueId: userDetail?.id || '' }),
+      searchHistories(accessToken, { ...params, ...pageParam, userUniqueId: userDetail?.sub || '' }),
     initialPageParam: {
       size: 25,
       page: 0,

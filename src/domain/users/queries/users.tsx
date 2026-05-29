@@ -6,9 +6,12 @@ import { getUserDetail, getUserLeaveEntry } from '@/domain/users/apis/users';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 
 export function useUser(uniqueId?: string) {
+  // context
+  const { accessToken } = useContext(AuthContext);
+
   const { data, isLoading } = useQuery<UserDetail>({
     queryKey: ['users', uniqueId],
-    queryFn: () => getUserDetail(uniqueId || ''),
+    queryFn: () => getUserDetail(accessToken, { id: uniqueId || '' }),
     enabled: !!uniqueId,
   });
 

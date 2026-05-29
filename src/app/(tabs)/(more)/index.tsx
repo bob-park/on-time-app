@@ -1,18 +1,18 @@
 import { useContext } from 'react';
 
 import { Platform, ScrollView, Text, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
+import { useUser } from '@/domain/users/queries/users';
 import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
 import { Icon } from '@/shared/components/Icon';
 import Menu, { MenuItem } from '@/shared/components/menu/Menu';
 import { enterHero, enterPage } from '@/shared/components/motion/entering';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-
-import Reanimated from 'react-native-reanimated';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
@@ -30,13 +30,14 @@ const CARD_SHADOW = Platform.select({
 
 export default function MoreIndex() {
   // context
-  const { userDetail: user, onLogout } = useContext(AuthContext);
+  const { userinfo, onLogout } = useContext(AuthContext);
 
   // hooks
   const router = useRouter();
 
   // queries
-  const { employment } = useUserEmployment(user?.id);
+  const { user } = useUser(userinfo?.sub);
+  const { employment } = useUserEmployment(userinfo?.sub);
 
   // handle
   const handleLogout = () => {
@@ -51,18 +52,20 @@ export default function MoreIndex() {
     >
       {/* section header */}
       <Reanimated.View entering={enterPage(0)}>
-      <Text className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-        프로필
-      </Text>
+        <Text className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">프로필</Text>
       </Reanimated.View>
 
       {/* Profile Card */}
-      <Reanimated.View entering={enterHero(60)} className="overflow-hidden rounded-3xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+      <Reanimated.View
+        entering={enterHero(60)}
+        className="overflow-hidden rounded-3xl bg-white dark:bg-gray-900"
+        style={CARD_SHADOW}
+      >
         <View className="flex flex-row items-center gap-4 p-5">
           {/* avatar */}
           <View className="flex-none">
             <UserAvatar
-              src={`${DEFAULT_API_HOST}/api/v1/users/${user?.id}/avatar`}
+              src={`${DEFAULT_API_HOST}/api/v1/users/${userinfo?.sub}/avatar`}
               username={user?.username}
               size="sm"
             />
@@ -97,58 +100,58 @@ export default function MoreIndex() {
       <View className="mt-10 flex flex-col gap-8">
         {/* 계정 */}
         <Reanimated.View entering={enterPage(160)}>
-        <Menu title="계정">
-          <MenuItem
-            text="로그아웃"
-            iconBg="rgba(239,68,68,0.12)"
-            icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color="#ef4444" />}
-            onPress={handleLogout}
-          />
-          <MenuItem
-            text="알림 설정"
-            move
-            iconBg="rgba(59,130,246,0.12)"
-            icon={<Icon sf="bell" fallback="🔔" size={18} color="#3b82f6" />}
-            onPress={() => router.push('./notifications')}
-          />
-        </Menu>
+          <Menu title="계정">
+            <MenuItem
+              text="로그아웃"
+              iconBg="rgba(239,68,68,0.12)"
+              icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color="#ef4444" />}
+              onPress={handleLogout}
+            />
+            <MenuItem
+              text="알림 설정"
+              move
+              iconBg="rgba(59,130,246,0.12)"
+              icon={<Icon sf="bell" fallback="🔔" size={18} color="#3b82f6" />}
+              onPress={() => router.push('./notifications')}
+            />
+          </Menu>
         </Reanimated.View>
 
         {/* 설정 */}
         <Reanimated.View entering={enterPage(240)}>
-        <Menu title="설정">
-          <MenuItem
-            move
-            text="화면 테마"
-            iconBg="rgba(245,158,11,0.12)"
-            icon={<Icon sf="sun.max" fallback="☀" size={18} color="#f59e0b" />}
-            onPress={() => router.push('./theme')}
-          />
-        </Menu>
+          <Menu title="설정">
+            <MenuItem
+              move
+              text="화면 테마"
+              iconBg="rgba(245,158,11,0.12)"
+              icon={<Icon sf="sun.max" fallback="☀" size={18} color="#f59e0b" />}
+              onPress={() => router.push('./theme')}
+            />
+          </Menu>
         </Reanimated.View>
 
         {/* 더보기 */}
         <Reanimated.View entering={enterPage(320)}>
-        <Menu title="더보기">
-          <MenuItem
-            move
-            text="공지사항"
-            iconBg="rgba(99,102,241,0.12)"
-            icon={<Icon sf="newspaper" fallback="📰" size={18} color="#6366f1" />}
-          />
-          <MenuItem
-            move
-            text="근무"
-            iconBg="rgba(59,130,246,0.08)"
-            icon={<Icon sf="timer" fallback="⏱" size={18} color="#3b82f6" />}
-          />
-          <MenuItem
-            move
-            text="구성원"
-            iconBg="rgba(168,85,247,0.12)"
-            icon={<Icon sf="person.2" fallback="👥" size={18} color="#a855f7" />}
-          />
-        </Menu>
+          <Menu title="더보기">
+            <MenuItem
+              move
+              text="공지사항"
+              iconBg="rgba(99,102,241,0.12)"
+              icon={<Icon sf="newspaper" fallback="📰" size={18} color="#6366f1" />}
+            />
+            <MenuItem
+              move
+              text="근무"
+              iconBg="rgba(59,130,246,0.08)"
+              icon={<Icon sf="timer" fallback="⏱" size={18} color="#3b82f6" />}
+            />
+            <MenuItem
+              move
+              text="구성원"
+              iconBg="rgba(168,85,247,0.12)"
+              icon={<Icon sf="person.2" fallback="👥" size={18} color="#a855f7" />}
+            />
+          </Menu>
         </Reanimated.View>
       </View>
     </ScrollView>

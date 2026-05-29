@@ -1,21 +1,21 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useVacations } from '@/domain/documents/queries/vacations';
+import { Icon } from '@/shared/components/Icon';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
-import { Icon } from '@/shared/components/Icon';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import LottieView from 'lottie-react-native';
-import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -101,10 +101,7 @@ const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) =>
         {/* days */}
         <View className="items-end justify-center pt-1">
           <View className="flex-row items-baseline gap-0.5">
-            <Text
-              className="text-lg font-bold text-blue-500"
-              style={{ fontVariant: ['tabular-nums'] }}
-            >
+            <Text className="text-lg font-bold text-blue-500" style={{ fontVariant: ['tabular-nums'] }}>
               {vacation.usedDays}
             </Text>
             <Text className="text-xs font-semibold text-blue-500/80">일</Text>
@@ -129,7 +126,7 @@ const NoVacation = () => {
 
 export default function DayoffHistoriesPage() {
   // context
-  const { userDetail } = useContext(AuthContext);
+  const { userinfo: userDetail } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
 
   // hooks
@@ -137,7 +134,7 @@ export default function DayoffHistoriesPage() {
 
   // query
   const { vacations, reload } = useVacations({
-    userUniqueId: userDetail?.id,
+    userUniqueId: userDetail?.sub,
     startDateFrom: dayjs().startOf('year').toDate(),
     endDateFrom: dayjs().endOf('year').toDate(),
     status: 'APPROVED',

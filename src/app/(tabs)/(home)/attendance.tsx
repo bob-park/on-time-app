@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { ActivityIndicator, Alert, Linking, Modal, Text, TouchableOpacity, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -15,6 +16,8 @@ import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import Loading from '@/shared/components/loading/Loading';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterHero, enterPage } from '@/shared/components/motion/entering';
 import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -23,10 +26,6 @@ import { getDaysOfWeek, round } from '@/utils/parse';
 
 import cx from 'classnames';
 import LottieView from 'lottie-react-native';
-import Reanimated from 'react-native-reanimated';
-
-import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
-import { enterHero, enterPage } from '@/shared/components/motion/entering';
 
 const WEEKEND_DAYS = [0, 6];
 
@@ -225,7 +224,11 @@ export default function Attendance() {
   }
 
   const weekdayColor =
-    dayjs().day() === 0 ? 'text-red-500 dark:text-red-300' : dayjs().day() === 6 ? 'text-blue-500 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500';
+    dayjs().day() === 0
+      ? 'text-red-500 dark:text-red-300'
+      : dayjs().day() === 6
+        ? 'text-blue-500 dark:text-blue-300'
+        : 'text-gray-400 dark:text-gray-500';
 
   const isBeforeClockIn = !today?.clockInTime;
   const isAfterClockOut = !!today?.clockOutTime;
@@ -238,7 +241,15 @@ export default function Attendance() {
         <MaterialCommunityIcons
           name="office-building-outline"
           size={18}
-          color={workType === 'OFFICE' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+          color={
+            workType === 'OFFICE'
+              ? theme === 'light'
+                ? '#f3f4f6'
+                : '#111827'
+              : theme === 'light'
+                ? '#111827'
+                : '#f3f4f6'
+          }
         />
       ),
     },
@@ -249,7 +260,15 @@ export default function Attendance() {
         <FontAwesome
           name="car"
           size={18}
-          color={workType === 'OUTSIDE' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+          color={
+            workType === 'OUTSIDE'
+              ? theme === 'light'
+                ? '#f3f4f6'
+                : '#111827'
+              : theme === 'light'
+                ? '#111827'
+                : '#f3f4f6'
+          }
         />
       ),
     },
@@ -260,7 +279,15 @@ export default function Attendance() {
         <Ionicons
           name="home-sharp"
           size={18}
-          color={workType === 'HOME' ? (theme === 'light' ? '#f3f4f6' : '#111827') : theme === 'light' ? '#111827' : '#f3f4f6'}
+          color={
+            workType === 'HOME'
+              ? theme === 'light'
+                ? '#f3f4f6'
+                : '#111827'
+              : theme === 'light'
+                ? '#111827'
+                : '#f3f4f6'
+          }
         />
       ),
     },
@@ -281,9 +308,7 @@ export default function Attendance() {
 
         {/* today — 숫자가 주인공 */}
         <Reanimated.View entering={enterHero(40)} className="mt-2">
-          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            오늘
-          </Text>
+          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">오늘</Text>
           <View className="mt-1 flex flex-row items-baseline gap-2">
             <Text
               className="text-[32px] font-bold leading-none text-gray-900 dark:text-white"
@@ -291,9 +316,7 @@ export default function Attendance() {
             >
               {dayjs().format('M월 D일')}
             </Text>
-            <Text className={cx('text-lg font-semibold', weekdayColor)}>
-              {getDaysOfWeek(dayjs().day())}
-            </Text>
+            <Text className={cx('text-lg font-semibold', weekdayColor)}>{getDaysOfWeek(dayjs().day())}</Text>
           </View>
         </Reanimated.View>
 
@@ -363,7 +386,7 @@ export default function Attendance() {
         </Reanimated.View>
 
         {/* CTA — 썸-존 하단 배치, 전체 폭 */}
-        <Reanimated.View entering={enterPage(320)} className="pb-4 pt-4">
+        <Reanimated.View entering={enterPage(320)} className="pb-28 pt-4">
           {isBeforeClockIn ? (
             <AnimatedPressable
               className={cx(
@@ -420,10 +443,7 @@ function TimeInfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between px-4 py-3.5">
       <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{label}</Text>
-      <Text
-        className="text-sm font-bold text-gray-900 dark:text-white"
-        style={{ fontVariant: ['tabular-nums'] }}
-      >
+      <Text className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontVariant: ['tabular-nums'] }}>
         {value}
       </Text>
     </View>

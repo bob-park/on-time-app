@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import { Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
@@ -12,8 +13,6 @@ import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
-import Reanimated from 'react-native-reanimated';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -44,7 +43,7 @@ function parseNotificationType(type: NotificationType) {
   }
 }
 
-function NotificationIcon({ type, theme }: { type: NotificationType; theme: 'dark' | 'light' }) {
+function NotificationIcon({ type, theme }: { type: NotificationType; theme: 'dark' | 'light' | 'system' }) {
   const iconColor = theme === 'light' ? '#3b82f6' : '#60a5fa';
 
   switch (type) {
@@ -82,7 +81,7 @@ function getIconBg(type: NotificationType): string {
 
 export default function NotificationSettings() {
   // context
-  const { userDetail } = useContext(AuthContext);
+  const { userinfo: userDetail } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const { userProviderId } = useContext(NotificationContext);
 
@@ -90,8 +89,8 @@ export default function NotificationSettings() {
   const router = useRouter();
 
   // queries
-  const { notificationProviders } = useUserNotifications({ userUniqueId: userDetail?.id });
-  const { updateProvider } = useUpdateUserNotification({ userUniqueId: userDetail?.id || '' }, {});
+  const { notificationProviders } = useUserNotifications({ userUniqueId: userDetail?.sub });
+  const { updateProvider } = useUpdateUserNotification({ userUniqueId: userDetail?.sub || '' }, {});
 
   // handle
   const handleUpdateEnabled = ({ providerId, enabled }: { providerId: string; enabled: boolean }) => {
