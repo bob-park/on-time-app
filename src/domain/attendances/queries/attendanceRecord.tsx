@@ -10,13 +10,13 @@ export function useTodayAttendance() {
   const now = dayjs().format('YYYY-MM-DD');
 
   // context
-  const { userDetail, accessToken } = useContext(AuthContext);
+  const { userinfo: userDetail, accessToken } = useContext(AuthContext);
 
   const { data, isLoading, refetch } = useQuery<AttendanceRecord>({
     queryKey: ['attendances', now],
     queryFn: () =>
       getAttendanceRecords(accessToken || '', {
-        userUniqueId: userDetail?.id || '',
+        userUniqueId: userDetail?.sub || '',
         startDate: now,
         endDate: now,
       }).then((data) => data[0]),
@@ -28,7 +28,7 @@ export function useTodayAttendance() {
 
 export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
   // context
-  const { userDetail, accessToken } = useContext(AuthContext);
+  const { userinfo: userDetail, accessToken } = useContext(AuthContext);
 
   const queryClient = useQueryClient();
 
@@ -42,7 +42,7 @@ export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
       workType: AttendanceWorkType;
       latitude: number;
       longitude: number;
-    }) => clockIn(accessToken, { userUniqueId: userDetail?.id || '', workType, latitude, longitude }),
+    }) => clockIn(accessToken, { userUniqueId: userDetail?.sub || '', workType, latitude, longitude }),
     onSuccess: (data) => {
       queryClient.setQueryData(['attendances', dayjs(data.workingDate).format('YYYY-MM-DD')], data);
 
@@ -55,7 +55,7 @@ export function useClockIn({ onSuccess }: QueryHandler<AttendanceRecord>) {
 
 export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
   // context
-  const { userDetail, accessToken } = useContext(AuthContext);
+  const { userinfo: userDetail, accessToken } = useContext(AuthContext);
 
   const queryClient = useQueryClient();
 
@@ -69,7 +69,7 @@ export function useClockOut({ onSuccess }: QueryHandler<AttendanceRecord>) {
       attendanceRecordId: number;
       latitude: number;
       longitude: number;
-    }) => clockOut(accessToken, { userUniqueId: userDetail?.id || '', attendanceRecordId, latitude, longitude }),
+    }) => clockOut(accessToken, { userUniqueId: userDetail?.sub || '', attendanceRecordId, latitude, longitude }),
     onSuccess: (data) => {
       queryClient.setQueryData(['attendances', dayjs(data.workingDate).format('YYYY-MM-DD')], data);
 

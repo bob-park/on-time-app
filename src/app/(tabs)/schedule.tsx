@@ -2,6 +2,7 @@ import { useContext, useMemo, useRef, useState } from 'react';
 
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { usePagerView } from 'react-native-pager-view';
+import Reanimated from 'react-native-reanimated';
 
 import ScheduleEmptyState from '@/domain/documents/components/ScheduleEmptyState';
 import ScheduleSkeleton from '@/domain/documents/components/ScheduleSkeleton';
@@ -10,14 +11,12 @@ import { useVacations } from '@/domain/documents/queries/vacations';
 import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
 import { Icon } from '@/shared/components/Icon';
+import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 
 import cx from 'classnames';
-import Reanimated from 'react-native-reanimated';
-
-import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
@@ -168,7 +167,7 @@ export default function Schedule() {
   const changePageRef = useRef<number>(1);
 
   // context
-  const { userDetail } = useContext(AuthContext);
+  const { userinfo: userDetail } = useContext(AuthContext);
 
   // state
   const [selectedDate, setSelectedDate] = useState<Date>(dayjs().startOf('day').toDate());
@@ -229,29 +228,27 @@ export default function Schedule() {
     () =>
       vacations.filter(
         (v) =>
-          v.userUniqueId === userDetail?.id &&
+          v.userUniqueId === userDetail?.sub &&
           includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
       ),
-    [vacations, selectedDate, userDetail?.id],
+    [vacations, selectedDate, userDetail?.sub],
   );
 
   const colleagueVacations = useMemo(
     () =>
       vacations.filter(
         (v) =>
-          v.userUniqueId !== userDetail?.id &&
+          v.userUniqueId !== userDetail?.sub &&
           includeDate(selectedDate, { startDate: v.startDate, endDate: v.endDate }),
       ),
-    [vacations, selectedDate, userDetail?.id],
+    [vacations, selectedDate, userDetail?.sub],
   );
 
   return (
     <View className="flex size-full flex-col bg-gray-50 pt-[68px] dark:bg-gray-950">
       {/* Header */}
       <Reanimated.View entering={enterPage(0)} className="px-4 pb-3">
-        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          일정
-        </Text>
+        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">일정</Text>
         <View className="mt-1 flex-row items-end justify-between">
           <Text className="text-[28px] font-bold leading-none text-gray-900 dark:text-white">
             {dayjs(selectedDate).format('YYYY년 M월')}
@@ -358,9 +355,7 @@ export default function Schedule() {
         {/* 내 일정 */}
         <View className="mb-8">
           <View className="mb-3 flex-row items-center gap-2">
-            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-              내 일정
-            </Text>
+            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">내 일정</Text>
             <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
               <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
                 {isLoading ? '-' : myVacations.length}

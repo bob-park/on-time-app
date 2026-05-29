@@ -7,7 +7,6 @@ import * as WebBrowser from 'expo-web-browser';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { deleteUserNotificationProvider } from '@/domain/notification/apis/userNotification';
-import { getUserDetail } from '@/domain/users/apis/users';
 import dayjs from '@/shared/dayjs';
 import delay from '@/utils/delay';
 
@@ -34,7 +33,7 @@ export const redirectUri = makeRedirectUri({
 });
 
 interface AuthContextProps {
-  userDetail?: UserDetail;
+  userinfo?: UserInfo;
   accessToken: string;
   refreshToken?: string;
   isLoggedIn: boolean;
@@ -51,9 +50,8 @@ export const AuthContext = createContext<AuthContextProps>({
 
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
-  const [user, setUser] = useState<User>();
+  const [userinfo, setUserInfo] = useState<UserInfo>();
   const [expiredAt, setExpiredAt] = useState<Date>();
-  const [userDetail, setUserDetail] = useState<UserDetail>();
   const [accessToken, setAccessToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -65,23 +63,6 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   useEffect(() => {
     loadAuth();
   }, []);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    getUserDetail(user.id)
-      .then((data: UserDetail) => {
-        setUserDetail(data);
-        console.log('logged in');
-        setIsLoggedIn(true);
-      })
-      .catch((err) => {
-        console.error(err);
-        handleLogout();
-      });
-  }, [user]);
 
   useEffect(() => {
     if (!accessToken) {
@@ -103,12 +84,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
         return data as UserInfo;
       })
       .then(async (userinfo) => {
-        setUser({
-          id: userinfo.sub,
-          userId: userinfo.userId,
-          username: userinfo.name,
-          role: userinfo.role,
-        });
+        setUserInfo(userinfo);
+        setIsLoggedIn(true);
         loadAuth();
       })
       .catch((err) => {
@@ -136,8 +113,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const handleLogout = () => {
     Promise.all([
       SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
-        if (data && user) {
-          await deleteUserNotificationProvider({ userUniqueId: user.id, userProviderId: data });
+        if (data && userinfo) {
+          await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId: data });
         }
 
         SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);
@@ -146,7 +123,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
       SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
     ]).then(() => {
-      setUser(undefined);
+      setUserInfo(undefined);
       setIsLoggedIn(false);
       setAccessToken('');
       setRefreshToken(undefined);
@@ -223,14 +200,14 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   // memorize
   const memorizeValue = useMemo<AuthContextProps>(
     () => ({
+      userinfo,
       isLoggedIn,
-      userDetail,
       accessToken,
       refreshToken,
       onLoggedIn: handleLoggedIn,
       onLogout: handleLogout,
     }),
-    [userDetail, accessToken, refreshToken, isLoggedIn],
+    [userinfo, accessToken, refreshToken, isLoggedIn],
   );
 
   return <AuthContext value={memorizeValue}>{children}</AuthContext>;

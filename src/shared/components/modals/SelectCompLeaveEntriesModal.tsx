@@ -38,14 +38,14 @@ export default function SelectCompLeaveEntriesModal({
   onSelect,
 }: Readonly<SelectCompLeaveEntriesModalProps>) {
   // context
-  const { userDetail } = useContext(AuthContext);
+  const { userinfo: userDetail } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
 
   // state
   const [selectedEntries, setSelectedEntries] = useState<UserCompLeaveEntry[]>([]);
 
   // query
-  const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.id });
+  const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.sub });
 
   // handle
   const handleSelect = () => {

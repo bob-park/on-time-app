@@ -1,6 +1,14 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Animated, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import Reanimated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -16,15 +24,6 @@ import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isIncludeTime } from '@/utils/dataUtils';
 import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
 import { TimeCode } from '@/utils/timecode/TimeCode';
-
-import Reanimated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 
 const ONE_HOUR = 3_600;
 const WEEKEND_DAYS = [0, 6];
@@ -381,10 +380,7 @@ function HeroDone({ today }: { today: any }) {
         <View className="mt-3 flex-row items-center gap-2">
           <Text className="text-[13px] text-white/60">총 근무 {durationText}</Text>
           {overtimeText && (
-            <Text
-              className="text-[13px] font-semibold text-[#FF6B6B]"
-              style={{ fontVariant: ['tabular-nums'] }}
-            >
+            <Text className="text-[13px] font-semibold text-[#FF6B6B]" style={{ fontVariant: ['tabular-nums'] }}>
               +{overtimeText.formatHours.padStart(2, '0')}:{overtimeText.formatMinutes.padStart(2, '0')} 초과
             </Text>
           )}
@@ -647,9 +643,7 @@ export default function HomeIndex() {
 
       {/* Primary actions — 자주 쓰는 휴가 바로가기 2개 */}
       <Reanimated.View entering={enterPage(180)} className="mt-8 px-4">
-        <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          휴가
-        </Text>
+        <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">휴가</Text>
         <View className="flex-row gap-3">
           {isLoading && !today ? (
             <>
