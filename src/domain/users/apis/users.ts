@@ -2,7 +2,7 @@ import api, { generateAuthHeader } from '@/shared/api';
 
 export async function getUserDetail(accessToken: string, { id }: { id: string }) {
   return api
-    .get(`api/v1/users/${id}`, {
+    .get(`api/v1/users/${id}/summary`, {
       headers: generateAuthHeader(accessToken),
     })
     .json<UserDetail>();

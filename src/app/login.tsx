@@ -30,7 +30,7 @@ export default function LoginPage() {
     {
       clientId,
       clientSecret,
-      scopes: ['openid', 'profile'],
+      scopes: ['openid', 'profile', 'users:read:summary'],
       redirectUri,
       responseType: 'code',
     },
