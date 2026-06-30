@@ -1,8 +1,7 @@
 import { forwardRef } from 'react';
 
 import { Pressable, PressableProps, View } from 'react-native';
-
-import Animated, { useAnimatedStyle, useSharedValue, withTiming, Easing } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const AnimatedPressableBase = Animated.createAnimatedComponent(Pressable);
 

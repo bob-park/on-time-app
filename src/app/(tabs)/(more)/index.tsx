@@ -52,7 +52,7 @@ export default function MoreIndex() {
     >
       {/* section header */}
       <Reanimated.View entering={enterPage(0)}>
-        <Text className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">프로필</Text>
+        <Text className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">프로필</Text>
       </Reanimated.View>
 
       {/* Profile Card */}

@@ -19,9 +19,7 @@ export const useStore = create<BoundState>()(
       {
         name: 'on-time-app',
         storage: createJSONStorage(() => AsyncStorage),
-        partialize: (
-          state,
-        ): { userinfo?: UserInfo; themePreference?: ThemePreference } => ({
+        partialize: (state): { userinfo?: UserInfo; themePreference?: ThemePreference } => ({
           userinfo: state.userinfo,
           themePreference: state.themePreference,
         }),

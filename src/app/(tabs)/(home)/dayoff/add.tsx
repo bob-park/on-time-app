@@ -172,7 +172,7 @@ export default function AddDayOff() {
         >
           {/* leave info card (merged) */}
           <Reanimated.View entering={enterPage(0)}>
-            <Text className="mb-3 mt-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="mt-4 mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               잔여 현황
             </Text>
             <View className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
@@ -238,7 +238,7 @@ export default function AddDayOff() {
 
           {/* vacation type chips */}
           <Reanimated.View entering={enterPage(80)} className="mt-8">
-            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               휴가 구분
             </Text>
             <View className="flex flex-row items-center gap-2">
@@ -269,7 +269,7 @@ export default function AddDayOff() {
 
           {/* vacation sub type chips */}
           <Reanimated.View entering={enterPage(140)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               부가 구분
             </Text>
             <View className="flex flex-row items-center gap-2">
@@ -295,7 +295,7 @@ export default function AddDayOff() {
 
           {/* reason input */}
           <Reanimated.View entering={enterPage(200)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               사유
             </Text>
             <View className="rounded-2xl bg-white px-4 py-3 dark:bg-gray-900" style={CARD_SHADOW}>
@@ -315,7 +315,7 @@ export default function AddDayOff() {
 
           {/* calendar */}
           <Reanimated.View entering={enterPage(260)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               기간
             </Text>
             <View className="rounded-2xl bg-white p-3 dark:bg-gray-900" style={CARD_SHADOW}>

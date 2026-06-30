@@ -55,18 +55,18 @@ function HeroBeforeWork({ today }: { today: any }) {
       </View>
 
       <Text className="text-sm text-white/75">아직 출근 전이에요</Text>
-      <Text className="mt-1 text-[28px] font-bold leading-tight text-white">오늘도 화이팅!</Text>
+      <Text className="mt-1 text-[28px] leading-tight font-bold text-white">오늘도 화이팅!</Text>
 
       {/* stats */}
       <View className="mt-6 flex-row gap-8">
         <View className="gap-1">
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-white/55">예정 출근</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-white/55 uppercase">예정 출근</Text>
           <Text className="text-base font-bold text-white" style={{ fontVariant: ['tabular-nums'] }}>
             09:00
           </Text>
         </View>
         <View className="gap-1">
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-white/55">목표 퇴근</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-white/55 uppercase">목표 퇴근</Text>
           <Text className="text-base font-bold text-white" style={{ fontVariant: ['tabular-nums'] }}>
             {today?.leaveWorkAt ? dayjs(today.leaveWorkAt).format('HH:mm') : '18:00'}
           </Text>
@@ -102,7 +102,7 @@ function HeroWeekend() {
       </View>
 
       <Text className="text-sm text-white/75">오늘은 주말이에요</Text>
-      <Text className="mt-1 text-[28px] font-bold leading-tight text-white">푹 쉬세요</Text>
+      <Text className="mt-1 text-[28px] leading-tight font-bold text-white">푹 쉬세요</Text>
 
       <Text className="mt-6 text-[13px] leading-relaxed text-white/55">
         출근이 필요하면{'\n'}아래 버튼을 눌러주세요
@@ -174,18 +174,18 @@ function HeroWorking({
       {/* header — 숫자가 주인공 */}
       <View className="flex-row items-start justify-between">
         <View>
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-white/60">목표 퇴근</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-white/60 uppercase">목표 퇴근</Text>
           <Text
-            className="mt-1 text-[44px] font-bold leading-none text-white"
+            className="mt-1 text-[44px] leading-none font-bold text-white"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {leaveWorkAt?.format('HH:mm')}
           </Text>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-white/60">남은 시간</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-white/60 uppercase">남은 시간</Text>
           <Text
-            className="mt-1 text-2xl font-bold leading-tight text-[#ADE1FF]"
+            className="mt-1 text-2xl leading-tight font-bold text-[#ADE1FF]"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {remainingLabel}
@@ -262,18 +262,18 @@ function HeroOvertime({
       {/* header — 숫자가 주인공 */}
       <View className="flex-row items-start justify-between">
         <View>
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-white/60">목표 퇴근</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-white/60 uppercase">목표 퇴근</Text>
           <Text
-            className="mt-1 text-[44px] font-bold leading-none text-white"
+            className="mt-1 text-[44px] leading-none font-bold text-white"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {leaveWorkAt?.format('HH:mm')}
           </Text>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold uppercase tracking-wider text-[#FF6B6B]/80">초과 근무</Text>
+          <Text className="text-[11px] font-semibold tracking-wider text-[#FF6B6B]/80 uppercase">초과 근무</Text>
           <Text
-            className="mt-1 text-2xl font-bold leading-tight text-[#FF6B6B]"
+            className="mt-1 text-2xl leading-tight font-bold text-[#FF6B6B]"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {overtimeLabel}
@@ -608,10 +608,10 @@ export default function HomeIndex() {
       {/* Page Header */}
       <Reanimated.View entering={enterPage(0)} className="flex-row items-center justify-between px-4 pb-1">
         <View>
-          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
             {dayjs().format('YYYY.M.D')} · {getDaysOfWeek(dayjs().day())}
           </Text>
-          <Text className="mt-1 text-[28px] font-bold leading-none text-gray-900 dark:text-white">오늘</Text>
+          <Text className="mt-1 text-[28px] leading-none font-bold text-gray-900 dark:text-white">오늘</Text>
         </View>
         <AnimatedPressable
           className="size-10 items-center justify-center rounded-full bg-white dark:bg-gray-800"
@@ -620,7 +620,7 @@ export default function HomeIndex() {
         >
           <Ionicons name="notifications-outline" size={20} color={theme === 'light' ? '#1C1C1E' : '#FFFFFF'} />
           {notifications.some((n) => !n.isRead) && (
-            <View className="absolute right-0 top-0 size-2.5 rounded-full bg-red-500" />
+            <View className="absolute top-0 right-0 size-2.5 rounded-full bg-red-500" />
           )}
         </AnimatedPressable>
       </Reanimated.View>
@@ -643,7 +643,7 @@ export default function HomeIndex() {
 
       {/* Primary actions — 자주 쓰는 휴가 바로가기 2개 */}
       <Reanimated.View entering={enterPage(180)} className="mt-8 px-4">
-        <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">휴가</Text>
+        <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">휴가</Text>
         <View className="flex-row gap-3">
           {isLoading && !today ? (
             <>
@@ -673,7 +673,7 @@ export default function HomeIndex() {
 
       {/* Secondary actions — 덜 자주 쓰는 건 리스트로 (리듬 변화) */}
       <Reanimated.View entering={enterPage(260)} className="mt-6 px-4">
-        <Text className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+        <Text className="mb-2 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
           바로가기
         </Text>
         <View

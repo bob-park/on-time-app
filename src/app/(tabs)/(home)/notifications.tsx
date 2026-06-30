@@ -1,21 +1,20 @@
 import { useContext } from 'react';
 
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useNotificationHistories, useReadNotification } from '@/domain/notification/queries/userNotification';
 import { Icon } from '@/shared/components/Icon';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import dayjs from '@/shared/dayjs';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import LottieView from 'lottie-react-native';
-import Reanimated from 'react-native-reanimated';
-
-import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
-import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 
 const CARD_SHADOW = Platform.select({
   ios: {
@@ -54,7 +53,7 @@ const MessageItem = ({
           </View>
 
           {/* unread dot */}
-          {!message.isRead && <View className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-blue-500" />}
+          {!message.isRead && <View className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-blue-500" />}
         </View>
 
         {/* body */}

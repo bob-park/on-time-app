@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';

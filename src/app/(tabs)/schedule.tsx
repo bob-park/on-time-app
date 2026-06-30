@@ -248,9 +248,9 @@ export default function Schedule() {
     <View className="flex size-full flex-col bg-gray-50 pt-[68px] dark:bg-gray-950">
       {/* Header */}
       <Reanimated.View entering={enterPage(0)} className="px-4 pb-3">
-        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">일정</Text>
+        <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">일정</Text>
         <View className="mt-1 flex-row items-end justify-between">
-          <Text className="text-[28px] font-bold leading-none text-gray-900 dark:text-white">
+          <Text className="text-[28px] leading-none font-bold text-gray-900 dark:text-white">
             {dayjs(selectedDate).format('YYYY년 M월')}
           </Text>
           <TouchableOpacity
@@ -267,7 +267,7 @@ export default function Schedule() {
       {/* Week Calendar Strip - M3 Surface */}
       <Reanimated.View entering={enterHero(100)} className="mt-2 px-4">
         <View
-          className="rounded-[20px] bg-white pb-2 pt-3 dark:bg-gray-900"
+          className="rounded-[20px] bg-white pt-3 pb-2 dark:bg-gray-900"
           style={{
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 1 },
@@ -340,7 +340,7 @@ export default function Schedule() {
           </View>
 
           {/* Swipe indicator */}
-          <View className="items-center pb-1 pt-2">
+          <View className="items-center pt-2 pb-1">
             <View className="h-1 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
           </View>
         </View>
@@ -355,7 +355,7 @@ export default function Schedule() {
         {/* 내 일정 */}
         <View className="mb-8">
           <View className="mb-3 flex-row items-center gap-2">
-            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">내 일정</Text>
+            <Text className="text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">내 일정</Text>
             <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
               <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
                 {isLoading ? '-' : myVacations.length}
@@ -381,7 +381,7 @@ export default function Schedule() {
         {/* 동료 일정 */}
         <View>
           <View className="mb-3 flex-row items-center gap-2">
-            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <Text className="text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
               동료 일정
             </Text>
             <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">

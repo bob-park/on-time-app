@@ -1,4 +1,5 @@
 import { createContext, useEffect, useMemo } from 'react';
+
 import { useColorScheme as useDeviceColorScheme } from 'react-native';
 
 import { useStore } from '@/shared/store/rootStore';

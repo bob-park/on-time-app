@@ -51,7 +51,7 @@ const InvalidLocationModal = ({
     <Modal visible={show} animationType="fade" transparent onRequestClose={onClose}>
       <BlurView className="relative flex h-screen w-screen flex-col items-center justify-center" tint="dark">
         {/* outside */}
-        <TouchableOpacity className="absolute left-0 top-0 h-screen w-screen" activeOpacity={1} onPress={onClose} />
+        <TouchableOpacity className="absolute top-0 left-0 h-screen w-screen" activeOpacity={1} onPress={onClose} />
 
         {/* message */}
         <View
@@ -75,7 +75,7 @@ const InvalidLocationModal = ({
           </View>
 
           {/* action */}
-          <View className="absolute bottom-2 right-3">
+          <View className="absolute right-3 bottom-2">
             <TouchableOpacity className="rounded-xl bg-gray-200 p-4 dark:bg-gray-600" onPress={onClose}>
               <Text className="font-semibold text-gray-500 dark:text-gray-200">닫기</Text>
             </TouchableOpacity>
@@ -308,10 +308,10 @@ export default function Attendance() {
 
         {/* today — 숫자가 주인공 */}
         <Reanimated.View entering={enterHero(40)} className="mt-2">
-          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">오늘</Text>
+          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">오늘</Text>
           <View className="mt-1 flex flex-row items-baseline gap-2">
             <Text
-              className="text-[32px] font-bold leading-none text-gray-900 dark:text-white"
+              className="text-[32px] leading-none font-bold text-gray-900 dark:text-white"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {dayjs().format('M월 D일')}
@@ -322,7 +322,7 @@ export default function Attendance() {
 
         {/* select work type */}
         <Reanimated.View entering={enterPage(140)} className="mt-8">
-          <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
             근무 위치
           </Text>
           <View className="flex flex-row items-center gap-2">
@@ -386,7 +386,7 @@ export default function Attendance() {
         </Reanimated.View>
 
         {/* CTA — 썸-존 하단 배치, 전체 폭 */}
-        <Reanimated.View entering={enterPage(320)} className="pb-28 pt-4">
+        <Reanimated.View entering={enterPage(320)} className="pt-4 pb-28">
           {isBeforeClockIn ? (
             <AnimatedPressable
               className={cx(

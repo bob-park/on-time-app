@@ -81,14 +81,14 @@ export default function SelectCompLeaveEntriesModal({
           </View>
 
           <TouchableOpacity
-            className="absolute left-4 top-0 size-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800"
+            className="absolute top-0 left-4 size-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800"
             onPress={() => onClose()}
           >
             <Ionicons name="close" size={24} color={theme === 'light' ? 'black' : 'white'} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="absolute right-4 top-0 h-10 w-20 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800"
+            className="absolute top-0 right-4 h-10 w-20 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800"
             onPress={handleSelect}
           >
             <Text className="font-bold dark:text-gray-100">선택</Text>

@@ -172,12 +172,12 @@ export default function DayoffHistoriesPage() {
       {/* year + total — 숫자가 주인공, count-up */}
       <Reanimated.View entering={enterHero(80)} className="mt-4 flex-row items-end justify-between">
         <View>
-          <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
             {dayjs().format('YYYY')}년 사용 내역
           </Text>
           <View className="mt-1 flex-row items-baseline gap-1.5">
             <Text
-              className="text-[40px] font-bold leading-none text-gray-900 dark:text-white"
+              className="text-[40px] leading-none font-bold text-gray-900 dark:text-white"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {animatedTotal}
