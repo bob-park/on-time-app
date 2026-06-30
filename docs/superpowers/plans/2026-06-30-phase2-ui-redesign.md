@@ -4,14 +4,14 @@
 
 **Goal:** On Time 앱 전 화면을 Spotify Dark Immersive 방향(방향 A)으로 라이트·다크 모두 지원하도록 리디자인하되, 홈·출퇴근 화면을 최우선으로 완성한다.
 
-**Architecture:** Phase 1에서 정의한 `tailwind.config.js` 디자인 토큰을 단일 출처로 사용한다. 재사용 공용 컴포넌트(Button/Card/StatTile/Badge/ProgressBar/ProgressRing/SectionHeader)를 먼저 만들고, 화면들을 그 위에서 재구성한다. NativeWind `dark:` 클래스로 다크/라이트를 분기하며, iOS는 expo-glass-effect 표면을 사용한다.
+**Architecture:** Phase 1에서 정의한 디자인 토큰(NativeWind 5/Tailwind 4 CSS-first — `src/app/global.css`의 `@theme` 블록에 `--color-*` 로 정의됨; `tailwind.config.js`는 NW5에서 제거됨)을 단일 출처로 사용한다. 재사용 공용 컴포넌트(Button/Card/StatTile/Badge/ProgressBar/ProgressRing/SectionHeader)를 먼저 만들고, 화면들을 그 위에서 재구성한다. NativeWind `dark:` 클래스로 다크/라이트를 분기하며, iOS는 expo-glass-effect 표면을 사용한다.
 
 **Tech Stack:** NativeWind 5 + Tailwind 4(토큰), react-native-reanimated(기존 motion), expo-glass-effect, expo-symbols, expo-image, react-i18next.
 
 ## Global Constraints
 
 - 작업 브랜치: `feature/ui-v3-and-live-activity`. **Phase 1이 완료(빌드 통과)된 상태에서 시작.**
-- 디자인 토큰은 `tailwind.config.js`에 정의된 시맨틱 색만 사용(`base/surface/elevated/border/content/muted/brand/danger`). 하드코딩 hex 신규 추가 금지(그라데이션 등 불가피한 경우 제외).
+- 디자인 토큰은 `src/app/global.css`의 `@theme` 블록(`--color-base/surface/elevated/border/content/muted/brand/danger` + 각 `-dark`)에서 파생된 시맨틱 유틸리티만 사용(`bg-base`, `dark:bg-surface-dark`, `text-content`, `bg-brand`, `border-brand-border`, `text-danger` 등). 하드코딩 hex 신규 추가 금지(그라데이션 등 불가피한 경우 제외).
 - 액센트는 브랜드 그린 `#1ed760` 단일. 기능적 사용만(장식 금지).
 - 버튼은 pill 지오메트리(`rounded-full`), 시간/숫자는 `fontVariant: ['tabular-nums']`.
 - 다크/라이트: 모든 표면·텍스트는 `dark:` 변형을 가진다. `darkMode: 'class'`.
