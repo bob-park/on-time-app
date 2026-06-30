@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import createThemeSlice from '@/domain/theme/store/slice';
+import { ThemeState } from '@/domain/theme/store/theme.state';
 import createUserSlice from '@/domain/users/store/slice';
 import { UserState } from '@/domain/users/store/users.state';
 
@@ -12,15 +14,21 @@ export const useStore = create<BoundState>()(
     persist(
       immer((...a) => ({
         ...createUserSlice(...a),
+        ...createThemeSlice(...a),
       })),
       {
         name: 'on-time-app',
         storage: createJSONStorage(() => AsyncStorage),
-        partialize: (state): { userinfo?: UserInfo } => ({ userinfo: state.userinfo }),
+        partialize: (
+          state,
+        ): { userinfo?: UserInfo; themePreference?: ThemePreference } => ({
+          userinfo: state.userinfo,
+          themePreference: state.themePreference,
+        }),
       },
     ),
     { name: 'on-time-app', enabled: process.env.NODE_ENV !== 'production' },
   ),
 );
 
-export type BoundState = UserState;
+export type BoundState = UserState & ThemeState;
