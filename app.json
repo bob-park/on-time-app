@@ -83,7 +83,8 @@
       "expo-secure-store",
       "expo-navigation-bar",
       "expo-status-bar",
-      "expo-asset"
+      "expo-asset",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

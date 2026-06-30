@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
 import AuthProvider, { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import I18nProvider from '@/shared/providers/i18n/I18nProvider';
 import NotificationProvider from '@/shared/providers/notification/NotificationProvider';
 import RQProvider from '@/shared/providers/query/RQProvider';
 import ThemeProvider from '@/shared/providers/theme/ThemeProvider';
@@ -32,16 +33,18 @@ const RootStackLayout = () => {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RQProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <AnimateAppLoader>
-              <StatusBar style="auto" animated />
-              <RootStackLayout />
-            </AnimateAppLoader>
-          </NotificationProvider>
-        </AuthProvider>
-      </RQProvider>
+      <I18nProvider>
+        <RQProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <AnimateAppLoader>
+                <StatusBar style="auto" animated />
+                <RootStackLayout />
+              </AnimateAppLoader>
+            </NotificationProvider>
+          </AuthProvider>
+        </RQProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }
