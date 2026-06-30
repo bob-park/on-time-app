@@ -9,9 +9,9 @@ export function generateAuthHeader(accessToken: string) {
 }
 
 const index = ky.extend({
-  prefixUrl: API_HOST,
+  prefix: API_HOST,
   hooks: {
-    afterResponse: [(request, options, response) => {}],
+    afterResponse: [() => {}],
   },
 });
 
