@@ -13,7 +13,11 @@ export const useStore = create<BoundState>()(
       immer((...a) => ({
         ...createUserSlice(...a),
       })),
-      { name: 'on-time-app', storage: createJSONStorage(() => AsyncStorage) },
+      {
+        name: 'on-time-app',
+        storage: createJSONStorage(() => AsyncStorage),
+        partialize: (state): { userinfo?: UserInfo } => ({ userinfo: state.userinfo }),
+      },
     ),
     { name: 'on-time-app', enabled: process.env.NODE_ENV !== 'production' },
   ),
