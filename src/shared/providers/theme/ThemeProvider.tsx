@@ -1,4 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
+import { useColorScheme as useDeviceColorScheme } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -22,6 +23,7 @@ export default function ThemeProvider({ children }: Readonly<{ children: React.R
 
   // hooks
   const { setColorScheme } = useNativewindColorSchema();
+  const deviceScheme = useDeviceColorScheme();
 
   // useEffect
   useEffect(() => {
@@ -31,11 +33,12 @@ export default function ThemeProvider({ children }: Readonly<{ children: React.R
   }, []);
 
   useEffect(() => {
-    setColorScheme(theme);
+    // NW5의 setColorScheme 은 'system' 을 받지 않으므로 디바이스 스킴으로 해석한다.
+    setColorScheme(theme === 'system' ? (deviceScheme ?? 'light') : theme);
 
     // save
     AsyncStorage.setItem(KEY_THEME_PREFERENCE, theme);
-  }, [theme]);
+  }, [theme, deviceScheme]);
 
   // memorize
   const contextValue = useMemo<ThemeContextType>(
