@@ -2,6 +2,7 @@ import { useContext } from 'react';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
@@ -32,19 +33,21 @@ const RootStackLayout = () => {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <I18nProvider>
-        <RQProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <AnimateAppLoader>
-                <StatusBar style="auto" animated />
-                <RootStackLayout />
-              </AnimateAppLoader>
-            </NotificationProvider>
-          </AuthProvider>
-        </RQProvider>
-      </I18nProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <I18nProvider>
+          <RQProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <AnimateAppLoader>
+                  <StatusBar style="auto" animated />
+                  <RootStackLayout />
+                </AnimateAppLoader>
+              </NotificationProvider>
+            </AuthProvider>
+          </RQProvider>
+        </I18nProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

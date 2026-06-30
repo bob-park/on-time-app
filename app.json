@@ -84,7 +84,8 @@
       "expo-navigation-bar",
       "expo-status-bar",
       "expo-asset",
-      "expo-localization"
+      "expo-localization",
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true
