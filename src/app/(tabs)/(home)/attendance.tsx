@@ -16,8 +16,8 @@ import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import Loading from '@/shared/components/loading/Loading';
-import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterHero, enterPage } from '@/shared/components/motion/entering';
+import { Button, Card, StatusPill } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -28,6 +28,7 @@ import cx from 'classnames';
 import LottieView from 'lottie-react-native';
 
 const WEEKEND_DAYS = [0, 6];
+const TABULAR = { fontVariant: ['tabular-nums' as const] };
 
 function parseWorkType(workType: AttendanceWorkType) {
   switch (workType) {
@@ -55,30 +56,26 @@ const InvalidLocationModal = ({
 
         {/* message */}
         <View
-          className="left-auto h-48 w-80 rounded-xl bg-gray-50 dark:bg-gray-700"
+          className="w-80 rounded-3xl border border-border bg-surface p-5 dark:border-border-dark dark:bg-surface-dark"
           style={{
-            shadowColor: 'black',
+            shadowColor: '#000000',
             shadowOpacity: 0.15,
-            shadowOffset: { width: 4, height: 4 },
+            shadowOffset: { width: 0, height: 8 },
+            shadowRadius: 16,
           }}
         >
-          <View className="flex flex-col items-center gap-3 p-4">
-            {/* header */}
-            <View className="w-full">
-              <Text className="text-xl font-extrabold text-gray-500 dark:text-gray-300">잘못된 위치</Text>
-            </View>
+          {/* header */}
+          <StatusPill label="잘못된 위치" tone="danger" />
 
-            {/* message */}
-            <View className="mt-4 w-full">
-              <Text className="text-center text-lg font-bold text-gray-900 dark:text-gray-200">사무실 아닌디??</Text>
-            </View>
-          </View>
+          {/* message */}
+          <Text className="mt-4 text-lg font-bold text-content dark:text-content-dark">사무실 아닌디??</Text>
+          <Text className="mt-1 text-sm text-muted dark:text-muted-dark">
+            현재 위치가 등록된 근무지와 달라요. 위치를 다시 확인해 주세요.
+          </Text>
 
           {/* action */}
-          <View className="absolute right-3 bottom-2">
-            <TouchableOpacity className="rounded-xl bg-gray-200 p-4 dark:bg-gray-600" onPress={onClose}>
-              <Text className="font-semibold text-gray-500 dark:text-gray-200">닫기</Text>
-            </TouchableOpacity>
+          <View className="mt-6 self-end">
+            <Button variant="secondary" label="닫기" onPress={onClose} />
           </View>
         </View>
       </BlurView>
@@ -223,106 +220,72 @@ export default function Attendance() {
     return <Loading />;
   }
 
+  // icon color tokens (mode-safe)
+  const brandColor = '#1ed760';
+  const dangerColor = theme === 'light' ? '#e0455a' : '#f3727f';
+  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
+
   const weekdayColor =
     dayjs().day() === 0
-      ? 'text-red-500 dark:text-red-300'
+      ? 'text-danger dark:text-danger-dark'
       : dayjs().day() === 6
         ? 'text-blue-500 dark:text-blue-300'
-        : 'text-gray-400 dark:text-gray-500';
+        : 'text-muted dark:text-muted-dark';
 
   const isBeforeClockIn = !today?.clockInTime;
   const isAfterClockOut = !!today?.clockOutTime;
 
-  const WORK_TYPES: { key: AttendanceWorkType; label: string; icon: React.ReactNode }[] = [
+  const WORK_TYPES: { key: AttendanceWorkType; label: string; icon: (active: boolean) => React.ReactNode }[] = [
     {
       key: 'OFFICE',
       label: '사무실',
-      icon: (
+      icon: (active) => (
         <MaterialCommunityIcons
           name="office-building-outline"
           size={18}
-          color={
-            workType === 'OFFICE'
-              ? theme === 'light'
-                ? '#f3f4f6'
-                : '#111827'
-              : theme === 'light'
-                ? '#111827'
-                : '#f3f4f6'
-          }
+          color={active ? '#000000' : contentColor}
         />
       ),
     },
     {
       key: 'OUTSIDE',
       label: '외근',
-      icon: (
-        <FontAwesome
-          name="car"
-          size={18}
-          color={
-            workType === 'OUTSIDE'
-              ? theme === 'light'
-                ? '#f3f4f6'
-                : '#111827'
-              : theme === 'light'
-                ? '#111827'
-                : '#f3f4f6'
-          }
-        />
-      ),
+      icon: (active) => <FontAwesome name="car" size={18} color={active ? '#000000' : contentColor} />,
     },
     {
       key: 'HOME',
       label: '재택근무',
-      icon: (
-        <Ionicons
-          name="home-sharp"
-          size={18}
-          color={
-            workType === 'HOME'
-              ? theme === 'light'
-                ? '#f3f4f6'
-                : '#111827'
-              : theme === 'light'
-                ? '#111827'
-                : '#f3f4f6'
-          }
-        />
-      ),
+      icon: (active) => <Ionicons name="home-sharp" size={18} color={active ? '#000000' : contentColor} />,
     },
   ];
 
   return (
     <>
-      <View className="flex-1">
+      <View className="flex-1 bg-base dark:bg-base-dark">
         {/* header — 다른 서브페이지와 동일 패턴 */}
         <View className="relative mb-2 flex flex-row items-center justify-center">
           <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-            <Entypo name="chevron-left" size={30} color={theme === 'light' ? 'black' : 'white'} />
+            <Entypo name="chevron-left" size={30} color={contentColor} />
           </TouchableOpacity>
-          <Text className="text-xl font-bold dark:text-white">
+          <Text className="text-xl font-bold text-content dark:text-content-dark">
             {isBeforeClockIn ? '출근' : isAfterClockOut ? '근무 완료' : '퇴근'}
           </Text>
         </View>
 
         {/* today — 숫자가 주인공 */}
         <Reanimated.View entering={enterHero(40)} className="mt-2">
-          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">오늘</Text>
+          <Text className="text-xs font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">오늘</Text>
           <View className="mt-1 flex flex-row items-baseline gap-2">
-            <Text
-              className="text-[32px] leading-none font-bold text-gray-900 dark:text-white"
-              style={{ fontVariant: ['tabular-nums'] }}
-            >
+            <Text className="text-[32px] leading-none font-bold text-content dark:text-content-dark" style={TABULAR}>
               {dayjs().format('M월 D일')}
             </Text>
             <Text className={cx('text-lg font-semibold', weekdayColor)}>{getDaysOfWeek(dayjs().day())}</Text>
           </View>
         </Reanimated.View>
 
-        {/* select work type */}
+        {/* select work type — pill segment group */}
         <Reanimated.View entering={enterPage(140)} className="mt-8">
-          <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+          <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
             근무 위치
           </Text>
           <View className="flex flex-row items-center gap-2">
@@ -334,18 +297,18 @@ export default function Attendance() {
                 <TouchableOpacity
                   key={option.key}
                   className={cx(
-                    'h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-2xl',
-                    isActive ? 'bg-gray-900 dark:bg-gray-100' : 'bg-gray-100 dark:bg-gray-800',
+                    'h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-full',
+                    isActive ? 'bg-brand' : 'bg-elevated dark:bg-elevated-dark',
                     disabled && !isActive && 'opacity-50',
                   )}
                   disabled={isActive || disabled}
                   onPress={() => setWorkType(option.key)}
                 >
-                  {option.icon}
+                  {option.icon(isActive)}
                   <Text
                     className={cx('text-sm font-bold', {
-                      'text-white dark:text-gray-900': isActive,
-                      'text-gray-700 dark:text-gray-200': !isActive,
+                      'text-black': isActive,
+                      'text-content dark:text-content-dark': !isActive,
                     })}
                   >
                     {option.label}
@@ -354,6 +317,29 @@ export default function Attendance() {
               );
             })}
           </View>
+        </Reanimated.View>
+
+        {/* GPS / location status */}
+        <Reanimated.View entering={enterPage(180)} className="mt-4">
+          <Card className={invalidLocation ? 'border-danger dark:border-danger-dark' : 'border-brand'}>
+            <View className="flex-row items-center gap-3">
+              <View className="size-10 items-center justify-center rounded-full bg-elevated dark:bg-elevated-dark">
+                <Ionicons name="location" size={20} color={invalidLocation ? dangerColor : brandColor} />
+              </View>
+              <View className="flex-1">
+                <StatusPill
+                  label={invalidLocation ? '위치 확인 필요' : '위치 확인됨'}
+                  tone={invalidLocation ? 'danger' : 'brand'}
+                />
+                <Text
+                  className="mt-1.5 text-sm font-semibold text-content dark:text-content-dark"
+                  numberOfLines={1}
+                >
+                  {currentAddress ?? '위치를 확인하는 중...'}
+                </Text>
+              </View>
+            </View>
+          </Card>
         </Reanimated.View>
 
         {/* animation + time info */}
@@ -369,15 +355,15 @@ export default function Attendance() {
             )}
           </View>
 
-          {/* time info — 라벨 ↔ 값 정렬, 억지 고정폭 대신 flex */}
+          {/* time info — 라벨 ↔ 값 정렬 */}
           {!isBeforeClockIn && (
-            <View className="mt-2 overflow-hidden rounded-2xl bg-white dark:bg-gray-900">
+            <View className="mt-2 overflow-hidden rounded-3xl border border-border bg-surface dark:border-border-dark dark:bg-surface-dark">
               <TimeInfoRow label="출근 시간" value={dayjs(today?.clockInTime).format('YYYY.M.D · A hh:mm')} />
-              <View className="ml-4 border-b border-gray-100 dark:border-gray-800" />
+              <View className="ml-4 border-b border-border dark:border-border-dark" />
               <TimeInfoRow label="목표 퇴근" value={dayjs(today?.leaveWorkAt).format('YYYY.M.D · A hh:mm')} />
               {isAfterClockOut && (
                 <>
-                  <View className="ml-4 border-b border-gray-100 dark:border-gray-800" />
+                  <View className="ml-4 border-b border-border dark:border-border-dark" />
                   <TimeInfoRow label="퇴근 시간" value={dayjs(today?.clockOutTime).format('YYYY.M.D · A hh:mm')} />
                 </>
               )}
@@ -388,45 +374,35 @@ export default function Attendance() {
         {/* CTA — 썸-존 하단 배치, 전체 폭 */}
         <Reanimated.View entering={enterPage(320)} className="pt-4 pb-28">
           {isBeforeClockIn ? (
-            <AnimatedPressable
-              className={cx(
-                'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
-                isClockInLoading || !currentLocation || invalidLocation ? 'bg-blue-300' : 'bg-blue-500',
-              )}
+            <Button
+              variant="primary"
+              label="출근하기"
               disabled={isClockInLoading || invalidLocation || !currentLocation}
               onPress={handleClockIn}
-            >
-              {isClockInLoading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
-                <MaterialCommunityIcons name="video-input-antenna" size={22} color="white" />
-              )}
-              <Text className="text-base font-bold text-white">출근하기</Text>
-            </AnimatedPressable>
+              icon={
+                isClockInLoading ? (
+                  <ActivityIndicator size="small" color="#000000" />
+                ) : (
+                  <MaterialCommunityIcons name="video-input-antenna" size={20} color="#000000" />
+                )
+              }
+            />
           ) : (
-            <AnimatedPressable
-              className={cx(
-                'h-14 flex-row items-center justify-center gap-2 rounded-2xl',
-                isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut
-                  ? 'bg-gray-500'
-                  : 'bg-gray-900 dark:bg-gray-100',
-              )}
+            <Button
+              variant="primary"
+              label={isAfterClockOut ? '퇴근' : '퇴근하기'}
               disabled={isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut}
               onPress={handleClockOut}
-            >
-              {isClockOutLoading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : isAfterClockOut ? (
-                <FontAwesome6 name="dragon" size={22} color={theme === 'light' ? 'white' : '#111827'} />
-              ) : (
-                <Ionicons name="bus-outline" size={22} color={theme === 'light' ? 'white' : '#111827'} />
-              )}
-              <Text
-                className={cx('text-base font-bold', isAfterClockOut ? 'text-white' : 'text-white dark:text-gray-900')}
-              >
-                {isAfterClockOut ? '퇴근' : '퇴근하기'}
-              </Text>
-            </AnimatedPressable>
+              icon={
+                isClockOutLoading ? (
+                  <ActivityIndicator size="small" color="#000000" />
+                ) : isAfterClockOut ? (
+                  <FontAwesome6 name="dragon" size={20} color="#000000" />
+                ) : (
+                  <Ionicons name="bus-outline" size={20} color="#000000" />
+                )
+              }
+            />
           )}
         </Reanimated.View>
       </View>
@@ -442,8 +418,8 @@ export default function Attendance() {
 function TimeInfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between px-4 py-3.5">
-      <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">{label}</Text>
-      <Text className="text-sm font-bold text-gray-900 dark:text-white" style={{ fontVariant: ['tabular-nums'] }}>
+      <Text className="text-sm font-semibold text-muted dark:text-muted-dark">{label}</Text>
+      <Text className="text-sm font-bold text-content dark:text-content-dark" style={TABULAR}>
         {value}
       </Text>
     </View>
