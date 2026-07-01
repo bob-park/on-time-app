@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-07-02
+
+### Added
+- 근무시간 iOS Live Activity: 출근 시 시작·퇴근 시 종료, 잠금화면(남은시간 hero + 선형 진행바 + 근무/목표)과 다이나믹 아일랜드(compact 좌 남은/우 근무, expanded, minimal) 표시. `expo-widgets` + `@expo/ui/swift-ui`로 네이티브 코드 없이 구현, 분 단위 갱신, 초과근무 시 남은시간 자리에 초과분 `+HH:MM` 카운트업
+- zustand 전역 스토어(persist + immer): 로그인·테마 선호·알림 provider 상태 이전
+- i18next 다국어 인프라(ko 기본)
+- 공용 UI 컴포넌트 세트(Button/Card/StatTile/StatusPill/ProgressBar/ProgressRing/SectionHeader)와 CSS-first 디자인 토큰(@theme)
+
+### Changed
+- 프레임워크 업그레이드: Expo SDK 55→56, React Native 0.83→0.85, NativeWind 4→5 + Tailwind 3→4, ky 1→2
+- 전면 UI 리디자인(방향 A · 라이트+다크): 홈/출퇴근/연차/스케줄/투두/알림/더보기·테마/로그인 등 전 화면을 디자인 토큰 기반으로 재구성
+- 하단 탭: iOS는 NativeTabs, Android는 JS Tabs로 OS별 분기
+- 홈 초과근무 상태를 목표 퇴근시각 +30분부터 진입하도록 변경
+- `app.json` → 타입 있는 `app.config.ts`로 전환(버전은 package.json 단일 출처)
+- 보상휴가 선택 모달을 디자인 토큰 + 공용 Button으로 통일
+
+### Fixed
+- 시스템 테마 모드가 OS를 따라가지 않던 문제(NativeWind 5 setColorScheme → Appearance `'unspecified'`)
+- 휴가 신청 화면 '신청하기' 버튼이 탭바에 가려지던 문제
+- 다이나믹 아일랜드 확장 뷰에서 남은시간 분이 `…`로 잘리던 문제
+
 ## [1.0.6] - 2026-04-17
 
 ### Changed
