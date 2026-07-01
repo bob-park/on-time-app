@@ -115,7 +115,7 @@ export default function Attendance() {
         : dayjs(data.clockInTime ?? undefined)
             .add(8, 'hour')
             .toISOString();
-      startWorkActivity({ clockInAt, targetLeaveAt }).catch(() => {});
+      startWorkActivity({ clockInAt, targetLeaveAt }).catch((err) => console.error('[LiveActivity] start failed', err));
     },
   });
   const { clockOut, isLoading: isClockOutLoading } = useClockOut({
@@ -128,7 +128,7 @@ export default function Attendance() {
       });
 
       // iOS Live Activity 종료 (실패해도 퇴근 플로우를 막지 않는다)
-      endWorkActivity().catch(() => {});
+      endWorkActivity().catch((err) => console.error('[LiveActivity] end failed', err));
     },
   });
 

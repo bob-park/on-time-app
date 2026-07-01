@@ -24,6 +24,24 @@ function formatDuration(ms: number): string {
   return `${hours}:${String(minutes).padStart(2, '0')}`;
 }
 
+// Compact duration for the Dynamic Island's tiny compact/minimal slots: when the
+// duration is at least an hour we drop the minutes ("1h20m" → "1h"); under an
+// hour we show whole minutes ("20m"). Keeping this short avoids the ".."
+// truncation the seconds-based timer produced.
+function formatCompact(ms: number): string {
+  const totalMinutes = Math.floor(Math.max(ms, 0) / 60_000);
+  if (totalMinutes >= 60) return `${Math.floor(totalMinutes / 60)}h`;
+  return `${totalMinutes}m`;
+}
+
+// Format an instant as a local wall-clock "HH:mm". Uses local getters (not UTC)
+// so the label matches the target time the user sees elsewhere in the app
+// (home screen uses dayjs local `HH:mm`).
+function formatClockTime(ms: number): string {
+  const d = new Date(ms);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
 export function computeWorkActivityProps(input: WorkActivityInput, now: Date): WorkActivityProps {
   const clockInMs = new Date(input.clockInAt).getTime();
   const targetMs = new Date(input.targetLeaveAt).getTime();
@@ -34,7 +52,9 @@ export function computeWorkActivityProps(input: WorkActivityInput, now: Date): W
   const isOvertime = nowMs > targetMs;
 
   const progress = totalMs > 0 ? clamp01(elapsedMs / totalMs) : isOvertime ? 1 : 0;
-  const remainingMs = isOvertime ? nowMs - targetMs : targetMs - nowMs;
+  // Remaining counts down to the target and floors at 0 once in overtime; the
+  // overtime amount is not surfaced as "remaining" (worked keeps climbing).
+  const remainingMs = isOvertime ? 0 : targetMs - nowMs;
 
   return {
     clockInAt: input.clockInAt,
@@ -42,6 +62,9 @@ export function computeWorkActivityProps(input: WorkActivityInput, now: Date): W
     progress,
     remainingLabel: formatDuration(remainingMs),
     workedLabel: formatDuration(elapsedMs),
+    remainingCompact: formatCompact(remainingMs),
+    workedCompact: formatCompact(elapsedMs),
+    targetLabel: formatClockTime(targetMs),
     isOvertime,
   };
 }

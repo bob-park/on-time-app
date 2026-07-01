@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
-import { syncWorkActivity } from '@/domain/attendances/liveActivity';
+import { syncWorkActivity, updateWorkActivity } from '@/domain/attendances/liveActivity';
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
@@ -493,7 +493,28 @@ export default function HomeIndex() {
 
   // 부팅/오늘 기록 변경 시 iOS Live Activity 상태를 동기화 (iOS 외 no-op)
   useEffect(() => {
-    syncWorkActivity(today).catch(() => {});
+    syncWorkActivity(today).catch((err) => console.error('[LiveActivity] sync failed', err));
+  }, [today]);
+
+  // 근무 중일 때만 앱 포그라운드에서 분 단위로 Live Activity 라벨을 갱신한다.
+  // (백그라운드/잠금화면에서는 마지막 값이 그대로 유지되며, 진짜 분단위 백그라운드
+  //  갱신은 push[enablePushNotifications]가 필요 — 후속 과제. iOS 외 no-op)
+  useEffect(() => {
+    const isWorking = !!today?.clockInTime && !today?.clockOutTime;
+    if (!isWorking) return;
+
+    const clockInAt = dayjs(today.clockInTime).toISOString();
+    const targetLeaveAt = today.leaveWorkAt
+      ? dayjs(today.leaveWorkAt).toISOString()
+      : dayjs(today.clockInTime).add(8, 'hour').toISOString();
+
+    const intervalId = setInterval(() => {
+      updateWorkActivity({ clockInAt, targetLeaveAt }).catch((err) =>
+        console.error('[LiveActivity] minute refresh failed', err),
+      );
+    }, 60_000);
+
+    return () => clearInterval(intervalId);
   }, [today]);
 
   const calculateRemainingTime = () => {
