@@ -1,14 +1,13 @@
 import { useContext } from 'react';
 
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 
 import { Stack } from 'expo-router';
 
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 export default function MoreLayout() {
-  // context
-  const { theme } = useContext(ThemeContext);
+  const colorScheme = useColorScheme();
 
   return (
     <View className="flex size-full bg-gray-50 dark:bg-gray-950">
@@ -20,7 +19,7 @@ export default function MoreLayout() {
             paddingRight: 16,
             paddingTop: 68,
             paddingBottom: 12,
-            backgroundColor: theme === 'light' ? '#f9fafb' : '#030712',
+            backgroundColor: colorScheme === 'light' ? '#f9fafb' : '#030712',
           },
         }}
       />

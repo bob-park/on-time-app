@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 
+import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Stack } from 'expo-router';
@@ -13,8 +14,6 @@ import NotificationProvider from '@/shared/providers/notification/NotificationPr
 import RQProvider from '@/shared/providers/query/RQProvider';
 import ThemeProvider from '@/shared/providers/theme/ThemeProvider';
 
-import { useColorScheme } from 'nativewind';
-
 export { ErrorBoundary } from 'expo-router';
 
 const RootStackLayout = () => {
@@ -22,7 +21,7 @@ const RootStackLayout = () => {
   const { isLoggedIn } = useContext(AuthContext);
 
   // hooks
-  const { colorScheme } = useColorScheme();
+  const colorScheme = useColorScheme();
 
   return (
     <Stack

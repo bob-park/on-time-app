@@ -1,11 +1,11 @@
+import { useColorScheme } from 'react-native';
+
 import { Tabs } from 'expo-router';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from 'nativewind';
-
 export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
+  const colorScheme = useColorScheme();
 
   const isDark = colorScheme === 'dark';
 

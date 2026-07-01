@@ -1,9 +1,9 @@
+import { useColorScheme } from 'react-native';
+
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { useColorScheme } from 'nativewind';
-
 export default function TabLayout() {
-  const { colorScheme } = useColorScheme();
+  const colorScheme = useColorScheme();
 
   const isDark = colorScheme === 'dark';
 
