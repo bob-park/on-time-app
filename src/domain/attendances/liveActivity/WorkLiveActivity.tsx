@@ -1,7 +1,15 @@
 import { type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
 
 import { HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { font, foregroundStyle, monospacedDigit, padding, tint } from '@expo/ui/swift-ui/modifiers';
+import {
+  font,
+  foregroundStyle,
+  lineLimit,
+  minimumScaleFactor,
+  monospacedDigit,
+  padding,
+  tint,
+} from '@expo/ui/swift-ui/modifiers';
 
 import type { WorkActivityProps } from './types';
 
@@ -40,11 +48,16 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
   const heroLabel = props.isOvertime ? '초과 근무' : '퇴근까지';
 
   // --- shared building blocks (reused across regions) ---
+  // `lineLimit(1)` + `minimumScaleFactor` let the hero shrink to fit the narrow
+  // Dynamic Island expanded-leading region (e.g. "17:39") instead of truncating
+  // the minutes to "…"; on the full-width lock-screen banner it stays at 40pt.
   const remainingHero = (
     <Text
       modifiers={[
         font({ size: 40, weight: 'bold', design: 'rounded' }),
         monospacedDigit(),
+        lineLimit(1),
+        minimumScaleFactor(0.5),
         foregroundStyle(accentColor),
       ]}
     >
