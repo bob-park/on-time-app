@@ -14,11 +14,11 @@ import { enterHero, enterPage } from '@/shared/components/motion/entering';
 import { Card, SectionHeader } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
 const BRAND = '#1ed760';
-const DANGER = '#e0455a';
 const MUTED = '#8a8f99';
 
 type SettingRowProps = {
@@ -72,9 +72,13 @@ function RowDivider() {
 export default function MoreIndex() {
   // context
   const { userinfo, onLogout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
+
+  // theme-conditional danger (matches --color-danger / --color-danger-dark)
+  const dangerColor = theme === 'light' ? '#e0455a' : '#f3727f';
 
   // queries
   const { user } = useUser(userinfo?.sub);
@@ -144,7 +148,7 @@ export default function MoreIndex() {
             <SettingRow
               label="로그아웃"
               tone="danger"
-              icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color={DANGER} />}
+              icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color={dangerColor} />}
               onPress={handleLogout}
             />
             <RowDivider />
