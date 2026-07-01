@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
@@ -12,19 +12,9 @@ import { Icon } from '@/shared/components/Icon';
 import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-  },
-  android: {
-    elevation: 2,
-  },
-});
+const BRAND = '#1ed760';
+const MUTED = '#8a8f99';
 
 function parseNotificationType(type: NotificationType) {
   switch (type) {
@@ -43,46 +33,26 @@ function parseNotificationType(type: NotificationType) {
   }
 }
 
-function NotificationIcon({ type, theme }: { type: NotificationType; theme: 'dark' | 'light' | 'system' }) {
-  const iconColor = theme === 'light' ? '#3b82f6' : '#60a5fa';
-
+function NotificationIcon({ type }: { type: NotificationType }) {
   switch (type) {
     case 'ANDROID':
     case 'IOS':
-      return <Icon sf="iphone" fallback="📱" size={18} color={iconColor} />;
+      return <Icon sf="iphone" fallback="📱" size={18} color={BRAND} />;
     case 'SLACK':
-      return <FontAwesome5 name="slack" size={18} color={theme === 'light' ? '#611f69' : '#e0b0ff'} />;
+      return <FontAwesome5 name="slack" size={18} color={BRAND} />;
     case 'SMTP':
-      return <Icon sf="envelope" fallback="📧" size={18} color={iconColor} />;
+      return <Icon sf="envelope" fallback="📧" size={18} color={BRAND} />;
     case 'FLOW':
     case 'FLOW_HOOKS':
-      return <Icon sf="bolt" fallback="⚡" size={18} color="#f59e0b" />;
+      return <Icon sf="bolt" fallback="⚡" size={18} color={BRAND} />;
     default:
-      return <Icon sf="bell" fallback="🔔" size={18} color={iconColor} />;
-  }
-}
-
-function getIconBg(type: NotificationType): string {
-  switch (type) {
-    case 'ANDROID':
-    case 'IOS':
-      return 'rgba(59,130,246,0.12)';
-    case 'SLACK':
-      return 'rgba(168,85,247,0.12)';
-    case 'SMTP':
-      return 'rgba(99,102,241,0.12)';
-    case 'FLOW':
-    case 'FLOW_HOOKS':
-      return 'rgba(245,158,11,0.12)';
-    default:
-      return 'rgba(59,130,246,0.12)';
+      return <Icon sf="bell" fallback="🔔" size={18} color={BRAND} />;
   }
 }
 
 export default function NotificationSettings() {
   // context
   const { userinfo: userDetail } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
   const { userProviderId } = useContext(NotificationContext);
 
   // hooks
@@ -110,44 +80,36 @@ export default function NotificationSettings() {
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon
-            sf="chevron.left"
-            fallback="‹"
-            size={24}
-            weight="semibold"
-            color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
-          />
+          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={MUTED} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold dark:text-white">알림 설정</Text>
+        <Text className="text-content dark:text-content-dark text-xl font-bold">알림 설정</Text>
       </Reanimated.View>
 
       {/* notification providers card */}
-      <View className="mt-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
+      <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark mt-2 overflow-hidden rounded-3xl border">
         {filteredProviders.map((provider, index) => (
           <Reanimated.View key={`notification-providers-item-${provider.id}`} entering={enterListItem(index, 80)}>
             <View className="flex flex-row items-center gap-3 px-4 py-3.5">
               {/* icon */}
-              <View
-                className="size-9 flex-none items-center justify-center rounded-xl"
-                style={{ backgroundColor: getIconBg(provider.provider.type) }}
-              >
-                <NotificationIcon type={provider.provider.type} theme={theme} />
+              <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
+                <NotificationIcon type={provider.provider.type} />
               </View>
 
               {/* label */}
-              <Text className="flex-1 text-[15px] font-semibold dark:text-white">
+              <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">
                 {parseNotificationType(provider.provider.type)}
               </Text>
 
               {/* toggle */}
               <Switch
                 value={provider.enabled}
+                trackColor={{ true: BRAND }}
                 onValueChange={(value) => handleUpdateEnabled({ providerId: provider.id, enabled: value })}
               />
             </View>
 
             {index < filteredProviders.length - 1 && (
-              <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
+              <View className="border-border dark:border-border-dark ml-[60px] border-b" />
             )}
           </Reanimated.View>
         ))}

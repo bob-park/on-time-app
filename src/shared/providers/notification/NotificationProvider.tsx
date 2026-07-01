@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { Linking, Text, View } from 'react-native';
 import Toast, { ToastConfig } from 'react-native-toast-message';
@@ -7,12 +7,18 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { usePathname, useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 
 import { useNotificationHistories, useUserNotification } from '@/domain/notification/queries/userNotification';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { useStore } from '@/shared/store/rootStore';
 
-const KEY_USER_PROVIDER_ID = 'userProviderId';
+export interface NotificationMessage {
+  id: string;
+  title: string;
+  message?: string;
+  read: boolean;
+  createdDate: Date;
+}
 
 // custom toast
 const toastConfig: ToastConfig = {
@@ -57,8 +63,9 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
   // context
   const { userinfo: userDetail } = useContext(AuthContext);
 
-  // state
-  const [userProviderId, setUserProviderId] = useState<string>();
+  // store
+  const userProviderId = useStore((s) => s.userProviderId);
+  const setUserProviderId = useStore((s) => s.setUserProviderId);
 
   // hooks
   const router = useRouter();
@@ -89,16 +96,10 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
   }, [notifications]);
 
   useEffect(() => {
-    SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then((data) => {
-      if (!data) {
-        // init
-        handleInit();
-
-        return;
-      }
-
-      handleUpdateUserProviderId(data);
-    });
+    // persist 된 userProviderId 가 없으면 초기화(권한 요청 + 토큰 등록)
+    if (!useStore.getState().userProviderId) {
+      handleInit();
+    }
 
     const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
       showToast({
@@ -148,7 +149,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     if (!Device.isDevice) {
       console.warn('no device');
-      return;
+      // return;
     }
 
     const projectId = Constants.expoConfig?.extra?.esp?.projectId ?? Constants.easConfig?.projectId;
@@ -164,8 +165,6 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
   const handleUpdateUserProviderId = (id: string) => {
     setUserProviderId(id);
-
-    SecureStore.setItemAsync(KEY_USER_PROVIDER_ID, id);
   };
 
   const showToast = ({

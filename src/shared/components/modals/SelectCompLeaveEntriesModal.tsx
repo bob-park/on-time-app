@@ -6,6 +6,7 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useUserCompLeaveEntries } from '@/domain/users/queries/usersCompLeaveEntries';
+import { Button } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
@@ -20,7 +21,7 @@ const NoData = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-lg font-extrabold text-gray-500">보상 휴가가 없어요..</Text>
+        <Text className="text-muted dark:text-muted-dark text-lg font-extrabold">보상 휴가가 없어요..</Text>
       </View>
     </View>
   );
@@ -46,6 +47,9 @@ export default function SelectCompLeaveEntriesModal({
 
   // query
   const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.sub });
+
+  // mode-safe raw colors
+  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
 
   // handle
   const handleSelect = () => {
@@ -73,30 +77,23 @@ export default function SelectCompLeaveEntriesModal({
 
   return (
     <Modal visible={show} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <View className="flex size-full flex-col items-center gap-3 dark:bg-black">
+      <View className="bg-base dark:bg-base-dark flex size-full flex-col items-center gap-3">
         {/* headers */}
         <View className="relative mt-6 w-full">
           <View className="mt-2 flex flex-col items-center justify-center gap-3">
-            <Text className="text-xl font-bold dark:text-white">보상 휴가 선택</Text>
+            <Text className="text-content dark:text-content-dark text-xl font-bold">보상 휴가 선택</Text>
           </View>
 
           <TouchableOpacity
-            className="absolute left-4 top-0 size-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800"
+            className="bg-elevated dark:bg-elevated-dark absolute top-0 left-4 size-10 items-center justify-center rounded-full"
             onPress={() => onClose()}
           >
-            <Ionicons name="close" size={24} color={theme === 'light' ? 'black' : 'white'} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="absolute right-4 top-0 h-10 w-20 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800"
-            onPress={handleSelect}
-          >
-            <Text className="font-bold dark:text-gray-100">선택</Text>
+            <Ionicons name="close" size={24} color={contentColor} />
           </TouchableOpacity>
         </View>
 
         {/* contents */}
-        <View className="size-full px-5 py-4">
+        <View className="w-full flex-1 px-5 py-4">
           <FlashList
             className="w-full"
             data={compLeaveEntries}
@@ -109,6 +106,11 @@ export default function SelectCompLeaveEntriesModal({
             )}
             ListFooterComponent={compLeaveEntries.length === 0 ? <NoData /> : <View className="h-40 w-full" />}
           />
+        </View>
+
+        {/* action */}
+        <View className="w-full px-5 pb-8">
+          <Button variant="primary" label="선택" onPress={handleSelect} />
         </View>
       </View>
     </Modal>
@@ -135,54 +137,48 @@ const CompLeaveEntry = ({
   return (
     <View className="px-4 py-2">
       <TouchableOpacity
-        className={cx('flex w-full flex-row items-start gap-2 rounded-2xl px-4 py-4', {
-          'bg-gray-50 dark:bg-gray-900': !selected,
-          'bg-gray-200 dark:bg-gray-700': selected,
+        className={cx('flex w-full flex-row items-start gap-2 rounded-2xl border px-4 py-4', {
+          'border-border bg-surface dark:border-border-dark dark:bg-surface-dark': !selected,
+          'border-brand bg-surface dark:bg-surface-dark': selected,
         })}
-        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
         onPress={handleToggle}
       >
         <View className="mt-2 w-12 flex-none">
-          <Feather name="calendar" size={24} color={theme === 'light' ? 'black' : 'white'} />
+          <Feather name="calendar" size={24} color="#1ed760" />
         </View>
         <View className="flex-1">
           <View className="flex flex-col items-center gap-2">
-            <Text className="w-full text-base font-semibold dark:text-white" numberOfLines={2} lineBreakMode="tail">
+            <Text
+              className="text-content dark:text-content-dark w-full text-base font-semibold"
+              numberOfLines={2}
+              lineBreakMode="tail"
+            >
               {entry.contents}
             </Text>
 
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">휴가 발생일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">
+              <Text className="text-muted dark:text-muted-dark w-20 flex-none text-sm">휴가 발생일 : </Text>
+              <Text className="text-muted dark:text-muted-dark flex-1 text-sm">
                 {dayjs(entry.effectiveDate).format('YYYY-MM-DD (dd)')}
               </Text>
             </View>
 
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">생성 휴가일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">{entry.leaveDays}</Text>
+              <Text className="text-muted dark:text-muted-dark w-20 flex-none text-sm">생성 휴가일 : </Text>
+              <Text className="text-muted dark:text-muted-dark flex-1 text-sm">{entry.leaveDays}</Text>
             </View>
             <View className="flex w-full flex-row items-center gap-2">
-              <Text className="w-20 flex-none text-sm text-gray-500 dark:text-gray-400">잔여일 : </Text>
-              <Text className="flex-1 text-sm text-gray-500 dark:text-gray-400">
-                {entry.leaveDays - entry.usedDays}
-              </Text>
+              <Text className="text-muted dark:text-muted-dark w-20 flex-none text-sm">잔여일 : </Text>
+              <Text className="text-muted dark:text-muted-dark flex-1 text-sm">{entry.leaveDays - entry.usedDays}</Text>
             </View>
           </View>
         </View>
-        <View className="w-12 flex-none">
-          {theme === 'light' &&
-            (selected ? (
-              <MaterialCommunityIcons name="checkbox-marked" size={24} color="black" />
-            ) : (
-              <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="black" />
-            ))}
-          {theme === 'dark' &&
-            (selected ? (
-              <MaterialCommunityIcons name="checkbox-outline" size={24} color="white" />
-            ) : (
-              <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="white" />
-            ))}
+        <View className="w-12 flex-none items-center justify-center">
+          <MaterialCommunityIcons
+            name={selected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+            size={24}
+            color={selected ? '#1ed760' : theme === 'light' ? '#8a8f99' : 'rgba(255,255,255,0.5)'}
+          />
         </View>
       </TouchableOpacity>
     </View>

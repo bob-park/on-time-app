@@ -1,0 +1,4 @@
+{
+  "tabs": { "home": "홈", "schedule": "스케줄", "todo": "투두", "more": "더보기" },
+  "common": { "clockIn": "출근 입력", "clockOut": "퇴근 입력", "cancel": "취소", "confirm": "확인" }
+}

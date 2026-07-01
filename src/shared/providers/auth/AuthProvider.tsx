@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { deleteUserNotificationProvider } from '@/domain/notification/apis/userNotification';
 import dayjs from '@/shared/dayjs';
+import { useStore } from '@/shared/store/rootStore';
 import delay from '@/utils/delay';
 
 const KEY_ACCESS_TOKEN = 'accessToken';
@@ -50,11 +51,17 @@ export const AuthContext = createContext<AuthContextProps>({
 
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
-  const [userinfo, setUserInfo] = useState<UserInfo>();
   const [expiredAt, setExpiredAt] = useState<Date>();
   const [accessToken, setAccessToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  // store
+  const userinfo = useStore((state) => state.userinfo);
+  const isLoggedIn = useStore((state) => state.isLoggedIn);
+  const loggedIn = useStore((state) => state.loggedIn);
+  const loggedOut = useStore((state) => state.loggedOut);
+
+  const userProviderId = useStore((state) => state.userProviderId);
 
   // queries
   const queryClient = useQueryClient();
@@ -84,8 +91,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
         return data as UserInfo;
       })
       .then(async (userinfo) => {
-        setUserInfo(userinfo);
-        setIsLoggedIn(true);
+        loggedIn(userinfo);
         loadAuth();
       })
       .catch((err) => {
@@ -110,7 +116,11 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     };
   }, [expiredAt, refreshToken]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (userinfo && userProviderId) {
+      await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId });
+    }
+
     Promise.all([
       SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
         if (data && userinfo) {
@@ -123,8 +133,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
       SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
     ]).then(() => {
-      setUserInfo(undefined);
-      setIsLoggedIn(false);
+      loggedOut();
       setAccessToken('');
       setRefreshToken(undefined);
       setExpiredAt(undefined);

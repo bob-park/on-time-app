@@ -14,6 +14,8 @@ export const enterPage = (delay = 0) => FadeInDown.duration(420).delay(delay).ea
 export const enterHero = (delay = 0) => FadeInDown.duration(520).delay(delay).easing(EASE_OUT_QUART);
 
 export const enterListItem = (index: number, baseDelay = 0) =>
-  FadeInUp.duration(360).delay(baseDelay + index * 60).easing(EASE_OUT_QUART);
+  FadeInUp.duration(360)
+    .delay(baseDelay + index * 60)
+    .easing(EASE_OUT_QUART);
 
 export const enterSoft = (delay = 0) => FadeIn.duration(360).delay(delay).easing(EASE_OUT_QUART);

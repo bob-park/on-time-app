@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Platform, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
@@ -9,31 +9,76 @@ import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
 import { useUserEmployment } from '@/domain/users/queries/usersEmployments';
 import { Icon } from '@/shared/components/Icon';
-import Menu, { MenuItem } from '@/shared/components/menu/Menu';
+import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterHero, enterPage } from '@/shared/components/motion/entering';
+import { Card, SectionHeader } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
+import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
 
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-  },
-  android: {
-    elevation: 2,
-  },
-});
+const BRAND = '#1ed760';
+const MUTED = '#8a8f99';
+
+type SettingRowProps = {
+  icon: React.ReactNode;
+  label: string;
+  tone?: 'default' | 'danger';
+  move?: boolean;
+  onPress?: () => void;
+};
+
+function SettingRow({ icon, label, tone = 'default', move = false, onPress }: SettingRowProps) {
+  return (
+    <AnimatedPressable
+      className="flex-row items-center gap-3 px-4 py-3.5"
+      onPress={onPress}
+      disabled={!onPress}
+      scaleTo={0.98}
+    >
+      {/* icon */}
+      <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
+        {icon}
+      </View>
+
+      {/* label */}
+      <Text
+        className={`flex-1 text-[15px] font-semibold ${
+          tone === 'danger' ? 'text-danger dark:text-danger-dark' : 'text-content dark:text-content-dark'
+        }`}
+      >
+        {label}
+      </Text>
+
+      {/* chevron */}
+      {move && <Icon sf="chevron.right" fallback="›" size={14} color={MUTED} weight="semibold" />}
+    </AnimatedPressable>
+  );
+}
+
+function SettingsGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
+      {children}
+    </View>
+  );
+}
+
+function RowDivider() {
+  return <View className="border-border dark:border-border-dark ml-[60px] border-b" />;
+}
 
 export default function MoreIndex() {
   // context
   const { userinfo, onLogout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
 
   // hooks
   const router = useRouter();
+
+  // theme-conditional danger (matches --color-danger / --color-danger-dark)
+  const dangerColor = theme === 'light' ? '#e0455a' : '#f3727f';
 
   // queries
   const { user } = useUser(userinfo?.sub);
@@ -51,107 +96,94 @@ export default function MoreIndex() {
       showsVerticalScrollIndicator={false}
     >
       {/* section header */}
-      <Reanimated.View entering={enterPage(0)}>
-        <Text className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">프로필</Text>
+      <Reanimated.View entering={enterPage(0)} className="mb-4">
+        <SectionHeader title="프로필" />
       </Reanimated.View>
 
       {/* Profile Card */}
-      <Reanimated.View
-        entering={enterHero(60)}
-        className="overflow-hidden rounded-3xl bg-white dark:bg-gray-900"
-        style={CARD_SHADOW}
-      >
-        <View className="flex flex-row items-center gap-4 p-5">
-          {/* avatar */}
-          <View className="flex-none">
-            <UserAvatar
-              src={`${DEFAULT_API_HOST}/api/v1/users/${userinfo?.sub}/avatar`}
-              username={user?.username}
-              size="sm"
-            />
-          </View>
+      <Reanimated.View entering={enterHero(60)}>
+        <Card className="p-5">
+          <View className="flex flex-row items-center gap-4">
+            {/* avatar */}
+            <View className="flex-none">
+              <UserAvatar
+                src={`${DEFAULT_API_HOST}/api/v1/users/${userinfo?.sub}/avatar`}
+                username={user?.username}
+                size="sm"
+              />
+            </View>
 
-          {/* info */}
-          <View className="flex flex-1 flex-col gap-1">
-            <Text className="text-xl font-bold text-gray-900 dark:text-white">{user?.username}</Text>
+            {/* info */}
+            <View className="flex flex-1 flex-col gap-1">
+              <Text className="text-content dark:text-content-dark text-xl font-bold">{user?.username}</Text>
 
-            <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-              {user?.position?.name}
-              {user?.group?.teamUserDescription ? ` (${user?.group?.teamUserDescription})` : ''}
-            </Text>
+              <Text className="text-muted dark:text-muted-dark text-sm font-semibold">
+                {user?.position?.name}
+                {user?.group?.teamUserDescription ? ` (${user?.group?.teamUserDescription})` : ''}
+              </Text>
 
-            <View className="mt-1 flex flex-row items-center gap-2">
-              <View className="rounded-full bg-gray-100 px-2.5 py-1 dark:bg-white/10">
-                <Text className="text-xs text-gray-500 dark:text-gray-400">
-                  {user?.group?.name} ·{' '}
-                  {employment?.effectiveDate
-                    ? dayjs
-                        .duration((dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000)
-                        .format('Y년 M개월 D일')
-                    : ''}
-                </Text>
+              <View className="mt-1 flex flex-row items-center gap-2">
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-1">
+                  <Text className="text-muted dark:text-muted-dark text-xs">
+                    {user?.group?.name} ·{' '}
+                    {employment?.effectiveDate
+                      ? dayjs
+                          .duration((dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000)
+                          .format('Y년 M개월 D일')
+                      : ''}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
+        </Card>
       </Reanimated.View>
 
       {/* Menu Groups */}
       <View className="mt-10 flex flex-col gap-8">
         {/* 계정 */}
-        <Reanimated.View entering={enterPage(160)}>
-          <Menu title="계정">
-            <MenuItem
-              text="로그아웃"
-              iconBg="rgba(239,68,68,0.12)"
-              icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color="#ef4444" />}
+        <Reanimated.View entering={enterPage(160)} className="flex flex-col gap-3">
+          <SectionHeader title="계정" />
+          <SettingsGroup>
+            <SettingRow
+              label="로그아웃"
+              tone="danger"
+              icon={<Icon sf="rectangle.portrait.and.arrow.forward" fallback="↩" size={18} color={dangerColor} />}
               onPress={handleLogout}
             />
-            <MenuItem
-              text="알림 설정"
+            <RowDivider />
+            <SettingRow
+              label="알림 설정"
               move
-              iconBg="rgba(59,130,246,0.12)"
-              icon={<Icon sf="bell" fallback="🔔" size={18} color="#3b82f6" />}
+              icon={<Icon sf="bell" fallback="🔔" size={18} color={BRAND} />}
               onPress={() => router.push('./notifications')}
             />
-          </Menu>
+          </SettingsGroup>
         </Reanimated.View>
 
         {/* 설정 */}
-        <Reanimated.View entering={enterPage(240)}>
-          <Menu title="설정">
-            <MenuItem
+        <Reanimated.View entering={enterPage(240)} className="flex flex-col gap-3">
+          <SectionHeader title="설정" />
+          <SettingsGroup>
+            <SettingRow
+              label="화면 테마"
               move
-              text="화면 테마"
-              iconBg="rgba(245,158,11,0.12)"
-              icon={<Icon sf="sun.max" fallback="☀" size={18} color="#f59e0b" />}
+              icon={<Icon sf="sun.max" fallback="☀" size={18} color={BRAND} />}
               onPress={() => router.push('./theme')}
             />
-          </Menu>
+          </SettingsGroup>
         </Reanimated.View>
 
         {/* 더보기 */}
-        <Reanimated.View entering={enterPage(320)}>
-          <Menu title="더보기">
-            <MenuItem
-              move
-              text="공지사항"
-              iconBg="rgba(99,102,241,0.12)"
-              icon={<Icon sf="newspaper" fallback="📰" size={18} color="#6366f1" />}
-            />
-            <MenuItem
-              move
-              text="근무"
-              iconBg="rgba(59,130,246,0.08)"
-              icon={<Icon sf="timer" fallback="⏱" size={18} color="#3b82f6" />}
-            />
-            <MenuItem
-              move
-              text="구성원"
-              iconBg="rgba(168,85,247,0.12)"
-              icon={<Icon sf="person.2" fallback="👥" size={18} color="#a855f7" />}
-            />
-          </Menu>
+        <Reanimated.View entering={enterPage(320)} className="flex flex-col gap-3">
+          <SectionHeader title="더보기" />
+          <SettingsGroup>
+            <SettingRow move label="공지사항" icon={<Icon sf="newspaper" fallback="📰" size={18} color={BRAND} />} />
+            <RowDivider />
+            <SettingRow move label="근무" icon={<Icon sf="timer" fallback="⏱" size={18} color={BRAND} />} />
+            <RowDivider />
+            <SettingRow move label="구성원" icon={<Icon sf="person.2" fallback="👥" size={18} color={BRAND} />} />
+          </SettingsGroup>
         </Reanimated.View>
       </View>
     </ScrollView>

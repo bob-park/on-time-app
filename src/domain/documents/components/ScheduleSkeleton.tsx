@@ -61,13 +61,7 @@ function ColleagueSkeleton() {
   );
 }
 
-export default function ScheduleSkeleton({
-  variant,
-  count,
-}: {
-  variant: 'my' | 'colleague';
-  count: number;
-}) {
+export default function ScheduleSkeleton({ variant, count }: { variant: 'my' | 'colleague'; count: number }) {
   const Component = variant === 'my' ? MyScheduleSkeleton : ColleagueSkeleton;
 
   return (

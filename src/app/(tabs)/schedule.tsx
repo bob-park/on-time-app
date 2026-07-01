@@ -12,6 +12,7 @@ import UserAvatar from '@/domain/users/components/avatar/UserAvatar';
 import { useUser } from '@/domain/users/queries/users';
 import { Icon } from '@/shared/components/Icon';
 import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
+import { Card, SectionHeader } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
@@ -19,6 +20,8 @@ import { getDaysOfWeek, getWeekStartDate, isSameDate } from '@/utils/parse';
 import cx from 'classnames';
 
 const DEFAULT_API_HOST = process.env.EXPO_PUBLIC_API_HOST;
+
+const TABULAR = { fontVariant: ['tabular-nums' as const] };
 
 // --- Utilities ---
 
@@ -98,7 +101,7 @@ const WeekDayItem = ({
   return (
     <TouchableOpacity
       className={cx('flex size-10 flex-col items-center justify-center rounded-full', {
-        'bg-purple-500 dark:bg-purple-300': selected,
+        'bg-brand': selected,
       })}
       onPress={handlePress}
       activeOpacity={0.7}
@@ -106,9 +109,10 @@ const WeekDayItem = ({
     >
       <Text
         className={cx('text-[15px] font-semibold', {
-          'text-white dark:text-gray-900': selected,
-          'text-gray-900 dark:text-gray-100': !selected,
+          'text-black': selected,
+          'text-content dark:text-content-dark': !selected,
         })}
+        style={TABULAR}
       >
         {dayjs(date).date()}
       </Text>
@@ -124,15 +128,11 @@ const WeekDayItem = ({
             />
           ))}
         {selected &&
-          uniqueTypes.map((_, i) => (
-            <View key={`dot-sel-${i}`} className="size-[5px] rounded-full bg-white dark:bg-gray-900" />
-          ))}
+          uniqueTypes.map((_, i) => <View key={`dot-sel-${i}`} className="size-[5px] rounded-full bg-black" />)}
       </View>
 
       {/* Today ring indicator */}
-      {isToday && !selected && (
-        <View className="absolute inset-0 rounded-full border-2 border-purple-500 dark:border-purple-300" />
-      )}
+      {isToday && !selected && <View className="border-brand absolute inset-0 rounded-full border-2" />}
     </TouchableOpacity>
   );
 };
@@ -245,37 +245,28 @@ export default function Schedule() {
   );
 
   return (
-    <View className="flex size-full flex-col bg-gray-50 pt-[68px] dark:bg-gray-950">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col pt-[68px]">
       {/* Header */}
       <Reanimated.View entering={enterPage(0)} className="px-4 pb-3">
-        <Text className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">일정</Text>
+        <Text className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wider uppercase">일정</Text>
         <View className="mt-1 flex-row items-end justify-between">
-          <Text className="text-[28px] font-bold leading-none text-gray-900 dark:text-white">
+          <Text className="text-content dark:text-content-dark text-[28px] leading-none font-bold" style={TABULAR}>
             {dayjs(selectedDate).format('YYYY년 M월')}
           </Text>
           <TouchableOpacity
-            className="h-9 items-center justify-center rounded-full bg-purple-100 px-4 dark:bg-purple-900/40"
+            className="bg-brand h-9 items-center justify-center rounded-full px-4"
             onPress={handleSelectToday}
             activeOpacity={0.7}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text className="text-sm font-bold text-purple-600 dark:text-purple-300">오늘</Text>
+            <Text className="text-sm font-bold text-black">오늘</Text>
           </TouchableOpacity>
         </View>
       </Reanimated.View>
 
       {/* Week Calendar Strip - M3 Surface */}
       <Reanimated.View entering={enterHero(100)} className="mt-2 px-4">
-        <View
-          className="rounded-[20px] bg-white pb-2 pt-3 dark:bg-gray-900"
-          style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.06,
-            shadowRadius: 3,
-            elevation: 2,
-          }}
-        >
+        <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-[20px] border pt-3 pb-2">
           <View className="h-[88px]">
             <AnimatedPagerView
               {...rest}
@@ -317,7 +308,7 @@ export default function Schedule() {
                               className={cx('text-[11px] font-semibold', {
                                 'text-red-400': dayOfWeek === 0,
                                 'text-blue-400': dayOfWeek === 6,
-                                'text-gray-400 dark:text-gray-500': ![0, 6].includes(dayOfWeek),
+                                'text-muted dark:text-muted-dark': ![0, 6].includes(dayOfWeek),
                               })}
                             >
                               {getDaysOfWeek(dayOfWeek)}
@@ -340,8 +331,8 @@ export default function Schedule() {
           </View>
 
           {/* Swipe indicator */}
-          <View className="items-center pb-1 pt-2">
-            <View className="h-1 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <View className="items-center pt-2 pb-1">
+            <View className="bg-border dark:bg-border-dark h-1 w-16 rounded-full" />
           </View>
         </View>
       </Reanimated.View>
@@ -354,13 +345,17 @@ export default function Schedule() {
       >
         {/* 내 일정 */}
         <View className="mb-8">
-          <View className="mb-3 flex-row items-center gap-2">
-            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">내 일정</Text>
-            <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
-              <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
-                {isLoading ? '-' : myVacations.length}
-              </Text>
-            </View>
+          <View className="mb-3">
+            <SectionHeader
+              title="내 일정"
+              action={
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-0.5">
+                  <Text className="text-brand text-[11px] font-bold" style={TABULAR}>
+                    {isLoading ? '-' : myVacations.length}
+                  </Text>
+                </View>
+              }
+            />
           </View>
 
           {isLoading ? (
@@ -380,15 +375,17 @@ export default function Schedule() {
 
         {/* 동료 일정 */}
         <View>
-          <View className="mb-3 flex-row items-center gap-2">
-            <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-              동료 일정
-            </Text>
-            <View className="rounded-full bg-purple-100 px-2 py-0.5 dark:bg-purple-900/40">
-              <Text className="text-[11px] font-bold text-purple-600 dark:text-purple-300">
-                {isLoading ? '-' : colleagueVacations.length}
-              </Text>
-            </View>
+          <View className="mb-3">
+            <SectionHeader
+              title="동료 일정"
+              action={
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-0.5">
+                  <Text className="text-brand text-[11px] font-bold" style={TABULAR}>
+                    {isLoading ? '-' : colleagueVacations.length}
+                  </Text>
+                </View>
+              }
+            />
           </View>
 
           {isLoading ? (
@@ -423,16 +420,7 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
   const icon = getVacationIcon(vacation.vacationType);
 
   return (
-    <View
-      className="flex-row items-center gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 3,
-        elevation: 2,
-      }}
-    >
+    <Card className="flex-row items-center gap-4 rounded-2xl p-4">
       {/* Icon tile — type identity comes from the tile, not a stripe */}
       <View className={cx('size-12 items-center justify-center rounded-2xl', colors.bg, colors.darkBg)}>
         <Icon sf={icon.sf} fallback={icon.fallback} size={22} color={colors.iconColor} />
@@ -441,7 +429,7 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
       {/* Info */}
       <View className="flex-1 gap-1">
         <View className="flex-row items-center gap-2">
-          <Text className="text-base font-bold text-gray-900 dark:text-gray-100">
+          <Text className="text-content dark:text-content-dark text-base font-bold">
             {parseVacationName(vacation.vacationType)}
           </Text>
           {vacation.vacationSubType && (
@@ -456,13 +444,13 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
             </View>
           )}
         </View>
-        <Text className="text-xs font-medium text-gray-400 dark:text-gray-500">
+        <Text className="text-muted dark:text-muted-dark text-xs font-medium" style={TABULAR}>
           {dayjs(vacation.startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(vacation.startDate).day())})
           {dayjs(vacation.startDate).isBefore(vacation.endDate) &&
             ` - ${dayjs(vacation.endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(vacation.endDate).day())})`}
         </Text>
       </View>
-    </View>
+    </Card>
   );
 }
 
@@ -487,16 +475,7 @@ function ColleagueScheduleCard({
   if (!user) return null;
 
   return (
-    <View
-      className="flex-row items-center gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.06,
-        shadowRadius: 3,
-        elevation: 2,
-      }}
-    >
+    <Card className="flex-row items-center gap-4 rounded-2xl p-4">
       {/* Avatar */}
       <View className="size-14 flex-none">
         <UserAvatar
@@ -508,11 +487,11 @@ function ColleagueScheduleCard({
 
       {/* Info */}
       <View className="flex-1 gap-0.5">
-        <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">{user?.username || ''}</Text>
-        <Text className="text-xs text-gray-400 dark:text-gray-500">
+        <Text className="text-content dark:text-content-dark text-base font-semibold">{user?.username || ''}</Text>
+        <Text className="text-muted dark:text-muted-dark text-xs">
           {user?.group?.name} · {user?.position?.name || ''}
         </Text>
-        <Text className="mt-1 text-xs font-medium text-gray-400 dark:text-gray-500">
+        <Text className="text-muted dark:text-muted-dark mt-1 text-xs font-medium" style={TABULAR}>
           {dayjs(startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(startDate).day())})
           {dayjs(startDate).isBefore(endDate) &&
             ` - ${dayjs(endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(endDate).day())})`}
@@ -523,6 +502,6 @@ function ColleagueScheduleCard({
       <View className={cx('rounded-lg px-2.5 py-1', colors.badgeBg)}>
         <Text className={cx('text-xs font-bold', colors.badgeText)}>{parseVacationName(type, subType)}</Text>
       </View>
-    </View>
+    </Card>
   );
 }

@@ -1,0 +1,4 @@
+{
+  "tabs": { "home": "Home", "schedule": "Schedule", "todo": "To-do", "more": "More" },
+  "common": { "clockIn": "Clock in", "clockOut": "Clock out", "cancel": "Cancel", "confirm": "Confirm" }
+}

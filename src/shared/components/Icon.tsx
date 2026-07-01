@@ -1,11 +1,18 @@
 import { Platform, PlatformColor, Text } from 'react-native';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-let SymbolView: React.ComponentType<{ name: string; tintColor?: string | ReturnType<typeof PlatformColor>; size?: number; weight?: string }> | null = null;
+let SymbolView: React.ComponentType<{
+  name: string;
+  tintColor?: string | ReturnType<typeof PlatformColor>;
+  size?: number;
+  weight?: string;
+}> | null = null;
 try {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   SymbolView = require('expo-symbols').SymbolView;
-} catch { /* fallback */ }
+} catch {
+  /* fallback */
+}
 
 interface IconProps {
   /** SF Symbol name */
@@ -27,8 +34,6 @@ export function Icon({ sf, fallback, size = 24, color, weight = 'regular' }: Ico
   }
 
   return (
-    <Text style={{ fontSize: Math.round(size * 0.85), color: color ?? '#1C1C1E', lineHeight: size }}>
-      {fallback}
-    </Text>
+    <Text style={{ fontSize: Math.round(size * 0.85), color: color ?? '#1C1C1E', lineHeight: size }}>{fallback}</Text>
   );
 }

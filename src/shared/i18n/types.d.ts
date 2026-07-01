@@ -1,0 +1,1 @@
+type SupportedLanguage = 'ko' | 'en';

@@ -23,9 +23,7 @@ export default function Menu({ title, children }: Readonly<{ title: string; chil
   return (
     <View className="flex flex-col gap-3">
       {/* section title */}
-      <Text className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-        {title}
-      </Text>
+      <Text className="text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">{title}</Text>
 
       {/* card container */}
       <View className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>

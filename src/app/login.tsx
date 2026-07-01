@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 import { exchangeCodeAsync, useAuthRequest } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -8,11 +8,10 @@ import * as WebBrowser from 'expo-web-browser';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
+import { Button } from '@/shared/components/ui';
 import { AuthContext, clientId, clientSecret, discovery, redirectUri } from '@/shared/providers/auth/AuthProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import delay from '@/utils/delay';
 
-import cx from 'classnames';
 import LottieView from 'lottie-react-native';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -20,7 +19,6 @@ WebBrowser.maybeCompleteAuthSession();
 export default function LoginPage() {
   // context
   const { onLoggedIn } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
 
   // state
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -67,32 +65,29 @@ export default function LoginPage() {
   }, [response]);
 
   return (
-    <View className="flex size-full flex-col items-center justify-center gap-10 bg-white p-10 dark:bg-black">
-      <View className="flex flex-col items-center justify-center">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col items-center justify-center gap-12 p-10">
+      <View className="flex flex-col items-center justify-center gap-2">
         <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
-        <View className="">
-          <Text className="text-4xl font-bold text-blue-500 dark:text-blue-300">On Time</Text>
-        </View>
+        <Text className="text-brand text-4xl font-extrabold">On Time</Text>
+        <Text className="text-muted dark:text-muted-dark text-base">시간을 지키는 가장 쉬운 방법</Text>
       </View>
+
       <View className="w-[80%]">
-        <TouchableOpacity
-          className={cx('flex flex-row items-center justify-center gap-2 rounded-2xl p-4', {
-            'bg-black dark:bg-white': !isLoggingIn,
-            'bg-gray-500 dark:bg-gray-400': isLoggingIn,
-          })}
+        <Button
+          label={isLoggingIn ? '로그인 중' : '로그인'}
           disabled={isLoggingIn}
           onPress={() => {
             promptAsync();
           }}
-        >
-          {isLoggingIn ? (
-            <ActivityIndicator size="small" color={theme !== 'light' ? '#d1d5db' : '#4b5563'} />
-          ) : (
-            <MaterialIcons name="login" size={24} color={theme === 'light' ? 'white' : 'black'} />
-          )}
-          <Text className="text-xl font-bold text-white dark:text-black">{isLoggingIn ? '로그인 중' : '로그인'}</Text>
-        </TouchableOpacity>
+          icon={
+            isLoggingIn ? (
+              <ActivityIndicator size="small" color="#000000" />
+            ) : (
+              <MaterialIcons name="login" size={20} color="#000000" />
+            )
+          }
+        />
       </View>
     </View>
   );
