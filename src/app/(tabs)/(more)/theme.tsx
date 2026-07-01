@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
@@ -10,51 +10,38 @@ import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable'
 import { enterListItem, enterPage } from '@/shared/components/motion/entering';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-  },
-  android: {
-    elevation: 2,
-  },
-});
+const BRAND = '#1ed760';
+const MUTED = '#8a8f99';
 
 type ThemeOption = {
   key: 'light' | 'dark' | 'system';
   label: string;
+  description: string;
   sf: string;
   fallback: string;
-  iconColor: string;
-  iconBg: string;
 };
 
 const THEME_OPTIONS: ThemeOption[] = [
   {
+    key: 'system',
+    label: '시스템 설정과 같이',
+    description: '기기 설정에 맞춰 자동 전환',
+    sf: 'circle.lefthalf.filled',
+    fallback: '◐',
+  },
+  {
     key: 'light',
     label: '밝은 모드',
+    description: '항상 밝은 화면 사용',
     sf: 'sun.max',
     fallback: '☀',
-    iconColor: '#f59e0b',
-    iconBg: 'rgba(245,158,11,0.12)',
   },
   {
     key: 'dark',
     label: '어두운 모드',
+    description: '항상 어두운 화면 사용',
     sf: 'moon',
     fallback: '🌙',
-    iconColor: '#6366f1',
-    iconBg: 'rgba(99,102,241,0.12)',
-  },
-  {
-    key: 'system',
-    label: '시스템 설정과 같이',
-    sf: 'circle.lefthalf.filled',
-    fallback: '◐',
-    iconColor: '#6b7280',
-    iconBg: 'rgba(107,114,128,0.12)',
   },
 ];
 
@@ -74,48 +61,44 @@ export default function Theme() {
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-6 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon
-            sf="chevron.left"
-            fallback="‹"
-            size={24}
-            weight="semibold"
-            color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
-          />
+          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={MUTED} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold dark:text-white">화면 테마</Text>
+        <Text className="text-xl font-bold text-content dark:text-content-dark">화면 테마</Text>
       </Reanimated.View>
 
-      {/* theme options card */}
-      <View className="mt-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-900" style={CARD_SHADOW}>
-        {THEME_OPTIONS.map((option, index) => (
-          <Reanimated.View key={option.key} entering={enterListItem(index, 80)}>
-            <AnimatedPressable
-              scaleTo={0.98}
-              className={`flex flex-row items-center gap-3 px-4 py-4 ${
-                theme === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-              }`}
-              onPress={() => onUpdateTheme(option.key)}
-            >
-              {/* icon */}
-              <View
-                className="size-9 flex-none items-center justify-center rounded-xl"
-                style={{ backgroundColor: option.iconBg }}
+      {/* theme option cards */}
+      <View className="mt-2 flex flex-col gap-3">
+        {THEME_OPTIONS.map((option, index) => {
+          const selected = theme === option.key;
+
+          return (
+            <Reanimated.View key={option.key} entering={enterListItem(index, 80)}>
+              <AnimatedPressable
+                scaleTo={0.98}
+                className={`flex flex-row items-center gap-3 rounded-3xl border p-4 ${
+                  selected
+                    ? 'border-brand bg-surface dark:bg-surface-dark'
+                    : 'border-border bg-surface dark:border-border-dark dark:bg-surface-dark'
+                }`}
+                onPress={() => onUpdateTheme(option.key)}
               >
-                <Icon sf={option.sf} fallback={option.fallback} size={18} color={option.iconColor} />
-              </View>
+                {/* icon */}
+                <View className="size-10 flex-none items-center justify-center rounded-2xl bg-elevated dark:bg-elevated-dark">
+                  <Icon sf={option.sf} fallback={option.fallback} size={20} color={selected ? BRAND : MUTED} />
+                </View>
 
-              {/* label */}
-              <Text className="flex-1 text-[15px] font-semibold dark:text-white">{option.label}</Text>
+                {/* label + description */}
+                <View className="flex-1">
+                  <Text className="text-[15px] font-bold text-content dark:text-content-dark">{option.label}</Text>
+                  <Text className="mt-0.5 text-xs text-muted dark:text-muted-dark">{option.description}</Text>
+                </View>
 
-              {/* checkmark */}
-              {theme === option.key && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color="#007AFF" />}
-            </AnimatedPressable>
-
-            {index < THEME_OPTIONS.length - 1 && (
-              <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
-            )}
-          </Reanimated.View>
-        ))}
+                {/* checkmark */}
+                {selected && <Icon sf="checkmark.circle.fill" fallback="✓" size={22} color={BRAND} />}
+              </AnimatedPressable>
+            </Reanimated.View>
+          );
+        })}
       </View>
     </ScrollView>
   );
