@@ -1,4 +1,4 @@
-import { type LiveActivityEnvironment, type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
+import { type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
 
 import { HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import { font, foregroundStyle, monospacedDigit, padding, tint } from '@expo/ui/swift-ui/modifiers';
@@ -24,18 +24,17 @@ import type { WorkActivityProps } from './types';
 // (see the foreground minute refresh in the home screen). This intentionally
 // trades second-level ticking for a calmer, minute-accurate display.
 // ────────────────────────────────────────────────────────────────────────────
-function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnvironment): LiveActivityLayout {
+function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
   'widget';
 
   // --- palette (brand + danger are identical in both color schemes) ---
   const BRAND = '#1ed760';
   const DANGER = '#f3727f';
-  const isDark = environment.colorScheme === 'dark';
-  // High-contrast text for the (usually dark) lock screen: captions AND values
-  // are full white on dark so "퇴근시간"/"근무"/"목표" and the target clock time
-  // stay clearly legible on the black background.
-  const valueColor = isDark ? '#ffffff' : '#11181C';
-  const captionColor = isDark ? '#ffffff' : '#3c3c43';
+  // The Live Activity surface (lock screen / Dynamic Island) is always dark, so
+  // every label/value except the brand-green remaining hero is full white —
+  // unconditionally, regardless of the device's light/dark scheme.
+  const valueColor = '#ffffff';
+  const captionColor = '#ffffff';
   const accentColor = props.isOvertime ? DANGER : BRAND;
   const clampedProgress = props.progress < 0 ? 0 : props.progress > 1 ? 1 : props.progress;
   const heroLabel = props.isOvertime ? '초과 근무' : '퇴근까지';
