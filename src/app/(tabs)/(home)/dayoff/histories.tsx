@@ -1,33 +1,26 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
+import { Entypo, Ionicons } from '@expo/vector-icons';
+
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useVacations } from '@/domain/documents/queries/vacations';
-import { Icon } from '@/shared/components/Icon';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterHero, enterListItem, enterPage } from '@/shared/components/motion/entering';
+import { StatusPill } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
+import cx from 'classnames';
 import LottieView from 'lottie-react-native';
 
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-  },
-  android: {
-    elevation: 2,
-  },
-});
+const TABULAR = { fontVariant: ['tabular-nums' as const] };
 
 function parseVacationType(vacationType: VacationType) {
   switch (vacationType) {
@@ -39,6 +32,21 @@ function parseVacationType(vacationType: VacationType) {
       return '공가';
     default:
       return '';
+  }
+}
+
+function parseStatus(status: ApprovalStatus): { label: string; tone: 'brand' | 'danger' | 'muted' } {
+  switch (status) {
+    case 'APPROVED':
+      return { label: '승인', tone: 'brand' };
+    case 'REJECTED':
+      return { label: '반려', tone: 'danger' };
+    case 'PROCEEDING':
+      return { label: '진행중', tone: 'muted' };
+    case 'WAITING':
+      return { label: '대기', tone: 'muted' };
+    default:
+      return { label: '임시저장', tone: 'muted' };
   }
 }
 
@@ -73,24 +81,25 @@ function useCountUp(value: number, durationMs = 800) {
 }
 
 const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) => {
+  const status = parseStatus(vacation.status);
+
   return (
     <View className="mt-3 px-1">
-      <View
-        className="flex w-full flex-row items-start gap-3 rounded-2xl bg-white px-4 py-4 dark:bg-gray-900"
-        style={CARD_SHADOW}
-      >
+      <View className="flex w-full flex-row items-start gap-3 rounded-3xl border border-border bg-surface px-4 py-4 dark:border-border-dark dark:bg-surface-dark">
         {/* icon container */}
-        <View
-          className="size-9 flex-none items-center justify-center rounded-xl"
-          style={{ backgroundColor: 'rgba(59,130,246,0.12)' }}
-        >
-          <Icon sf="calendar" fallback="📆" size={18} color="#3b82f6" />
+        <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+          <Ionicons name="calendar" size={18} color="#1ed760" />
         </View>
 
         {/* body */}
-        <View className="flex flex-1 flex-col gap-1">
-          <Text className="text-[15px] font-semibold dark:text-white">{parseVacationType(vacation.vacationType)}</Text>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">
+        <View className="flex flex-1 flex-col gap-1.5">
+          <View className="flex-row items-center gap-2">
+            <Text className="text-[15px] font-semibold text-content dark:text-content-dark">
+              {parseVacationType(vacation.vacationType)}
+            </Text>
+            <StatusPill label={status.label} tone={status.tone} />
+          </View>
+          <Text className="text-sm text-muted dark:text-muted-dark" style={TABULAR}>
             {dayjs(vacation.startDate).format('YYYY-MM-DD (dd)')}
             {dayjs(vacation.startDate).isBefore(vacation.endDate) && (
               <Text> - {dayjs(vacation.endDate).format('YYYY-MM-DD (dd)')}</Text>
@@ -101,10 +110,10 @@ const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) =>
         {/* days */}
         <View className="items-end justify-center pt-1">
           <View className="flex-row items-baseline gap-0.5">
-            <Text className="text-lg font-bold text-blue-500" style={{ fontVariant: ['tabular-nums'] }}>
+            <Text className="text-lg font-bold text-brand" style={TABULAR}>
               {vacation.usedDays}
             </Text>
-            <Text className="text-xs font-semibold text-blue-500/80">일</Text>
+            <Text className="text-xs font-semibold text-brand">일</Text>
           </View>
         </View>
       </View>
@@ -118,7 +127,7 @@ const NoVacation = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-base font-semibold text-gray-400 dark:text-gray-500">휴가를 사용하지 않으셨군요?</Text>
+        <Text className="text-base font-semibold text-muted dark:text-muted-dark">휴가를 사용하지 않으셨군요?</Text>
       </View>
     </View>
   );
@@ -153,40 +162,36 @@ export default function DayoffHistoriesPage() {
   const totalDays = newVacations.reduce((current, vacation) => vacation.usedDays + current, 0);
   const animatedTotal = useCountUp(totalDays, 900);
 
+  // mode-safe raw colors
+  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
+
   return (
-    <View className="flex size-full flex-col">
+    <View className="flex size-full flex-col bg-base dark:bg-base-dark">
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon
-            sf="chevron.left"
-            fallback="‹"
-            size={24}
-            weight="semibold"
-            color={theme === 'light' ? '#1C1C1E' : '#ffffff'}
-          />
+          <Entypo name="chevron-left" size={30} color={contentColor} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold dark:text-white">휴가 내역</Text>
+        <Text className="text-xl font-bold text-content dark:text-content-dark">휴가 내역</Text>
       </Reanimated.View>
 
       {/* year + total — 숫자가 주인공, count-up */}
       <Reanimated.View entering={enterHero(80)} className="mt-4 flex-row items-end justify-between">
         <View>
-          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
+          <Text className="text-xs font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
             {dayjs().format('YYYY')}년 사용 내역
           </Text>
           <View className="mt-1 flex-row items-baseline gap-1.5">
-            <Text
-              className="text-[40px] leading-none font-bold text-gray-900 dark:text-white"
-              style={{ fontVariant: ['tabular-nums'] }}
-            >
+            <Text className="text-[40px] leading-none font-bold text-content dark:text-content-dark" style={TABULAR}>
               {animatedTotal}
             </Text>
-            <Text className="text-base font-semibold text-gray-500 dark:text-gray-400">일</Text>
+            <Text className="text-base font-semibold text-muted dark:text-muted-dark">일</Text>
           </View>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">총 {newVacations.length}건</Text>
+          <Text className="text-[11px] font-semibold text-muted dark:text-muted-dark" style={TABULAR}>
+            총 {newVacations.length}건
+          </Text>
         </View>
       </Reanimated.View>
 
@@ -197,11 +202,13 @@ export default function DayoffHistoriesPage() {
           return (
             <AnimatedPressable
               key={option.key}
-              className={`rounded-full px-4 py-2 ${isActive ? 'bg-blue-500' : 'bg-gray-100 dark:bg-gray-800'}`}
+              className={cx('rounded-full px-4 py-2', isActive ? 'bg-brand' : 'bg-elevated dark:bg-elevated-dark')}
               disabled={isActive}
               onPress={() => setSelectedVacationType(option.key)}
             >
-              <Text className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+              <Text
+                className={cx('text-sm font-semibold', isActive ? 'text-black' : 'text-content dark:text-content-dark')}
+              >
                 {option.label}
               </Text>
             </AnimatedPressable>
