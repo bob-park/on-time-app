@@ -1,7 +1,0 @@
-{
-  "name": "live-activity",
-  "version": "0.1.0",
-  "description": "iOS Live Activity local Expo module for On Time",
-  "main": "index.ts",
-  "private": true
-}
