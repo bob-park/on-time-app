@@ -29,13 +29,16 @@ import { TimeCode } from '@/utils/timecode/TimeCode';
 const ONE_HOUR = 3_600;
 const WEEKEND_DAYS = [0, 6];
 const TABULAR = { fontVariant: ['tabular-nums' as const] };
+// '초과근무' 상태는 목표 퇴근시각을 지난 즉시가 아니라 30분을 초과한 시점부터 진입한다.
+const OVERTIME_GRACE_MINUTES = 30;
 
 type WorkState = 'before' | 'working' | 'overtime' | 'done';
 
 function getWorkState(today: any): WorkState {
   if (!today?.clockInTime) return 'before';
   if (today?.clockOutTime) return 'done';
-  if (today?.leaveWorkAt && dayjs(today.leaveWorkAt).unix() - dayjs().unix() < 0) return 'overtime';
+  if (today?.leaveWorkAt && dayjs(today.leaveWorkAt).add(OVERTIME_GRACE_MINUTES, 'minute').unix() - dayjs().unix() < 0)
+    return 'overtime';
   return 'working';
 }
 
@@ -267,7 +270,11 @@ function HeroDone({ today }: { today: any }) {
   const clockOutTime = today?.clockOutTime ? dayjs(today.clockOutTime) : null;
   const leaveWorkAt = today?.leaveWorkAt ? dayjs(today.leaveWorkAt) : null;
 
-  const isOvertime = !!(clockOutTime && leaveWorkAt && clockOutTime.unix() > leaveWorkAt.unix());
+  const isOvertime = !!(
+    clockOutTime &&
+    leaveWorkAt &&
+    clockOutTime.unix() > leaveWorkAt.add(OVERTIME_GRACE_MINUTES, 'minute').unix()
+  );
   const overtimeSec = isOvertime ? clockOutTime!.unix() - leaveWorkAt!.unix() : 0;
   const overtimeText = isOvertime ? new TimeCode(overtimeSec) : null;
 
@@ -518,9 +525,20 @@ export default function HomeIndex() {
   }, [today]);
 
   const calculateRemainingTime = () => {
+    if (!today?.leaveWorkAt) {
+      setRemainingTime({ isOvertime: false, time: false });
+      return;
+    }
+
+    // 남은 시간(양수) = 목표까지, 음수 = 목표 초과. 초과근무는 30분 유예 후 진입.
+    const remainingSec = dayjs(today.leaveWorkAt).unix() - dayjs().unix();
+    const isOvertime = -remainingSec > OVERTIME_GRACE_MINUTES * 60;
+
     setRemainingTime({
-      isOvertime: dayjs(today?.leaveWorkAt).unix() - dayjs().unix() < 0,
-      time: !!today?.leaveWorkAt && new TimeCode(Math.abs(dayjs(today?.leaveWorkAt).unix() - dayjs().unix())),
+      isOvertime,
+      // 초과근무면 목표 대비 초과분(30분+)을, 그 외에는 목표까지 남은 시간을 0에서 클램프해
+      // [목표, 목표+30분] 구간에 '남은 시간'이 잘못 커 보이지 않게 한다.
+      time: new TimeCode(isOvertime ? -remainingSec : Math.max(0, remainingSec)),
     });
   };
 
