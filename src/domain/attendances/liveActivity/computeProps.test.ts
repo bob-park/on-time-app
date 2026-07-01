@@ -64,22 +64,23 @@ describe('computeWorkActivityProps', () => {
     expect(props.targetLabel).toBe('18:00');
   });
 
-  it('초과 근무: isOvertime true, remaining는 0:00/0m, worked는 계속 증가, progress 1', () => {
+  it('초과 근무: isOvertime true, remaining 자리에 초과분 +카운트업, worked 증가, progress 1', () => {
     const props = computeWorkActivityProps(input, at(19, 15)); // 1h15 past target, 10h15 worked
 
     expect(props.isOvertime).toBe(true);
-    expect(props.remainingLabel).toBe('0:00');
-    expect(props.remainingCompact).toBe('0m');
+    expect(props.remainingLabel).toBe('+1:15');
+    expect(props.remainingCompact).toBe('+1h');
     expect(props.workedLabel).toBe('10:15');
     expect(props.workedCompact).toBe('10h');
     expect(props.progress).toBe(1);
   });
 
-  it('한참 초과: progress는 1을 넘지 않고 정확히 1', () => {
-    const props = computeWorkActivityProps(input, at(23, 0)); // 14h worked > 9h shift
+  it('한참 초과: progress는 1을 넘지 않고 정확히 1, 초과분 +카운트업', () => {
+    const props = computeWorkActivityProps(input, at(23, 0)); // 5h past target (14h worked > 9h shift)
 
     expect(props.progress).toBe(1);
     expect(props.isOvertime).toBe(true);
-    expect(props.remainingLabel).toBe('0:00');
+    expect(props.remainingLabel).toBe('+5:00');
+    expect(props.remainingCompact).toBe('+5h');
   });
 });

@@ -52,17 +52,19 @@ export function computeWorkActivityProps(input: WorkActivityInput, now: Date): W
   const isOvertime = nowMs > targetMs;
 
   const progress = totalMs > 0 ? clamp01(elapsedMs / totalMs) : isOvertime ? 1 : 0;
-  // Remaining counts down to the target and floors at 0 once in overtime; the
-  // overtime amount is not surfaced as "remaining" (worked keeps climbing).
-  const remainingMs = isOvertime ? 0 : targetMs - nowMs;
+  // Before the target: count down remaining. In overtime: the "remaining" slot
+  // instead counts UP the amount past the target, prefixed with "+"
+  // (e.g. "+0:30" / compact "+30m"), mirroring the home overtime hero.
+  const remainingMs = targetMs - nowMs;
+  const overtimeMs = nowMs - targetMs;
 
   return {
     clockInAt: input.clockInAt,
     targetLeaveAt: input.targetLeaveAt,
     progress,
-    remainingLabel: formatDuration(remainingMs),
+    remainingLabel: isOvertime ? `+${formatDuration(overtimeMs)}` : formatDuration(remainingMs),
     workedLabel: formatDuration(elapsedMs),
-    remainingCompact: formatCompact(remainingMs),
+    remainingCompact: isOvertime ? `+${formatCompact(overtimeMs)}` : formatCompact(remainingMs),
     workedCompact: formatCompact(elapsedMs),
     targetLabel: formatClockTime(targetMs),
     isOvertime,
