@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
+import { syncWorkActivity } from '@/domain/attendances/liveActivity';
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
@@ -488,6 +489,11 @@ export default function HomeIndex() {
     calculateRemainingTime();
     const intervalId = setInterval(() => calculateRemainingTime(), 1_000);
     return () => clearInterval(intervalId);
+  }, [today]);
+
+  // 부팅/오늘 기록 변경 시 iOS Live Activity 상태를 동기화 (iOS 외 no-op)
+  useEffect(() => {
+    syncWorkActivity(today).catch(() => {});
   }, [today]);
 
   const calculateRemainingTime = () => {

@@ -13,6 +13,7 @@ import { Entypo, FontAwesome, FontAwesome6, Ionicons, MaterialCommunityIcons } f
 import SplashLottie from '@/assets/lotties/splash-lottie.json';
 import WalkLottie from '@/assets/lotties/walk.json';
 import WorkingLottie from '@/assets/lotties/working-logo.json';
+import { endWorkActivity, startWorkActivity } from '@/domain/attendances/liveActivity';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import Loading from '@/shared/components/loading/Loading';
@@ -106,6 +107,15 @@ export default function Attendance() {
         title: '출근 완료',
         description: `${dayjs(data.clockInTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 출근 처리하였습니다.`,
       });
+
+      // iOS Live Activity 시작 (실패해도 출근 플로우를 막지 않는다)
+      const clockInAt = dayjs(data.clockInTime ?? undefined).toISOString();
+      const targetLeaveAt = data.leaveWorkAt
+        ? dayjs(data.leaveWorkAt).toISOString()
+        : dayjs(data.clockInTime ?? undefined)
+            .add(8, 'hour')
+            .toISOString();
+      startWorkActivity({ clockInAt, targetLeaveAt }).catch(() => {});
     },
   });
   const { clockOut, isLoading: isClockOutLoading } = useClockOut({
@@ -116,6 +126,9 @@ export default function Attendance() {
         title: '퇴근 완료',
         description: `${dayjs(data.clockOutTime).format('HH:mm')} ${parseWorkType(data.workType)}(으)로 퇴근 처리하였습니다.`,
       });
+
+      // iOS Live Activity 종료 (실패해도 퇴근 플로우를 막지 않는다)
+      endWorkActivity().catch(() => {});
     },
   });
 
