@@ -5,16 +5,19 @@ export async function getUserNotifications({ userUniqueId }: { userUniqueId: str
 }
 
 export async function createUserNotification({
+  accessToken,
   userUniqueId,
   type,
   notificationToken,
 }: {
+  accessToken: string;
   userUniqueId: string;
   type: NotificationType;
   notificationToken: string;
 }) {
   return api
     .post(`api/v1/users/${userUniqueId}/notification`, {
+      headers: generateAuthHeader(accessToken),
       json: { type, options: { token: notificationToken } },
     })
     .json<UserNotificationProvider>();

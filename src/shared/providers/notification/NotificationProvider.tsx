@@ -149,7 +149,7 @@ export default function NotificationProvider({ children }: Readonly<{ children: 
 
     if (!Device.isDevice) {
       console.warn('no device');
-      return;
+      // return;
     }
 
     const projectId = Constants.expoConfig?.extra?.esp?.projectId ?? Constants.easConfig?.projectId;

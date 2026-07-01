@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useLayoutEffect, useState } from 'react';
 
 import { Text, TouchableOpacity, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
@@ -60,6 +60,7 @@ const FILTER_OPTIONS: { key: VacationType | 'ALL'; label: string }[] = [
 /** Smoothly ease a number from 0 to `value` using requestAnimationFrame. */
 function useCountUp(value: number, durationMs = 800) {
   const [display, setDisplay] = useState(0);
+
   useEffect(() => {
     if (value === 0) {
       setDisplay(0);

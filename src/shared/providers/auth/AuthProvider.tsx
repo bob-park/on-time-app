@@ -61,6 +61,8 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
   const loggedIn = useStore((state) => state.loggedIn);
   const loggedOut = useStore((state) => state.loggedOut);
 
+  const userProviderId = useStore((state) => state.userProviderId);
+
   // queries
   const queryClient = useQueryClient();
 
@@ -114,7 +116,11 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     };
   }, [expiredAt, refreshToken]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (userinfo && userProviderId) {
+      await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId });
+    }
+
     Promise.all([
       SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
         if (data && userinfo) {

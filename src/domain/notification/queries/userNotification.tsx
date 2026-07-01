@@ -15,10 +15,12 @@ export function useUserNotification(
   { userUniqueId }: { userUniqueId: string },
   { onSuccess }: QueryHandler<UserNotificationProvider>,
 ) {
+  const { accessToken } = useContext(AuthContext);
+
   const { mutate, isPending } = useMutation({
     mutationKey: ['users', userUniqueId, 'notification', 'create'],
     mutationFn: (req: { type: NotificationType; notificationToken: string }) =>
-      createUserNotification({ ...req, userUniqueId }),
+      createUserNotification({ ...req, accessToken, userUniqueId }),
     onSuccess: (data) => {
       onSuccess && onSuccess(data);
     },

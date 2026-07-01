@@ -29,8 +29,6 @@ export default function ThemeProvider({ children }: Readonly<{ children: React.R
     // NW5의 setColorScheme 은 Appearance.setColorScheme 에 위임된다.
     // 'system' 은 OS 를 따라가는 'unspecified' 로 매핑한다(구체 값을 강제하면 시스템 추종이 깨진다).
     Appearance.setColorScheme(themePreference === 'system' ? 'unspecified' : themePreference);
-
-    console.log(themePreference, colorScheme);
   }, [themePreference]);
 
   // memorize
