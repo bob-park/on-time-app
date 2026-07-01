@@ -5,6 +5,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { useColorScheme } from 'nativewind';
+
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
 import AuthProvider, { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -19,8 +21,18 @@ const RootStackLayout = () => {
   // context
   const { isLoggedIn } = useContext(AuthContext);
 
+  // hooks
+  const { colorScheme } = useColorScheme();
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#000000' : '#f7f7f8',
+        },
+      }}
+    >
       <Stack.Protected guard={isLoggedIn}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
