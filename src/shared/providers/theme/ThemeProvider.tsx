@@ -1,7 +1,5 @@
 import { createContext, useEffect, useMemo } from 'react';
 
-import { useColorScheme as useDeviceColorScheme } from 'react-native';
-
 import { useStore } from '@/shared/store/rootStore';
 
 import { useColorScheme as useNativewindColorSchema } from 'nativewind';
@@ -23,13 +21,13 @@ export default function ThemeProvider({ children }: Readonly<{ children: React.R
 
   // hooks
   const { setColorScheme } = useNativewindColorSchema();
-  const deviceScheme = useDeviceColorScheme();
 
   // useEffect
   useEffect(() => {
-    // NW5의 setColorScheme 은 'system' 을 받지 않으므로 디바이스 스킴으로 해석한다.
-    setColorScheme(themePreference === 'system' ? (deviceScheme ?? 'light') : themePreference);
-  }, [themePreference, deviceScheme]);
+    // NW5의 setColorScheme 은 Appearance.setColorScheme 에 위임된다.
+    // 'system' 은 OS 를 따라가는 'unspecified' 로 매핑한다(구체 값을 강제하면 시스템 추종이 깨진다).
+    setColorScheme(themePreference === 'system' ? 'unspecified' : themePreference);
+  }, [themePreference, setColorScheme]);
 
   // memorize
   const contextValue = useMemo<ThemeContextType>(
