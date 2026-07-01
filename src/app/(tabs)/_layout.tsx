@@ -1,13 +1,13 @@
-import { useContext } from 'react';
-
 import { Tabs } from 'expo-router';
 
 import { Ionicons } from '@expo/vector-icons';
 
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+import { useColorScheme } from 'nativewind';
 
 export default function TabLayout() {
-  const { theme } = useContext(ThemeContext);
+  const { colorScheme } = useColorScheme();
+
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
@@ -15,11 +15,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#1ed760',
-        tabBarInactiveTintColor: theme === 'light' ? '#8a8f99' : 'rgba(255,255,255,0.5)',
+        tabBarInactiveTintColor: isDark ? 'rgba(255,255,255,0.5)' : '#8a8f99',
         tabBarLabelStyle: { fontSize: 10 },
         tabBarStyle: {
-          backgroundColor: theme === 'light' ? '#ffffff' : '#181818',
-          borderTopColor: theme === 'light' ? '#e6e6ea' : '#282828',
+          backgroundColor: isDark ? '#181818' : '#ffffff',
+          borderTopColor: isDark ? '#282828' : '#e6e6ea',
         },
       }}
     >

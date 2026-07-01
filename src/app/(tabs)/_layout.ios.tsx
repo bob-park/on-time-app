@@ -1,17 +1,17 @@
-import { useContext } from 'react';
-
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+import { useColorScheme } from 'nativewind';
 
 export default function TabLayout() {
-  const { theme } = useContext(ThemeContext);
+  const { colorScheme } = useColorScheme();
+
+  const isDark = colorScheme === 'dark';
 
   return (
     <NativeTabs
       backBehavior="history"
       tintColor="#1ed760"
-      iconColor={theme === 'light' ? '#8a8f99' : 'rgba(255,255,255,0.5)'}
+      iconColor={isDark ? 'rgba(255,255,255,0.5)' : '#8a8f99'}
       labelStyle={{
         default: { fontSize: 10 },
         selected: { fontSize: 10, fontWeight: '900' },
