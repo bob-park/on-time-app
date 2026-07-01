@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
 import { useColorScheme } from 'nativewind';
-import Svg, { Circle } from 'react-native-svg';
 
 // SVG stroke props require raw color strings (NativeWind class tokens do not
 // apply to react-native-svg stroke). These values mirror the @theme tokens in
@@ -10,15 +10,7 @@ const TRACK_LIGHT = '#e6e6ea'; // --color-border
 const TRACK_DARK = '#282828'; // --color-border-dark
 const BRAND = '#1ed760'; // --color-brand
 
-export function ProgressRing({
-  progress,
-  size = 78,
-  label,
-}: {
-  progress: number;
-  size?: number;
-  label?: string;
-}) {
+export function ProgressRing({ progress, size = 78, label }: { progress: number; size?: number; label?: string }) {
   const { colorScheme } = useColorScheme();
   const clamped = Math.min(Math.max(progress, 0), 100);
 
@@ -32,14 +24,7 @@ export function ProgressRing({
   return (
     <View style={{ width: size, height: size }} className="items-center justify-center">
       <Svg width={size} height={size}>
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke={track}
-          strokeWidth={stroke}
-          fill="none"
-        />
+        <Circle cx={center} cy={center} r={radius} stroke={track} strokeWidth={stroke} fill="none" />
         <Circle
           cx={center}
           cy={center}
@@ -56,7 +41,7 @@ export function ProgressRing({
       {label != null && (
         <View className="absolute items-center justify-center">
           <Text
-            className="text-base font-extrabold text-content dark:text-content-dark"
+            className="text-content dark:text-content-dark text-base font-extrabold"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {label}

@@ -85,21 +85,21 @@ const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) =>
 
   return (
     <View className="mt-3 px-1">
-      <View className="flex w-full flex-row items-start gap-3 rounded-3xl border border-border bg-surface px-4 py-4 dark:border-border-dark dark:bg-surface-dark">
+      <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark flex w-full flex-row items-start gap-3 rounded-3xl border px-4 py-4">
         {/* icon container */}
-        <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+        <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
           <Ionicons name="calendar" size={18} color="#1ed760" />
         </View>
 
         {/* body */}
         <View className="flex flex-1 flex-col gap-1.5">
           <View className="flex-row items-center gap-2">
-            <Text className="text-[15px] font-semibold text-content dark:text-content-dark">
+            <Text className="text-content dark:text-content-dark text-[15px] font-semibold">
               {parseVacationType(vacation.vacationType)}
             </Text>
             <StatusPill label={status.label} tone={status.tone} />
           </View>
-          <Text className="text-sm text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark text-sm" style={TABULAR}>
             {dayjs(vacation.startDate).format('YYYY-MM-DD (dd)')}
             {dayjs(vacation.startDate).isBefore(vacation.endDate) && (
               <Text> - {dayjs(vacation.endDate).format('YYYY-MM-DD (dd)')}</Text>
@@ -110,10 +110,10 @@ const VacationItem = ({ vacation }: Readonly<{ vacation: DocumentVacation }>) =>
         {/* days */}
         <View className="items-end justify-center pt-1">
           <View className="flex-row items-baseline gap-0.5">
-            <Text className="text-lg font-bold text-brand" style={TABULAR}>
+            <Text className="text-brand text-lg font-bold" style={TABULAR}>
               {vacation.usedDays}
             </Text>
-            <Text className="text-xs font-semibold text-brand">일</Text>
+            <Text className="text-brand text-xs font-semibold">일</Text>
           </View>
         </View>
       </View>
@@ -127,7 +127,7 @@ const NoVacation = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-base font-semibold text-muted dark:text-muted-dark">휴가를 사용하지 않으셨군요?</Text>
+        <Text className="text-muted dark:text-muted-dark text-base font-semibold">휴가를 사용하지 않으셨군요?</Text>
       </View>
     </View>
   );
@@ -166,30 +166,30 @@ export default function DayoffHistoriesPage() {
   const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
 
   return (
-    <View className="flex size-full flex-col bg-base dark:bg-base-dark">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col">
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Entypo name="chevron-left" size={30} color={contentColor} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-content dark:text-content-dark">휴가 내역</Text>
+        <Text className="text-content dark:text-content-dark text-xl font-bold">휴가 내역</Text>
       </Reanimated.View>
 
       {/* year + total — 숫자가 주인공, count-up */}
       <Reanimated.View entering={enterHero(80)} className="mt-4 flex-row items-end justify-between">
         <View>
-          <Text className="text-xs font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wider uppercase">
             {dayjs().format('YYYY')}년 사용 내역
           </Text>
           <View className="mt-1 flex-row items-baseline gap-1.5">
-            <Text className="text-[40px] leading-none font-bold text-content dark:text-content-dark" style={TABULAR}>
+            <Text className="text-content dark:text-content-dark text-[40px] leading-none font-bold" style={TABULAR}>
               {animatedTotal}
             </Text>
-            <Text className="text-base font-semibold text-muted dark:text-muted-dark">일</Text>
+            <Text className="text-muted dark:text-muted-dark text-base font-semibold">일</Text>
           </View>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold" style={TABULAR}>
             총 {newVacations.length}건
           </Text>
         </View>

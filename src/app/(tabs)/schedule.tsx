@@ -128,13 +128,11 @@ const WeekDayItem = ({
             />
           ))}
         {selected &&
-          uniqueTypes.map((_, i) => (
-            <View key={`dot-sel-${i}`} className="size-[5px] rounded-full bg-black" />
-          ))}
+          uniqueTypes.map((_, i) => <View key={`dot-sel-${i}`} className="size-[5px] rounded-full bg-black" />)}
       </View>
 
       {/* Today ring indicator */}
-      {isToday && !selected && <View className="absolute inset-0 rounded-full border-2 border-brand" />}
+      {isToday && !selected && <View className="border-brand absolute inset-0 rounded-full border-2" />}
     </TouchableOpacity>
   );
 };
@@ -247,16 +245,16 @@ export default function Schedule() {
   );
 
   return (
-    <View className="flex size-full flex-col bg-base pt-[68px] dark:bg-base-dark">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col pt-[68px]">
       {/* Header */}
       <Reanimated.View entering={enterPage(0)} className="px-4 pb-3">
-        <Text className="text-xs font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">일정</Text>
+        <Text className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wider uppercase">일정</Text>
         <View className="mt-1 flex-row items-end justify-between">
-          <Text className="text-[28px] leading-none font-bold text-content dark:text-content-dark" style={TABULAR}>
+          <Text className="text-content dark:text-content-dark text-[28px] leading-none font-bold" style={TABULAR}>
             {dayjs(selectedDate).format('YYYY년 M월')}
           </Text>
           <TouchableOpacity
-            className="h-9 items-center justify-center rounded-full bg-brand px-4"
+            className="bg-brand h-9 items-center justify-center rounded-full px-4"
             onPress={handleSelectToday}
             activeOpacity={0.7}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -268,7 +266,7 @@ export default function Schedule() {
 
       {/* Week Calendar Strip - M3 Surface */}
       <Reanimated.View entering={enterHero(100)} className="mt-2 px-4">
-        <View className="rounded-[20px] border border-border bg-surface pt-3 pb-2 dark:border-border-dark dark:bg-surface-dark">
+        <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-[20px] border pt-3 pb-2">
           <View className="h-[88px]">
             <AnimatedPagerView
               {...rest}
@@ -334,7 +332,7 @@ export default function Schedule() {
 
           {/* Swipe indicator */}
           <View className="items-center pt-2 pb-1">
-            <View className="h-1 w-16 rounded-full bg-border dark:bg-border-dark" />
+            <View className="bg-border dark:bg-border-dark h-1 w-16 rounded-full" />
           </View>
         </View>
       </Reanimated.View>
@@ -351,8 +349,8 @@ export default function Schedule() {
             <SectionHeader
               title="내 일정"
               action={
-                <View className="rounded-full bg-elevated px-2.5 py-0.5 dark:bg-elevated-dark">
-                  <Text className="text-[11px] font-bold text-brand" style={TABULAR}>
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-0.5">
+                  <Text className="text-brand text-[11px] font-bold" style={TABULAR}>
                     {isLoading ? '-' : myVacations.length}
                   </Text>
                 </View>
@@ -381,8 +379,8 @@ export default function Schedule() {
             <SectionHeader
               title="동료 일정"
               action={
-                <View className="rounded-full bg-elevated px-2.5 py-0.5 dark:bg-elevated-dark">
-                  <Text className="text-[11px] font-bold text-brand" style={TABULAR}>
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-0.5">
+                  <Text className="text-brand text-[11px] font-bold" style={TABULAR}>
                     {isLoading ? '-' : colleagueVacations.length}
                   </Text>
                 </View>
@@ -431,7 +429,7 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
       {/* Info */}
       <View className="flex-1 gap-1">
         <View className="flex-row items-center gap-2">
-          <Text className="text-base font-bold text-content dark:text-content-dark">
+          <Text className="text-content dark:text-content-dark text-base font-bold">
             {parseVacationName(vacation.vacationType)}
           </Text>
           {vacation.vacationSubType && (
@@ -446,7 +444,7 @@ function MyVacationCard({ vacation }: { vacation: DocumentVacation }) {
             </View>
           )}
         </View>
-        <Text className="text-xs font-medium text-muted dark:text-muted-dark" style={TABULAR}>
+        <Text className="text-muted dark:text-muted-dark text-xs font-medium" style={TABULAR}>
           {dayjs(vacation.startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(vacation.startDate).day())})
           {dayjs(vacation.startDate).isBefore(vacation.endDate) &&
             ` - ${dayjs(vacation.endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(vacation.endDate).day())})`}
@@ -489,11 +487,11 @@ function ColleagueScheduleCard({
 
       {/* Info */}
       <View className="flex-1 gap-0.5">
-        <Text className="text-base font-semibold text-content dark:text-content-dark">{user?.username || ''}</Text>
-        <Text className="text-xs text-muted dark:text-muted-dark">
+        <Text className="text-content dark:text-content-dark text-base font-semibold">{user?.username || ''}</Text>
+        <Text className="text-muted dark:text-muted-dark text-xs">
           {user?.group?.name} · {user?.position?.name || ''}
         </Text>
-        <Text className="mt-1 text-xs font-medium text-muted dark:text-muted-dark" style={TABULAR}>
+        <Text className="text-muted dark:text-muted-dark mt-1 text-xs font-medium" style={TABULAR}>
           {dayjs(startDate).format('YYYY-MM-DD')} ({getDaysOfWeek(dayjs(startDate).day())})
           {dayjs(startDate).isBefore(endDate) &&
             ` - ${dayjs(endDate).format('YYYY-MM-DD')} (${getDaysOfWeek(dayjs(endDate).day())})`}

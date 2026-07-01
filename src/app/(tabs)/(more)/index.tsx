@@ -38,7 +38,7 @@ function SettingRow({ icon, label, tone = 'default', move = false, onPress }: Se
       scaleTo={0.98}
     >
       {/* icon */}
-      <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+      <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
         {icon}
       </View>
 
@@ -59,14 +59,14 @@ function SettingRow({ icon, label, tone = 'default', move = false, onPress }: Se
 
 function SettingsGroup({ children }: { children: React.ReactNode }) {
   return (
-    <View className="overflow-hidden rounded-3xl border border-border bg-surface dark:border-border-dark dark:bg-surface-dark">
+    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
       {children}
     </View>
   );
 }
 
 function RowDivider() {
-  return <View className="ml-[60px] border-b border-border dark:border-border-dark" />;
+  return <View className="border-border dark:border-border-dark ml-[60px] border-b" />;
 }
 
 export default function MoreIndex() {
@@ -115,16 +115,16 @@ export default function MoreIndex() {
 
             {/* info */}
             <View className="flex flex-1 flex-col gap-1">
-              <Text className="text-xl font-bold text-content dark:text-content-dark">{user?.username}</Text>
+              <Text className="text-content dark:text-content-dark text-xl font-bold">{user?.username}</Text>
 
-              <Text className="text-sm font-semibold text-muted dark:text-muted-dark">
+              <Text className="text-muted dark:text-muted-dark text-sm font-semibold">
                 {user?.position?.name}
                 {user?.group?.teamUserDescription ? ` (${user?.group?.teamUserDescription})` : ''}
               </Text>
 
               <View className="mt-1 flex flex-row items-center gap-2">
-                <View className="rounded-full bg-elevated px-2.5 py-1 dark:bg-elevated-dark">
-                  <Text className="text-xs text-muted dark:text-muted-dark">
+                <View className="bg-elevated dark:bg-elevated-dark rounded-full px-2.5 py-1">
+                  <Text className="text-muted dark:text-muted-dark text-xs">
                     {user?.group?.name} ·{' '}
                     {employment?.effectiveDate
                       ? dayjs

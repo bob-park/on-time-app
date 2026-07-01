@@ -65,12 +65,12 @@ export default function LoginPage() {
   }, [response]);
 
   return (
-    <View className="flex size-full flex-col items-center justify-center gap-12 bg-base p-10 dark:bg-base-dark">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col items-center justify-center gap-12 p-10">
       <View className="flex flex-col items-center justify-center gap-2">
         <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
-        <Text className="text-4xl font-extrabold text-brand">On Time</Text>
-        <Text className="text-base text-muted dark:text-muted-dark">시간을 지키는 가장 쉬운 방법</Text>
+        <Text className="text-brand text-4xl font-extrabold">On Time</Text>
+        <Text className="text-muted dark:text-muted-dark text-base">시간을 지키는 가장 쉬운 방법</Text>
       </View>
 
       <View className="w-[80%]">

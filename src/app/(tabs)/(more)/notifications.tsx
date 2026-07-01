@@ -82,21 +82,21 @@ export default function NotificationSettings() {
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={MUTED} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-content dark:text-content-dark">알림 설정</Text>
+        <Text className="text-content dark:text-content-dark text-xl font-bold">알림 설정</Text>
       </Reanimated.View>
 
       {/* notification providers card */}
-      <View className="mt-2 overflow-hidden rounded-3xl border border-border bg-surface dark:border-border-dark dark:bg-surface-dark">
+      <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark mt-2 overflow-hidden rounded-3xl border">
         {filteredProviders.map((provider, index) => (
           <Reanimated.View key={`notification-providers-item-${provider.id}`} entering={enterListItem(index, 80)}>
             <View className="flex flex-row items-center gap-3 px-4 py-3.5">
               {/* icon */}
-              <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+              <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
                 <NotificationIcon type={provider.provider.type} />
               </View>
 
               {/* label */}
-              <Text className="flex-1 text-[15px] font-semibold text-content dark:text-content-dark">
+              <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">
                 {parseNotificationType(provider.provider.type)}
               </Text>
 
@@ -109,7 +109,7 @@ export default function NotificationSettings() {
             </View>
 
             {index < filteredProviders.length - 1 && (
-              <View className="ml-[60px] border-b border-border dark:border-border-dark" />
+              <View className="border-border dark:border-border-dark ml-[60px] border-b" />
             )}
           </Reanimated.View>
         ))}

@@ -45,27 +45,27 @@ function HeroBeforeWork({ today }: { today: any }) {
   const targetLeave = today?.leaveWorkAt ? dayjs(today.leaveWorkAt).format('HH:mm') : '18:00';
 
   return (
-    <View className="rounded-3xl border border-border bg-surface p-5 dark:border-border-dark dark:bg-surface-dark">
+    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-5">
       <StatusPill label="출근 전" tone="muted" />
 
-      <Text className="mt-4 text-sm text-muted dark:text-muted-dark">아직 출근 전이에요</Text>
-      <Text className="mt-1 text-3xl font-extrabold text-content dark:text-content-dark">오늘도 화이팅!</Text>
+      <Text className="text-muted dark:text-muted-dark mt-4 text-sm">아직 출근 전이에요</Text>
+      <Text className="text-content dark:text-content-dark mt-1 text-3xl font-extrabold">오늘도 화이팅!</Text>
 
       {/* times — secondary */}
       <View className="mt-6 flex-row gap-8">
         <View className="gap-1">
-          <Text className="text-[11px] font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
             예정 출근
           </Text>
-          <Text className="text-base font-bold text-content dark:text-content-dark" style={TABULAR}>
+          <Text className="text-content dark:text-content-dark text-base font-bold" style={TABULAR}>
             09:00
           </Text>
         </View>
         <View className="gap-1">
-          <Text className="text-[11px] font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
             목표 퇴근
           </Text>
-          <Text className="text-base font-bold text-content dark:text-content-dark" style={TABULAR}>
+          <Text className="text-content dark:text-content-dark text-base font-bold" style={TABULAR}>
             {targetLeave}
           </Text>
         </View>
@@ -84,13 +84,13 @@ function HeroWeekend() {
   const router = useRouter();
 
   return (
-    <View className="rounded-3xl border border-border bg-surface p-5 dark:border-border-dark dark:bg-surface-dark">
+    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-5">
       <StatusPill label="주말" tone="muted" />
 
-      <Text className="mt-4 text-sm text-muted dark:text-muted-dark">오늘은 주말이에요</Text>
-      <Text className="mt-1 text-3xl font-extrabold text-content dark:text-content-dark">푹 쉬세요</Text>
+      <Text className="text-muted dark:text-muted-dark mt-4 text-sm">오늘은 주말이에요</Text>
+      <Text className="text-content dark:text-content-dark mt-1 text-3xl font-extrabold">푹 쉬세요</Text>
 
-      <Text className="mt-6 text-[13px] leading-relaxed text-muted dark:text-muted-dark">
+      <Text className="text-muted dark:text-muted-dark mt-6 text-[13px] leading-relaxed">
         출근이 필요하면{'\n'}아래 버튼을 눌러주세요
       </Text>
 
@@ -148,28 +148,28 @@ function HeroWorking({
     : '';
 
   return (
-    <View className="rounded-3xl border border-brand bg-surface p-5 dark:bg-surface-dark">
+    <View className="border-brand bg-surface dark:bg-surface-dark rounded-3xl border p-5">
       {/* status pill — animated pulse dot (근무중) */}
-      <View className="flex-row items-center gap-1.5 self-start rounded-full bg-elevated px-2.5 py-1 dark:bg-elevated-dark">
-        <Reanimated.View className="size-2 rounded-full bg-brand" style={pulseStyle} />
-        <Text className="text-xs font-bold text-brand">근무중</Text>
+      <View className="bg-elevated dark:bg-elevated-dark flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
+        <Reanimated.View className="bg-brand size-2 rounded-full" style={pulseStyle} />
+        <Text className="text-brand text-xs font-bold">근무중</Text>
       </View>
 
       {/* hero — 남은시간 숫자가 주인공 */}
       <View className="mt-4 flex-row items-end justify-between">
         <View>
-          <Text className="text-[11px] font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
             남은 시간
           </Text>
-          <Text className="mt-1 text-6xl leading-none font-extrabold text-brand" style={TABULAR}>
+          <Text className="text-brand mt-1 text-6xl leading-none font-extrabold" style={TABULAR}>
             {remainingLabel}
           </Text>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
             목표 퇴근
           </Text>
-          <Text className="mt-1 text-lg font-bold text-content dark:text-content-dark" style={TABULAR}>
+          <Text className="text-content dark:text-content-dark mt-1 text-lg font-bold" style={TABULAR}>
             {leaveWorkAt?.format('HH:mm')}
           </Text>
         </View>
@@ -177,14 +177,14 @@ function HeroWorking({
 
       {/* progress — width animated smoothly across ticks (styled like ProgressBar) */}
       <View className="mt-5">
-        <View className="h-1.5 overflow-hidden rounded-full bg-elevated dark:bg-elevated-dark">
-          <Reanimated.View className="h-full rounded-full bg-brand" style={progressStyle} />
+        <View className="bg-elevated dark:bg-elevated-dark h-1.5 overflow-hidden rounded-full">
+          <Reanimated.View className="bg-brand h-full rounded-full" style={progressStyle} />
         </View>
         <View className="mt-2 flex-row justify-between">
-          <Text className="text-[11px] text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
             {clockInTime?.format('HH:mm')} 출근
           </Text>
-          <Text className="text-[11px] text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
             {Math.round(progress)}% 완료
           </Text>
         </View>
@@ -216,24 +216,24 @@ function HeroOvertime({
     : '';
 
   return (
-    <View className="rounded-3xl border border-danger bg-surface p-5 dark:border-danger-dark dark:bg-surface-dark">
+    <View className="border-danger bg-surface dark:border-danger-dark dark:bg-surface-dark rounded-3xl border p-5">
       <StatusPill label="초과" tone="danger" />
 
       {/* hero — 초과시간 숫자가 주인공 */}
       <View className="mt-4 flex-row items-end justify-between">
         <View>
-          <Text className="text-[11px] font-semibold tracking-wider text-danger uppercase dark:text-danger-dark">
+          <Text className="text-danger dark:text-danger-dark text-[11px] font-semibold tracking-wider uppercase">
             초과 근무
           </Text>
-          <Text className="mt-1 text-6xl leading-none font-extrabold text-danger dark:text-danger-dark" style={TABULAR}>
+          <Text className="text-danger dark:text-danger-dark mt-1 text-6xl leading-none font-extrabold" style={TABULAR}>
             {overtimeLabel}
           </Text>
         </View>
         <View className="items-end">
-          <Text className="text-[11px] font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
             목표 퇴근
           </Text>
-          <Text className="mt-1 text-lg font-bold text-content dark:text-content-dark" style={TABULAR}>
+          <Text className="text-content dark:text-content-dark mt-1 text-lg font-bold" style={TABULAR}>
             {leaveWorkAt?.format('HH:mm')}
           </Text>
         </View>
@@ -243,10 +243,10 @@ function HeroOvertime({
       <View className="mt-5">
         <ProgressBar progress={100} tone="danger" />
         <View className="mt-2 flex-row justify-between">
-          <Text className="text-[11px] text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
             {clockInTime?.format('HH:mm')} 출근
           </Text>
-          <Text className="text-[11px] font-semibold text-danger dark:text-danger-dark" style={TABULAR}>
+          <Text className="text-danger dark:text-danger-dark text-[11px] font-semibold" style={TABULAR}>
             {leaveWorkAt?.format('HH:mm')} 초과
           </Text>
         </View>
@@ -289,18 +289,18 @@ function HeroDone({ today }: { today: any }) {
 
   return (
     <View
-      className={`rounded-3xl border bg-surface p-5 dark:bg-surface-dark ${isOvertime ? 'border-danger dark:border-danger-dark' : 'border-border dark:border-border-dark'}`}
+      className={`bg-surface dark:bg-surface-dark rounded-3xl border p-5 ${isOvertime ? 'border-danger dark:border-danger-dark' : 'border-border dark:border-border-dark'}`}
     >
       <StatusPill label={isOvertime ? '초과' : '완료'} tone={isOvertime ? 'danger' : 'brand'} />
 
-      <Text className="mt-4 text-sm font-semibold text-muted dark:text-muted-dark">퇴근 완료</Text>
+      <Text className="text-muted dark:text-muted-dark mt-4 text-sm font-semibold">퇴근 완료</Text>
 
       {/* times — 숫자가 주인공 */}
       <View className="mt-2 flex-row items-baseline gap-3">
-        <Text className="text-4xl font-extrabold text-content dark:text-content-dark" style={TABULAR}>
+        <Text className="text-content dark:text-content-dark text-4xl font-extrabold" style={TABULAR}>
           {clockInTime?.format('HH:mm')}
         </Text>
-        <Text className="text-base text-muted dark:text-muted-dark">→</Text>
+        <Text className="text-muted dark:text-muted-dark text-base">→</Text>
         <Text
           className={`text-4xl font-extrabold ${isOvertime ? 'text-danger dark:text-danger-dark' : 'text-brand'}`}
           style={TABULAR}
@@ -315,9 +315,9 @@ function HeroDone({ today }: { today: any }) {
       </View>
 
       <View className="mt-3 flex-row items-center gap-2">
-        <Text className="text-[13px] text-muted dark:text-muted-dark">총 근무 {durationText}</Text>
+        <Text className="text-muted dark:text-muted-dark text-[13px]">총 근무 {durationText}</Text>
         {overtimeText && (
-          <Text className="text-[13px] font-semibold text-danger dark:text-danger-dark" style={TABULAR}>
+          <Text className="text-danger dark:text-danger-dark text-[13px] font-semibold" style={TABULAR}>
             +{overtimeText.formatHours.padStart(2, '0')}:{overtimeText.formatMinutes.padStart(2, '0')} 초과
           </Text>
         )}

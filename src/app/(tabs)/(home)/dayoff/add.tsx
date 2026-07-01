@@ -139,14 +139,14 @@ export default function AddDayOff() {
 
   return (
     <>
-      <View className="flex size-full flex-col bg-base dark:bg-base-dark">
+      <View className="bg-base dark:bg-base-dark flex size-full flex-col">
         {/* header */}
         <View className="relative mb-2 flex flex-row items-center justify-center">
           <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
             <Entypo name="chevron-left" size={30} color={contentColor} />
           </TouchableOpacity>
 
-          <Text className="text-xl font-bold text-content dark:text-content-dark">휴가 신청</Text>
+          <Text className="text-content dark:text-content-dark text-xl font-bold">휴가 신청</Text>
         </View>
 
         {/* scrollable content */}
@@ -157,18 +157,18 @@ export default function AddDayOff() {
         >
           {/* leave info card (merged) */}
           <Reanimated.View entering={enterPage(0)}>
-            <Text className="mt-4 mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+            <Text className="text-muted dark:text-muted-dark mt-4 mb-3 text-xs font-bold tracking-wider uppercase">
               잔여 현황
             </Text>
-            <View className="overflow-hidden rounded-3xl border border-border bg-surface dark:border-border-dark dark:bg-surface-dark">
+            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
               {/* 연차 row */}
               <View className="flex flex-row items-center gap-3 px-4 py-3.5">
-                <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+                <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
                   <Ionicons name="leaf" size={18} color={brandColor} />
                 </View>
-                <Text className="flex-1 text-[15px] font-semibold text-content dark:text-content-dark">연차</Text>
+                <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">연차</Text>
                 <View className="flex flex-row items-center gap-1">
-                  <Text className="text-xs text-muted dark:text-muted-dark" style={TABULAR}>
+                  <Text className="text-muted dark:text-muted-dark text-xs" style={TABULAR}>
                     전체 {leaveEntry?.totalLeaveDays} · 사용 {leaveEntry?.usedLeaveDays} · 남은{' '}
                   </Text>
                   <Text
@@ -187,16 +187,16 @@ export default function AddDayOff() {
               </View>
 
               {/* divider */}
-              <View className="ml-[48px] border-b border-border dark:border-border-dark" />
+              <View className="border-border dark:border-border-dark ml-[48px] border-b" />
 
               {/* 보상 휴가 row */}
               <View className="flex flex-row items-center gap-3 px-4 py-3.5">
-                <View className="size-9 flex-none items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+                <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
                   <Ionicons name="gift" size={18} color={brandColor} />
                 </View>
-                <Text className="flex-1 text-[15px] font-semibold text-content dark:text-content-dark">보상 휴가</Text>
+                <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">보상 휴가</Text>
                 <View className="flex flex-row items-center gap-1">
-                  <Text className="text-xs text-muted dark:text-muted-dark" style={TABULAR}>
+                  <Text className="text-muted dark:text-muted-dark text-xs" style={TABULAR}>
                     전체 {leaveEntry?.totalCompLeaveDays} · 사용 {leaveEntry?.usedCompLeaveDays} · 남은{' '}
                   </Text>
                   <Text
@@ -220,7 +220,7 @@ export default function AddDayOff() {
 
           {/* vacation type chips */}
           <Reanimated.View entering={enterPage(80)} className="mt-8">
-            <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
               휴가 구분
             </Text>
             <View className="flex flex-row items-center gap-2">
@@ -257,7 +257,7 @@ export default function AddDayOff() {
 
           {/* vacation sub type chips */}
           <Reanimated.View entering={enterPage(140)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
               부가 구분
             </Text>
             <View className="flex flex-row items-center gap-2">
@@ -289,12 +289,12 @@ export default function AddDayOff() {
 
           {/* reason input */}
           <Reanimated.View entering={enterPage(200)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
               사유
             </Text>
-            <View className="rounded-3xl border border-border bg-surface px-4 py-3 dark:border-border-dark dark:bg-surface-dark">
+            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border px-4 py-3">
               <TextInput
-                className={cx('w-full text-[15px] text-content dark:text-content-dark', {
+                className={cx('text-content dark:text-content-dark w-full text-[15px]', {
                   'h-12': Device.osName !== 'iOS',
                   'h-8': Device.osName === 'iOS',
                 })}
@@ -309,10 +309,10 @@ export default function AddDayOff() {
 
           {/* calendar */}
           <Reanimated.View entering={enterPage(260)} className="mt-6">
-            <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
               기간
             </Text>
-            <View className="rounded-3xl border border-border bg-surface p-3 dark:border-border-dark dark:bg-surface-dark">
+            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-3">
               <DateTimePicker
                 classNames={{
                   ...defaultClassNames,

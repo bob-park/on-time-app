@@ -5,8 +5,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
-import { useColorScheme } from 'nativewind';
-
 import '@/app/global.css';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
 import AuthProvider, { AuthContext } from '@/shared/providers/auth/AuthProvider';
@@ -14,6 +12,8 @@ import I18nProvider from '@/shared/providers/i18n/I18nProvider';
 import NotificationProvider from '@/shared/providers/notification/NotificationProvider';
 import RQProvider from '@/shared/providers/query/RQProvider';
 import ThemeProvider from '@/shared/providers/theme/ThemeProvider';
+
+import { useColorScheme } from 'nativewind';
 
 export { ErrorBoundary } from 'expo-router';
 

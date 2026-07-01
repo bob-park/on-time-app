@@ -25,8 +25,8 @@ const MessageItem = ({
   return (
     <View className="mt-3 px-1">
       <AnimatedPressable
-        className={`flex flex-row items-start gap-3 rounded-3xl border bg-surface px-4 py-4 dark:bg-surface-dark ${
-          message.isRead ? 'border-border opacity-60 dark:border-border-dark' : 'border-brand'
+        className={`bg-surface dark:bg-surface-dark flex flex-row items-start gap-3 rounded-3xl border px-4 py-4 ${
+          message.isRead ? 'border-border dark:border-border-dark opacity-60' : 'border-brand'
         }`}
         disabled={message.isRead}
         scaleTo={0.99}
@@ -34,25 +34,25 @@ const MessageItem = ({
       >
         {/* icon container */}
         <View className="relative flex-none">
-          <View className="size-9 items-center justify-center rounded-xl bg-elevated dark:bg-elevated-dark">
+          <View className="bg-elevated dark:bg-elevated-dark size-9 items-center justify-center rounded-xl">
             <Icon sf="bell" fallback="🔔" size={18} color="#1ed760" />
           </View>
 
           {/* unread dot */}
-          {!message.isRead && <View className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-brand" />}
+          {!message.isRead && <View className="bg-brand absolute -top-0.5 -right-0.5 size-2.5 rounded-full" />}
         </View>
 
         {/* body */}
         <View className="flex flex-1 flex-col gap-1">
-          <Text className="text-[15px] font-semibold text-content dark:text-content-dark">{message.title}</Text>
+          <Text className="text-content dark:text-content-dark text-[15px] font-semibold">{message.title}</Text>
           <Text
-            className="text-sm text-muted dark:text-muted-dark"
+            className="text-muted dark:text-muted-dark text-sm"
             textBreakStrategy="balanced"
             lineBreakStrategyIOS="hangul-word"
           >
             {message.contents}
           </Text>
-          <Text className="mt-0.5 text-xs text-muted dark:text-muted-dark" style={TABULAR}>
+          <Text className="text-muted dark:text-muted-dark mt-0.5 text-xs" style={TABULAR}>
             {dayjs(message.createdDate).fromNow()}
           </Text>
         </View>
@@ -67,7 +67,7 @@ const NoMessage = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-base font-semibold text-muted dark:text-muted-dark">새로운 소식이 없나봐요.</Text>
+        <Text className="text-muted dark:text-muted-dark text-base font-semibold">새로운 소식이 없나봐요.</Text>
       </View>
     </View>
   );
@@ -103,21 +103,17 @@ export default function NotificationsPage() {
   const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
 
   return (
-    <View className="flex size-full flex-col bg-base dark:bg-base-dark">
+    <View className="bg-base dark:bg-base-dark flex size-full flex-col">
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={contentColor} />
         </TouchableOpacity>
 
-        <Text className="text-xl font-bold text-content dark:text-content-dark">알림</Text>
+        <Text className="text-content dark:text-content-dark text-xl font-bold">알림</Text>
 
         <TouchableOpacity className="absolute right-0" disabled={allRead} onPress={handleAllRead}>
-          <Text
-            className={`text-[14px] font-semibold ${
-              allRead ? 'text-muted dark:text-muted-dark' : 'text-brand'
-            }`}
-          >
+          <Text className={`text-[14px] font-semibold ${allRead ? 'text-muted dark:text-muted-dark' : 'text-brand'}`}>
             모두 읽기
           </Text>
         </TouchableOpacity>

@@ -56,7 +56,7 @@ const InvalidLocationModal = ({
 
         {/* message */}
         <View
-          className="w-80 rounded-3xl border border-border bg-surface p-5 dark:border-border-dark dark:bg-surface-dark"
+          className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark w-80 rounded-3xl border p-5"
           style={{
             shadowColor: '#000000',
             shadowOpacity: 0.15,
@@ -68,8 +68,8 @@ const InvalidLocationModal = ({
           <StatusPill label="잘못된 위치" tone="danger" />
 
           {/* message */}
-          <Text className="mt-4 text-lg font-bold text-content dark:text-content-dark">사무실 아닌디??</Text>
-          <Text className="mt-1 text-sm text-muted dark:text-muted-dark">
+          <Text className="text-content dark:text-content-dark mt-4 text-lg font-bold">사무실 아닌디??</Text>
+          <Text className="text-muted dark:text-muted-dark mt-1 text-sm">
             현재 위치가 등록된 근무지와 달라요. 위치를 다시 확인해 주세요.
           </Text>
 
@@ -240,11 +240,7 @@ export default function Attendance() {
       key: 'OFFICE',
       label: '사무실',
       icon: (active) => (
-        <MaterialCommunityIcons
-          name="office-building-outline"
-          size={18}
-          color={active ? '#000000' : contentColor}
-        />
+        <MaterialCommunityIcons name="office-building-outline" size={18} color={active ? '#000000' : contentColor} />
       ),
     },
     {
@@ -261,22 +257,22 @@ export default function Attendance() {
 
   return (
     <>
-      <View className="flex-1 bg-base dark:bg-base-dark">
+      <View className="bg-base dark:bg-base-dark flex-1">
         {/* header — 다른 서브페이지와 동일 패턴 */}
         <View className="relative mb-2 flex flex-row items-center justify-center">
           <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
             <Entypo name="chevron-left" size={30} color={contentColor} />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-content dark:text-content-dark">
+          <Text className="text-content dark:text-content-dark text-xl font-bold">
             {isBeforeClockIn ? '출근' : isAfterClockOut ? '근무 완료' : '퇴근'}
           </Text>
         </View>
 
         {/* today — 숫자가 주인공 */}
         <Reanimated.View entering={enterHero(40)} className="mt-2">
-          <Text className="text-xs font-semibold tracking-wider text-muted uppercase dark:text-muted-dark">오늘</Text>
+          <Text className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wider uppercase">오늘</Text>
           <View className="mt-1 flex flex-row items-baseline gap-2">
-            <Text className="text-[32px] leading-none font-bold text-content dark:text-content-dark" style={TABULAR}>
+            <Text className="text-content dark:text-content-dark text-[32px] leading-none font-bold" style={TABULAR}>
               {dayjs().format('M월 D일')}
             </Text>
             <Text className={cx('text-lg font-semibold', weekdayColor)}>{getDaysOfWeek(dayjs().day())}</Text>
@@ -285,7 +281,7 @@ export default function Attendance() {
 
         {/* select work type — pill segment group */}
         <Reanimated.View entering={enterPage(140)} className="mt-8">
-          <Text className="mb-3 text-xs font-bold tracking-wider text-muted uppercase dark:text-muted-dark">
+          <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
             근무 위치
           </Text>
           <View className="flex flex-row items-center gap-2">
@@ -323,7 +319,7 @@ export default function Attendance() {
         <Reanimated.View entering={enterPage(180)} className="mt-4">
           <Card className={invalidLocation ? 'border-danger dark:border-danger-dark' : 'border-brand'}>
             <View className="flex-row items-center gap-3">
-              <View className="size-10 items-center justify-center rounded-full bg-elevated dark:bg-elevated-dark">
+              <View className="bg-elevated dark:bg-elevated-dark size-10 items-center justify-center rounded-full">
                 <Ionicons name="location" size={20} color={invalidLocation ? dangerColor : brandColor} />
               </View>
               <View className="flex-1">
@@ -331,10 +327,7 @@ export default function Attendance() {
                   label={invalidLocation ? '위치 확인 필요' : '위치 확인됨'}
                   tone={invalidLocation ? 'danger' : 'brand'}
                 />
-                <Text
-                  className="mt-1.5 text-sm font-semibold text-content dark:text-content-dark"
-                  numberOfLines={1}
-                >
+                <Text className="text-content dark:text-content-dark mt-1.5 text-sm font-semibold" numberOfLines={1}>
                   {currentAddress ?? '위치를 확인하는 중...'}
                 </Text>
               </View>
@@ -357,13 +350,13 @@ export default function Attendance() {
 
           {/* time info — 라벨 ↔ 값 정렬 */}
           {!isBeforeClockIn && (
-            <View className="mt-2 overflow-hidden rounded-3xl border border-border bg-surface dark:border-border-dark dark:bg-surface-dark">
+            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark mt-2 overflow-hidden rounded-3xl border">
               <TimeInfoRow label="출근 시간" value={dayjs(today?.clockInTime).format('YYYY.M.D · A hh:mm')} />
-              <View className="ml-4 border-b border-border dark:border-border-dark" />
+              <View className="border-border dark:border-border-dark ml-4 border-b" />
               <TimeInfoRow label="목표 퇴근" value={dayjs(today?.leaveWorkAt).format('YYYY.M.D · A hh:mm')} />
               {isAfterClockOut && (
                 <>
-                  <View className="ml-4 border-b border-border dark:border-border-dark" />
+                  <View className="border-border dark:border-border-dark ml-4 border-b" />
                   <TimeInfoRow label="퇴근 시간" value={dayjs(today?.clockOutTime).format('YYYY.M.D · A hh:mm')} />
                 </>
               )}
@@ -418,8 +411,8 @@ export default function Attendance() {
 function TimeInfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between px-4 py-3.5">
-      <Text className="text-sm font-semibold text-muted dark:text-muted-dark">{label}</Text>
-      <Text className="text-sm font-bold text-content dark:text-content-dark" style={TABULAR}>
+      <Text className="text-muted dark:text-muted-dark text-sm font-semibold">{label}</Text>
+      <Text className="text-content dark:text-content-dark text-sm font-bold" style={TABULAR}>
         {value}
       </Text>
     </View>

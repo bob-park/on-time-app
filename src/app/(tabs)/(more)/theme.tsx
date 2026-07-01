@@ -63,7 +63,7 @@ export default function Theme() {
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
           <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={MUTED} />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-content dark:text-content-dark">화면 테마</Text>
+        <Text className="text-content dark:text-content-dark text-xl font-bold">화면 테마</Text>
       </Reanimated.View>
 
       {/* theme option cards */}
@@ -83,14 +83,14 @@ export default function Theme() {
                 onPress={() => onUpdateTheme(option.key)}
               >
                 {/* icon */}
-                <View className="size-10 flex-none items-center justify-center rounded-2xl bg-elevated dark:bg-elevated-dark">
+                <View className="bg-elevated dark:bg-elevated-dark size-10 flex-none items-center justify-center rounded-2xl">
                   <Icon sf={option.sf} fallback={option.fallback} size={20} color={selected ? BRAND : MUTED} />
                 </View>
 
                 {/* label + description */}
                 <View className="flex-1">
-                  <Text className="text-[15px] font-bold text-content dark:text-content-dark">{option.label}</Text>
-                  <Text className="mt-0.5 text-xs text-muted dark:text-muted-dark">{option.description}</Text>
+                  <Text className="text-content dark:text-content-dark text-[15px] font-bold">{option.label}</Text>
+                  <Text className="text-muted dark:text-muted-dark mt-0.5 text-xs">{option.description}</Text>
                 </View>
 
                 {/* checkmark */}
