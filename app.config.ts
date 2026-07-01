@@ -85,6 +85,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-asset',
     'expo-localization',
     'expo-image',
+    [
+      // Live Activity 는 런타임에서 createLiveActivity('WorkLiveActivity', ...) 로 등록한다.
+      // widgets[] 배열은 홈/잠금화면 위젯 전용이며, supportedFamilies 없는 항목은
+      // invalid target 을 생성해 빌드가 깨지므로 Live Activity 는 여기에 추가하지 않는다.
+      'expo-widgets',
+      {
+        groupIdentifier: 'group.com.bobpark.ontimeapp',
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

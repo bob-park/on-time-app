@@ -2279,6 +2279,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo/ui@npm:~56.0.19":
+  version: 56.0.19
+  resolution: "@expo/ui@npm:56.0.19"
+  dependencies:
+    sf-symbols-typescript: "npm:^2.1.0"
+    vaul: "npm:^1.1.2"
+  peerDependencies:
+    "@babel/core": "*"
+    expo: "*"
+    react: "*"
+    react-dom: "*"
+    react-native: "*"
+    react-native-worklets: "*"
+  peerDependenciesMeta:
+    "@babel/core":
+      optional: true
+    react-dom:
+      optional: true
+    react-native-worklets:
+      optional: true
+  checksum: 10c0/e2fe41506c456cfbcbcb461be558173953ec0ba963a7429d9bc4a8221f8bfff7cc69f7f74bc63956c0e3a3e9a51219fb62652afc2020ac84ef7eda0873bc4103
+  languageName: node
+  linkType: hard
+
 "@expo/vector-icons@npm:^15.1.1":
   version: 15.1.1
   resolution: "@expo/vector-icons@npm:15.1.1"
@@ -7479,6 +7503,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-widgets@npm:~56.0.20":
+  version: 56.0.20
+  resolution: "expo-widgets@npm:56.0.20"
+  dependencies:
+    "@expo/plist": "npm:^0.7.0"
+    "@expo/ui": "npm:~56.0.19"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/da3b9a9551d319028c2fcf2c450d9037446b23852aab005ee1a68f4b090b37e9262a42a314c6661f4eff634948f9ae7e6731b682d270c034f54f683987957311
+  languageName: node
+  linkType: hard
+
 "expo@npm:^56.0.0":
   version: 56.0.12
   resolution: "expo@npm:56.0.12"
@@ -10791,6 +10829,7 @@ __metadata:
     "@bob-park/eslint-config-bobpark": "npm:^0.3.0-RC4-20260630"
     "@bob-park/prettier-config-bobpark": "npm:^0.4.0-RC1-20260630"
     "@expo/metro-runtime": "npm:~56.0.15"
+    "@expo/ui": "npm:~56.0.19"
     "@expo/vector-icons": "npm:^15.1.1"
     "@faker-js/faker": "npm:^10.4.0"
     "@lottiefiles/dotlottie-react": "npm:^0.18.9"
@@ -10833,6 +10872,7 @@ __metadata:
     expo-symbols: "npm:~56.0.6"
     expo-system-ui: "npm:~56.0.5"
     expo-web-browser: "npm:~56.0.5"
+    expo-widgets: "npm:~56.0.20"
     i18next: "npm:^26.3.3"
     immer: "npm:^11.1.8"
     jest: "npm:^29.2.1"

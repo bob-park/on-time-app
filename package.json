@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~56.0.15",
+    "@expo/ui": "~56.0.19",
     "@expo/vector-icons": "^15.1.1",
     "@lottiefiles/dotlottie-react": "^0.18.9",
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -51,6 +52,7 @@
     "expo-symbols": "~56.0.6",
     "expo-system-ui": "~56.0.5",
     "expo-web-browser": "~56.0.5",
+    "expo-widgets": "~56.0.20",
     "i18next": "^26.3.3",
     "immer": "^11.1.8",
     "ky": "^2.0.2",
