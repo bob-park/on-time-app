@@ -2,8 +2,9 @@
 
 # dependencies
 node_modules/
-android/
-ios/
+# Generated native projects (root only — keep local module ios/android sources tracked)
+/android/
+/ios/
 .pnp.*
 .yarn/*
 !.yarn/patches
