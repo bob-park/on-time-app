@@ -1,7 +1,7 @@
 import { type LiveActivityEnvironment, type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
 
-import { Gauge, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { font, foregroundStyle, frame, gaugeStyle, monospacedDigit, padding, tint } from '@expo/ui/swift-ui/modifiers';
+import { HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
+import { font, foregroundStyle, monospacedDigit, padding, tint } from '@expo/ui/swift-ui/modifiers';
 
 import type { WorkActivityProps } from './types';
 
@@ -14,11 +14,10 @@ import type { WorkActivityProps } from './types';
 // helper is therefore declared INSIDE the function; all data arrives via
 // `props` and `environment`.
 //
-// Design (direction A / L2 = circular progress): a circular capacity Gauge
-// (SwiftUI `.accessoryCircularCapacity`) shows progress toward the target;
-// beside it the remaining time is the hero in brand green; worked time + target
-// clock time are secondary. In overtime the accent flips to danger red and the
-// ring is full (remaining floors at 0:00).
+// Design: a LINEAR progress bar shows progress toward the target; the remaining
+// time is the hero in brand green; worked time + target clock time are secondary
+// (white on the dark lock screen). In overtime the accent flips to danger red
+// and the bar is full (remaining floors at 0:00).
 //
 // All labels are APP-COMPUTED static strings (minute granularity) rather than a
 // live-ticking `timerInterval` — they refresh when the app pushes an update
@@ -32,11 +31,11 @@ function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnviron
   const BRAND = '#1ed760';
   const DANGER = '#f3727f';
   const isDark = environment.colorScheme === 'dark';
-  // High-contrast text for the (usually dark) lock screen. Values use full
-  // white on dark; captions use a light gray — NOT a dim low-opacity gray — so
-  // the target/worked labels stay legible on the black background.
+  // High-contrast text for the (usually dark) lock screen: captions AND values
+  // are full white on dark so "퇴근시간"/"근무"/"목표" and the target clock time
+  // stay clearly legible on the black background.
   const valueColor = isDark ? '#ffffff' : '#11181C';
-  const captionColor = isDark ? '#c7c7cc' : '#3c3c43';
+  const captionColor = isDark ? '#ffffff' : '#3c3c43';
   const accentColor = props.isOvertime ? DANGER : BRAND;
   const clampedProgress = props.progress < 0 ? 0 : props.progress > 1 ? 1 : props.progress;
   const heroLabel = props.isOvertime ? '초과 근무' : '퇴근까지';
@@ -82,32 +81,31 @@ function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnviron
     </Text>
   );
 
-  // Circular capacity gauge = a filled progress ring (SwiftUI
-  // `.accessoryCircularCapacity`). `size` scales the ring for the given region.
-  const progressRing = (size: number) => (
-    <Gauge
-      value={clampedProgress}
-      modifiers={[gaugeStyle('circularCapacity'), tint(accentColor), frame({ width: size, height: size })]}
-    />
+  // Target clock time: same white color as the captions, ~half the hero size.
+  const targetValue = (
+    <Text modifiers={[font({ size: 20, weight: 'semibold' }), monospacedDigit(), foregroundStyle(valueColor)]}>
+      {props.targetLabel}
+    </Text>
   );
 
+  // Linear determinate progress bar (fills the available width of its container).
+  const progressBar = <ProgressView value={clampedProgress} modifiers={[tint(accentColor)]} />;
+
   return {
-    // ── Lock screen / Notification Center banner (circular progress + hero) ──
+    // ── Lock screen / Notification Center banner (linear progress bar + hero) ──
     banner: (
-      <HStack alignment="center" spacing={16} modifiers={[padding({ horizontal: 16, vertical: 12 })]}>
-        {progressRing(64)}
-        <VStack alignment="leading" spacing={2}>
-          {captionText(heroLabel)}
-          {remainingHero}
-          <HStack alignment="firstTextBaseline" spacing={6}>
-            {captionText('근무')}
-            {valueText(props.workedLabel)}
-            <Spacer />
-            {captionText('목표')}
-            {valueText(props.targetLabel)}
-          </HStack>
-        </VStack>
-      </HStack>
+      <VStack alignment="leading" spacing={6} modifiers={[padding({ horizontal: 16, vertical: 12 })]}>
+        {captionText(heroLabel)}
+        {remainingHero}
+        {progressBar}
+        <HStack alignment="firstTextBaseline" spacing={6}>
+          {captionText('근무')}
+          {valueText(props.workedLabel)}
+          <Spacer />
+          {captionText('목표')}
+          {targetValue}
+        </HStack>
+      </VStack>
     ),
 
     // ── Dynamic Island: compact (short compact strings avoid ".." truncation) ──
@@ -131,14 +129,14 @@ function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnviron
       </VStack>
     ),
     expandedBottom: (
-      <HStack alignment="center" spacing={12} modifiers={[padding({ horizontal: 8 })]}>
-        {progressRing(44)}
+      <VStack alignment="leading" spacing={6} modifiers={[padding({ horizontal: 8 })]}>
+        {progressBar}
         <HStack alignment="firstTextBaseline" spacing={6}>
           {captionText('목표')}
-          {valueText(props.targetLabel)}
+          {targetValue}
+          <Spacer />
         </HStack>
-        <Spacer />
-      </HStack>
+      </VStack>
     ),
   };
 }
