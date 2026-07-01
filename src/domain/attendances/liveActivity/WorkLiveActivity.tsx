@@ -1,6 +1,7 @@
+import { type LiveActivityEnvironment, type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
+
 import { HStack, Image, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import { font, foregroundStyle, monospacedDigit, padding, tint } from '@expo/ui/swift-ui/modifiers';
-import { createLiveActivity, type LiveActivityEnvironment, type LiveActivityLayout } from 'expo-widgets';
 
 import type { WorkActivityProps } from './types';
 
@@ -46,7 +47,11 @@ function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnviron
     <Text
       timerInterval={remainingRange}
       countsDown={!props.isOvertime}
-      modifiers={[font({ size: 40, weight: 'bold', design: 'rounded' }), monospacedDigit(), foregroundStyle(accentColor)]}
+      modifiers={[
+        font({ size: 40, weight: 'bold', design: 'rounded' }),
+        monospacedDigit(),
+        foregroundStyle(accentColor),
+      ]}
     >
       {props.remainingLabel}
     </Text>
@@ -56,7 +61,11 @@ function WorkActivity(props: WorkActivityProps, environment: LiveActivityEnviron
     <Text
       timerInterval={remainingRange}
       countsDown={!props.isOvertime}
-      modifiers={[font({ size: 15, weight: 'semibold', design: 'rounded' }), monospacedDigit(), foregroundStyle(accentColor)]}
+      modifiers={[
+        font({ size: 15, weight: 'semibold', design: 'rounded' }),
+        monospacedDigit(),
+        foregroundStyle(accentColor),
+      ]}
     >
       {props.remainingLabel}
     </Text>
