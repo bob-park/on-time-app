@@ -2,6 +2,7 @@ import { type LiveActivityLayout, createLiveActivity } from 'expo-widgets';
 
 import { HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import {
+  environment,
   font,
   foregroundStyle,
   lineLimit,
@@ -25,9 +26,11 @@ import type { WorkActivityProps } from './types';
 // Design: the flowing time texts (remaining until target / worked since
 // clock-in) are SYSTEM-RENDERED via `Text date + dateStyle('relative')`, and
 // the linear progress bar advances on its own via `ProgressView timerInterval`
-// — so both keep updating even when the app is terminated. The app only pushes
-// static bits: compact Dynamic Island strings, wall-clock labels, and the
-// overtime flip (caption "남은 시간" → "초과 근무", accent green → red). If the
+// — so both keep updating even when the app is terminated. The wall-clock
+// times are also system-rendered (`dateStyle('time')` + en_GB locale for
+// 24-hour HH:mm). The app only pushes static bits: compact Dynamic Island
+// strings and the overtime flip (caption "남은 시간" → "초과 근무", accent
+// green → red). If the
 // app is dead when the target passes, the relative text naturally counts back
 // up past zero (the value doubles as the overtime count-up) but the caption
 // and color stay stale until the next app push — an accepted limitation.
@@ -59,6 +62,7 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
     <Text
       date={targetDate}
       dateStyle="relative"
+      markdownEnabled
       modifiers={[
         font({ size: 24, weight: 'bold', design: 'rounded' }),
         monospacedDigit(),
@@ -105,10 +109,21 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
     <Text modifiers={[font({ size: 12, weight: 'semibold' }), foregroundStyle(captionColor)]}>{label}</Text>
   );
 
-  const valueText = (value: string) => (
-    <Text modifiers={[font({ size: 15, weight: 'semibold' }), monospacedDigit(), foregroundStyle(valueColor)]}>
-      {value}
-    </Text>
+  // System-rendered wall-clock time. `Text.DateStyle` has no custom format, so
+  // the en_GB locale forces 24-hour "HH:mm" regardless of the device's 12/24h
+  // setting — scoped to this Text only (a wider scope would flip the relative
+  // hero texts to English).
+  const timeText = (date: Date) => (
+    <Text
+      date={date}
+      dateStyle="time"
+      modifiers={[
+        environment({ key: 'locale', value: 'en_GB' }),
+        font({ size: 15, weight: 'semibold' }),
+        monospacedDigit(),
+        foregroundStyle(valueColor),
+      ]}
+    />
   );
 
   // Linear progress bar driven by the SYSTEM over the clock-in → target
@@ -125,11 +140,11 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
   // Bottom row: clock-in / target wall-clock times ("09:00 출근 … 퇴근 18:00").
   const clockRow = (
     <HStack alignment="firstTextBaseline" spacing={4}>
-      {valueText(props.clockInLabel)}
+      {timeText(clockInDate)}
       {captionText('출근')}
       <Spacer />
       {captionText('퇴근')}
-      {valueText(props.targetLabel)}
+      {timeText(targetDate)}
     </HStack>
   );
 
@@ -144,10 +159,10 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
             {remainingHero}
           </VStack>
           <Spacer />
-          <VStack alignment="trailing" spacing={2}>
-            {captionText('근무 시간')}
-            {workedHero}
-          </VStack>
+          {/*<VStack alignment="trailing" spacing={2}>*/}
+          {/*  {captionText('근무 시간')}*/}
+          {/*  {workedHero}*/}
+          {/*</VStack>*/}
         </HStack>
         {progressBar}
         {clockRow}
@@ -156,7 +171,7 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
 
     // ── Dynamic Island: compact (short compact strings avoid ".." truncation) ──
     compactLeading: remainingCompact,
-    compactTrailing: workedCompact,
+    // compactTrailing: workedCompact,
 
     // ── Dynamic Island: minimal ──
     minimal: remainingCompact,
@@ -168,12 +183,12 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
         {remainingHero}
       </VStack>
     ),
-    expandedTrailing: (
-      <VStack alignment="trailing" spacing={2} modifiers={[padding({ trailing: 8 })]}>
-        {captionText('근무 시간')}
-        {workedHero}
-      </VStack>
-    ),
+    // expandedTrailing: (
+    //   <VStack alignment="trailing" spacing={2} modifiers={[padding({ trailing: 8 })]}>
+    //     {captionText('근무 시간')}
+    //     {workedHero}
+    //   </VStack>
+    // ),
     expandedBottom: (
       <VStack alignment="leading" spacing={6} modifiers={[padding({ horizontal: 8 })]}>
         {progressBar}
