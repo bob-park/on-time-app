@@ -70,4 +70,16 @@ describe('computeWorkActivityProps', () => {
     expect(props.isOvertime).toBe(true);
     expect(props.remainingCompact).toBe('+5h');
   });
+
+  it('역전 구간: targetLeaveAt이 clockInAt보다 이르면 target을 clock-in으로 클램프', () => {
+    const invertedInput = {
+      clockInAt: at(18, 0).toISOString(), // 18:00
+      targetLeaveAt: at(9, 0).toISOString(), // 09:00 (target < clock-in)
+    };
+    const props = computeWorkActivityProps(invertedInput, at(19, 0)); // now past clock-in
+
+    expect(props.targetLeaveAtMs).toBe(at(18, 0).getTime());
+    expect(props.targetLeaveAtMs).toBe(props.clockInAtMs);
+    expect(props.isOvertime).toBe(true);
+  });
 });

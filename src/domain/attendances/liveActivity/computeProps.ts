@@ -34,14 +34,19 @@ function formatClockTime(ms: number): string {
 
 export function computeWorkActivityProps(input: WorkActivityInput, now: Date): WorkActivityProps {
   const clockInMs = new Date(input.clockInAt).getTime();
-  const targetMs = new Date(input.targetLeaveAt).getTime();
+  // Clamp the target to at least clock-in: if upstream data ever yields
+  // targetLeaveAt <= clockInAt, the raw values would give the widget's
+  // ProgressView timerInterval an inverted range, which renders as undefined.
+  const targetMs = Math.max(new Date(input.targetLeaveAt).getTime(), clockInMs);
   const nowMs = now.getTime();
 
   const elapsedMs = nowMs - clockInMs;
   const isOvertime = nowMs > targetMs;
   // Before the target: count down remaining. In overtime: the "remaining" slot
   // instead counts UP the amount past the target, prefixed with "+"
-  // (e.g. "+30m"/"+1h"), mirroring the home overtime hero.
+  // (e.g. "+30m"/"+1h"). Note the Live Activity flips isOvertime at the target
+  // instant itself (nowMs > targetMs, no grace), unlike the home overtime hero
+  // which only enters overtime after a 30-minute grace (OVERTIME_GRACE_MINUTES).
   const remainingMs = targetMs - nowMs;
   const overtimeMs = nowMs - targetMs;
 
