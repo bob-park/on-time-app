@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import createNotificationSlice from '@/domain/notification/store/slice';
 import { NotificationState } from '@/domain/notification/store/notifications.state';
+import createNotificationSlice from '@/domain/notification/store/slice';
 import createThemeSlice from '@/domain/theme/store/slice';
 import { ThemeState } from '@/domain/theme/store/theme.state';
 import createUserSlice from '@/domain/users/store/slice';
