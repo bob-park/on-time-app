@@ -22,15 +22,15 @@ import type { WorkActivityProps } from './types';
 // helper is therefore declared INSIDE the function; all data arrives via
 // `props` and `environment`.
 //
-// Design: a LINEAR progress bar shows progress toward the target; the remaining
-// time is the hero in brand green; worked time + target clock time are secondary
-// (white on the dark lock screen). In overtime the accent flips to danger red
-// and the bar is full (remaining floors at 0:00).
-//
-// All labels are APP-COMPUTED static strings (minute granularity) rather than a
-// live-ticking `timerInterval` — they refresh when the app pushes an update
-// (see the foreground minute refresh in the home screen). This intentionally
-// trades second-level ticking for a calmer, minute-accurate display.
+// Design: the flowing time texts (remaining until target / worked since
+// clock-in) are SYSTEM-RENDERED via `Text date + dateStyle('relative')`, and
+// the linear progress bar advances on its own via `ProgressView timerInterval`
+// — so both keep updating even when the app is terminated. The app only pushes
+// static bits: compact Dynamic Island strings, wall-clock labels, and the
+// overtime flip (caption "남은 시간" → "초과 근무", accent green → red). If the
+// app is dead when the target passes, the relative text naturally counts back
+// up past zero (the value doubles as the overtime count-up) but the caption
+// and color stay stale until the next app push — an accepted limitation.
 // ────────────────────────────────────────────────────────────────────────────
 function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
   'widget';
@@ -39,30 +39,48 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
   const BRAND = '#1ed760';
   const DANGER = '#f3727f';
   // The Live Activity surface (lock screen / Dynamic Island) is always dark, so
-  // every label/value except the brand-green remaining hero is full white —
+  // every label/value except the accent-colored remaining hero is full white —
   // unconditionally, regardless of the device's light/dark scheme.
   const valueColor = '#ffffff';
   const captionColor = '#ffffff';
   const accentColor = props.isOvertime ? DANGER : BRAND;
-  const clampedProgress = props.progress < 0 ? 0 : props.progress > 1 ? 1 : props.progress;
-  const heroLabel = props.isOvertime ? '초과 근무' : '퇴근까지';
+  const heroLabel = props.isOvertime ? '초과 근무' : '남은 시간';
+
+  const clockInDate = new Date(props.clockInAtMs);
+  const targetDate = new Date(props.targetLeaveAtMs);
 
   // --- shared building blocks (reused across regions) ---
-  // `lineLimit(1)` + `minimumScaleFactor` let the hero shrink to fit the narrow
-  // Dynamic Island expanded-leading region (e.g. "17:39") instead of truncating
-  // the minutes to "…"; on the full-width lock-screen banner it stays at 40pt.
+  // System-rendered relative time ("8시간 5분" on Korean devices), updating
+  // without app pushes. `lineLimit(1)` + `minimumScaleFactor` shrink the text
+  // to fit the narrow Dynamic Island expanded regions instead of truncating.
+  // Remaining counts toward the target; past the target the same text counts
+  // back up, which doubles as the overtime amount under the "초과 근무" caption.
   const remainingHero = (
     <Text
+      date={targetDate}
+      dateStyle="relative"
       modifiers={[
-        font({ size: 40, weight: 'bold', design: 'rounded' }),
+        font({ size: 24, weight: 'bold', design: 'rounded' }),
         monospacedDigit(),
         lineLimit(1),
         minimumScaleFactor(0.5),
         foregroundStyle(accentColor),
       ]}
-    >
-      {props.remainingLabel}
-    </Text>
+    />
+  );
+
+  const workedHero = (
+    <Text
+      date={clockInDate}
+      dateStyle="relative"
+      modifiers={[
+        font({ size: 24, weight: 'bold', design: 'rounded' }),
+        monospacedDigit(),
+        lineLimit(1),
+        minimumScaleFactor(0.5),
+        foregroundStyle(valueColor),
+      ]}
+    />
   );
 
   const remainingCompact = (
@@ -93,30 +111,46 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
     </Text>
   );
 
-  // Target clock time: same white color as the captions, ~half the hero size.
-  const targetValue = (
-    <Text modifiers={[font({ size: 20, weight: 'semibold' }), monospacedDigit(), foregroundStyle(valueColor)]}>
-      {props.targetLabel}
-    </Text>
+  // Linear progress bar driven by the SYSTEM over the clock-in → target
+  // interval (`countsDown={false}` fills as time passes; stays full past the
+  // target). No app pushes needed.
+  const progressBar = (
+    <ProgressView
+      timerInterval={{ lower: clockInDate, upper: targetDate }}
+      countsDown={false}
+      modifiers={[tint(accentColor)]}
+    />
   );
 
-  // Linear determinate progress bar (fills the available width of its container).
-  const progressBar = <ProgressView value={clampedProgress} modifiers={[tint(accentColor)]} />;
+  // Bottom row: clock-in / target wall-clock times ("09:00 출근 … 퇴근 18:00").
+  const clockRow = (
+    <HStack alignment="firstTextBaseline" spacing={4}>
+      {valueText(props.clockInLabel)}
+      {captionText('출근')}
+      <Spacer />
+      {captionText('퇴근')}
+      {valueText(props.targetLabel)}
+    </HStack>
+  );
 
   return {
-    // ── Lock screen / Notification Center banner (linear progress bar + hero) ──
+    // ── Lock screen / Notification Center banner ──
+    // 남은 시간 | 근무 시간 (two live columns) → progress bar → 출근/퇴근 row.
     banner: (
       <VStack alignment="leading" spacing={6} modifiers={[padding({ horizontal: 16, vertical: 12 })]}>
-        {captionText(heroLabel)}
-        {remainingHero}
-        {progressBar}
         <HStack alignment="firstTextBaseline" spacing={6}>
-          {captionText('근무')}
-          {valueText(props.workedLabel)}
+          <VStack alignment="leading" spacing={2}>
+            {captionText(heroLabel)}
+            {remainingHero}
+          </VStack>
           <Spacer />
-          {captionText('목표')}
-          {targetValue}
+          <VStack alignment="trailing" spacing={2}>
+            {captionText('근무 시간')}
+            {workedHero}
+          </VStack>
         </HStack>
+        {progressBar}
+        {clockRow}
       </VStack>
     ),
 
@@ -136,18 +170,14 @@ function WorkActivity(props: WorkActivityProps): LiveActivityLayout {
     ),
     expandedTrailing: (
       <VStack alignment="trailing" spacing={2} modifiers={[padding({ trailing: 8 })]}>
-        {captionText('근무')}
-        {valueText(props.workedLabel)}
+        {captionText('근무 시간')}
+        {workedHero}
       </VStack>
     ),
     expandedBottom: (
       <VStack alignment="leading" spacing={6} modifiers={[padding({ horizontal: 8 })]}>
         {progressBar}
-        <HStack alignment="firstTextBaseline" spacing={6}>
-          {captionText('목표')}
-          {targetValue}
-          <Spacer />
-        </HStack>
+        {clockRow}
       </VStack>
     ),
   };
