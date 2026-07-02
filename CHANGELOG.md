@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-07-02
+
+### Changed
+- Live Activity 시간 표시·진행바를 앱 push 기반에서 시스템 자동 갱신으로 전환: 남은 시간은 `Text date + relative`, 진행바는 `ProgressView timerInterval`로 렌더링되어 앱이 종료돼도 계속 갱신됨. 앱은 정적 요소(다이나믹 아일랜드 compact 문자열, 초과근무 전환)만 push
+- Live Activity props를 ISO 문자열·사전 계산 라벨에서 epoch ms 기반으로 재설계 (`progress`/`remainingLabel`/`workedLabel` 제거)
+- 출근/퇴근 시각을 시스템 렌더링(`dateStyle="time"` + en_GB locale)으로 전환해 기기 12/24시간 설정과 무관하게 24시간 `HH:mm` 고정
+- 잠금화면 banner를 남은 시간 hero 중심으로 단순화 (근무 시간 컬럼 제외)
+
+### Fixed
+- computeProps: `targetLeaveAt <= clockInAt` 역전 데이터가 들어오면 진행바 timerInterval이 무효 범위가 되던 문제를 target을 clock-in 이상으로 clamp 하여 가드
+
 ## [1.1.0] - 2026-07-02
 
 ### Added
