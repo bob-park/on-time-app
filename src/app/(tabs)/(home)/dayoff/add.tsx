@@ -9,7 +9,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useRequestDocument } from '@/domain/documents/queries/documents';
 import { useCreateVacation } from '@/domain/documents/queries/vacations';
-import { countRequestedDays } from '@/domain/documents/vacationDays';
+import { compLeavePayload, countRequestedDays } from '@/domain/documents/vacationDays';
 import { useUserLeaveEntry } from '@/domain/users/queries/users';
 import { Icon } from '@/shared/components/Icon';
 import Loading from '@/shared/components/loading/Loading';
@@ -133,11 +133,11 @@ export default function AddDayOff() {
       startDate: dayjs(selectedDate.startDate).format('YYYY-MM-DD'),
       endDate: dayjs(selectedDate.endDate).format('YYYY-MM-DD'),
       reason,
-      compLeaveEntries: (selectedCompLeaveEntries || []).map((item) => ({
-        compLeaveEntryId: item.id,
-        usedDays:
-          dayjs.duration(dayjs(selectedDate.endDate).unix() - dayjs(selectedDate.startDate).unix() + 1_000).days() + 1,
-      })),
+      compLeaveEntries: compLeavePayload(
+        vacationType,
+        selectedCompLeaveEntries,
+        dayjs.duration(dayjs(selectedDate.endDate).unix() - dayjs(selectedDate.startDate).unix() + 1_000).days() + 1,
+      ),
     });
   };
 
@@ -228,7 +228,7 @@ export default function AddDayOff() {
                   weekday_label: 'text-muted dark:text-muted-dark',
                   day_label: 'text-content dark:text-content-dark',
                   year_selector_label: 'text-content dark:text-content-dark font-bold',
-                  month_selector_label: 'text-content dark:text-content-dark font-bold text-base',
+                  month_selector_label: 'text-content dark:text-content-dark font-bold text-[16px]',
                   button_next: 'size-9 rounded-lg bg-elevated dark:bg-elevated-dark items-center justify-center',
                   button_prev: 'size-9 rounded-lg bg-elevated dark:bg-elevated-dark items-center justify-center',
                 }}

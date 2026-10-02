@@ -20,3 +20,13 @@ export function countRequestedDays({
   }
   return count;
 }
+
+// 보상휴가 신청일 때만 선택한 보상휴가 항목을 보낸다 (다른 종류로 바꾼 뒤 남은 선택값이 섞이지 않게).
+export function compLeavePayload(
+  vacationType: VacationType,
+  entries: UserCompLeaveEntry[] | undefined,
+  usedDays: number,
+): { compLeaveEntryId: number; usedDays: number }[] {
+  if (vacationType !== 'COMPENSATORY') return [];
+  return (entries || []).map((item) => ({ compLeaveEntryId: item.id, usedDays }));
+}
