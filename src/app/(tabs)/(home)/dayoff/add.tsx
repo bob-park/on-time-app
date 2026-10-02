@@ -4,26 +4,21 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import Reanimated from 'react-native-reanimated';
 import DateTimePicker, { useDefaultClassNames } from 'react-native-ui-datepicker';
 
-import * as Device from 'expo-device';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
-
-import { Entypo, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { useRequestDocument } from '@/domain/documents/queries/documents';
 import { useCreateVacation } from '@/domain/documents/queries/vacations';
+import { countRequestedDays } from '@/domain/documents/vacationDays';
 import { useUserLeaveEntry } from '@/domain/users/queries/users';
+import { Icon } from '@/shared/components/Icon';
 import Loading from '@/shared/components/loading/Loading';
 import SelectCompLeaveEntriesModal from '@/shared/components/modals/SelectCompLeaveEntriesModal';
-import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterPage } from '@/shared/components/motion/entering';
-import { Button } from '@/shared/components/ui';
+import { Button, Card, ChoiceChip, Segmented, usePalette } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-
-import cx from 'classnames';
 
 const TABULAR = { fontVariant: ['tabular-nums' as const] };
 
@@ -40,23 +35,30 @@ function parseVacationType(vacationType: VacationType) {
   }
 }
 
-const VACATION_TYPES: { key: VacationType; label: string }[] = [
-  { key: 'GENERAL', label: '연차' },
-  { key: 'COMPENSATORY', label: '보상 휴가' },
-  { key: 'OFFICIAL', label: '공가' },
-];
-
 const VACATION_SUB_TYPES: { key: VacationSubType | 'all'; label: string }[] = [
   { key: 'all', label: '종일' },
   { key: 'AM_HALF_DAY_OFF', label: '오전 반차' },
   { key: 'PM_HALF_DAY_OFF', label: '오후 반차' },
 ];
 
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <Text className="text-muted dark:text-muted-dark mt-6 mb-2 text-[11px] font-semibold tracking-wider">
+      {children}
+    </Text>
+  );
+}
+
 export default function AddDayOff() {
   // context
-  const { theme } = useContext(ThemeContext);
   const { userinfo: userDetail } = useContext(AuthContext);
   const { showToast } = useContext(NotificationContext);
+
+  // hooks
+  const router = useRouter();
+  const palette = usePalette();
+  const defaultClassNames = useDefaultClassNames();
+  const { type } = useLocalSearchParams<{ type?: VacationType }>();
 
   // queries
   const { leaveEntry } = useUserLeaveEntry({ uniqueId: userDetail?.sub, year: dayjs().year() });
@@ -91,10 +93,6 @@ export default function AddDayOff() {
   const [showCompLeaveEntries, setShowCompLeaveEntries] = useState<boolean>(false);
   const [selectedCompLeaveEntries, setSelectedCompLeaveEntries] = useState<UserCompLeaveEntry[]>();
 
-  // hooks
-  const router = useRouter();
-  const defaultClassNames = useDefaultClassNames();
-
   // useEffect
   useEffect(() => {
     if (showCompLeaveEntries) {
@@ -106,10 +104,25 @@ export default function AddDayOff() {
     }
   }, [showCompLeaveEntries, selectedCompLeaveEntries]);
 
+  // 홈의 '보상휴가' 바로가기로 진입하면 보상휴가 선택 모달을 바로 연다.
+  useEffect(() => {
+    if (type === 'COMPENSATORY') {
+      setVacationType('COMPENSATORY');
+      setShowCompLeaveEntries(true);
+    }
+  }, [type]);
+
   // handle
+  const handleChangeType = (value: VacationType) => {
+    setVacationType(value);
+    if (value === 'COMPENSATORY') {
+      setShowCompLeaveEntries(true);
+    }
+  };
+
   const handleCreateVacation = () => {
     if (dayjs(selectedDate.startDate).isAfter(selectedDate.endDate)) {
-      showToast({ title: '휴가일이 이상한디?', description: '똑바로 선택해주셈! 알겠셈?' });
+      showToast({ title: '종료일이 시작일보다 빨라요', description: '휴가 날짜를 선택해 주세요' });
       return;
     }
 
@@ -132,208 +145,92 @@ export default function AddDayOff() {
     return <Loading />;
   }
 
-  // mode-safe raw colors
-  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
-  const brandColor = '#1ed760';
-  const placeholderColor = theme === 'light' ? '#8a8f99' : 'rgba(255,255,255,0.5)';
+  const typeOptions: { value: VacationType; label: string }[] = [
+    { value: 'GENERAL', label: `연차 · ${remainingDays}일` },
+    { value: 'COMPENSATORY', label: `보상휴가 · ${remainingCompDays}일` },
+    { value: 'OFFICIAL', label: '공가' },
+  ];
+
+  const requestedDays = countRequestedDays({
+    startDate: selectedDate.startDate,
+    endDate: selectedDate.endDate,
+    subType: vacationSubType === 'all' ? undefined : vacationSubType,
+  });
+  const afterDays = remainingDays - requestedDays;
+
+  const start = dayjs(selectedDate.startDate);
+  const end = dayjs(selectedDate.endDate);
+  const rangeLabel = start.isSame(end, 'day')
+    ? start.format('M월 D일 (dd)')
+    : `${start.format('M월 D일 (dd)')} – ${end.format('M월 D일 (dd)')}`;
 
   return (
     <>
       <View className="bg-base dark:bg-base-dark flex size-full flex-col">
         {/* header */}
         <View className="relative mb-2 flex flex-row items-center justify-center">
-          <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-            <Entypo name="chevron-left" size={30} color={contentColor} />
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="뒤로"
+            className="absolute left-0 size-11 items-start justify-center"
+            onPress={() => router.back()}
+          >
+            <Icon sf="chevron.left" fallback="‹" size={22} weight="semibold" color={palette.content} />
           </TouchableOpacity>
-
           <Text className="text-content dark:text-content-dark text-xl font-bold">휴가 신청</Text>
         </View>
 
-        {/* scrollable content */}
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingBottom: 112 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
         >
-          {/* leave info card (merged) */}
-          <Reanimated.View entering={enterPage(0)}>
-            <Text className="text-muted dark:text-muted-dark mt-4 mb-3 text-xs font-bold tracking-wider uppercase">
-              잔여 현황
-            </Text>
-            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
-              {/* 연차 row */}
-              <View className="flex flex-row items-center gap-3 px-4 py-3.5">
-                <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
-                  <Ionicons name="leaf" size={18} color={brandColor} />
-                </View>
-                <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">연차</Text>
-                <View className="flex flex-row items-center gap-1">
-                  <Text className="text-muted dark:text-muted-dark text-xs" style={TABULAR}>
-                    전체 {leaveEntry?.totalLeaveDays} · 사용 {leaveEntry?.usedLeaveDays} · 남은{' '}
-                  </Text>
-                  <Text
-                    className={cx('text-xs font-bold', {
-                      'text-content dark:text-content-dark': remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.5,
-                      'text-amber-600 dark:text-amber-400':
-                        remainingDays > (leaveEntry?.totalLeaveDays || 0) * 0.3 &&
-                        remainingDays <= (leaveEntry?.totalLeaveDays || 0) * 0.5,
-                      'text-danger dark:text-danger-dark': remainingDays <= (leaveEntry?.totalLeaveDays || 0) * 0.3,
-                    })}
-                    style={TABULAR}
-                  >
-                    {remainingDays}
-                  </Text>
-                </View>
-              </View>
+          {/* type */}
+          <Reanimated.View entering={enterPage(0)} className="mt-4">
+            <Segmented options={typeOptions} value={vacationType} onChange={handleChangeType} />
+          </Reanimated.View>
 
-              {/* divider */}
-              <View className="border-border dark:border-border-dark ml-[48px] border-b" />
-
-              {/* 보상 휴가 row */}
-              <View className="flex flex-row items-center gap-3 px-4 py-3.5">
-                <View className="bg-elevated dark:bg-elevated-dark size-9 flex-none items-center justify-center rounded-xl">
-                  <Ionicons name="gift" size={18} color={brandColor} />
-                </View>
-                <Text className="text-content dark:text-content-dark flex-1 text-[15px] font-semibold">보상 휴가</Text>
-                <View className="flex flex-row items-center gap-1">
-                  <Text className="text-muted dark:text-muted-dark text-xs" style={TABULAR}>
-                    전체 {leaveEntry?.totalCompLeaveDays} · 사용 {leaveEntry?.usedCompLeaveDays} · 남은{' '}
-                  </Text>
-                  <Text
-                    className={cx('text-xs font-bold', {
-                      'text-content dark:text-content-dark':
-                        remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
-                      'text-amber-600 dark:text-amber-400':
-                        remainingCompDays > (leaveEntry?.totalCompLeaveDays || 0) * 0.3 &&
-                        remainingCompDays <= (leaveEntry?.totalCompLeaveDays || 0) * 0.5,
-                      'text-danger dark:text-danger-dark':
-                        remainingCompDays <= (leaveEntry?.totalCompLeaveDays || 0) * 0.3,
-                    })}
-                    style={TABULAR}
-                  >
-                    {remainingCompDays}
-                  </Text>
-                </View>
-              </View>
+          {/* sub type */}
+          <Reanimated.View entering={enterPage(60)}>
+            <SectionLabel>사용 단위</SectionLabel>
+            <View className="flex-row gap-2">
+              {VACATION_SUB_TYPES.map((option) => (
+                <ChoiceChip
+                  key={option.key}
+                  label={option.label}
+                  selected={vacationSubType === option.key}
+                  onPress={() => setVacationSubType(option.key)}
+                />
+              ))}
             </View>
           </Reanimated.View>
 
-          {/* vacation type chips */}
-          <Reanimated.View entering={enterPage(80)} className="mt-8">
-            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
-              휴가 구분
-            </Text>
-            <View className="flex flex-row items-center gap-2">
-              {VACATION_TYPES.map((option) => {
-                const isActive = vacationType === option.key;
-                return (
-                  <AnimatedPressable
-                    key={option.key}
-                    className={cx(
-                      'rounded-full px-4 py-2',
-                      isActive ? 'bg-brand' : 'bg-elevated dark:bg-elevated-dark',
-                    )}
-                    disabled={isActive}
-                    onPress={() => {
-                      setVacationType(option.key);
-                      if (option.key === 'COMPENSATORY') {
-                        setShowCompLeaveEntries(true);
-                      }
-                    }}
-                  >
-                    <Text
-                      className={cx(
-                        'text-sm font-semibold',
-                        isActive ? 'text-black' : 'text-content dark:text-content-dark',
-                      )}
-                    >
-                      {option.label}
-                    </Text>
-                  </AnimatedPressable>
-                );
-              })}
-            </View>
-          </Reanimated.View>
-
-          {/* vacation sub type chips */}
-          <Reanimated.View entering={enterPage(140)} className="mt-6">
-            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
-              부가 구분
-            </Text>
-            <View className="flex flex-row items-center gap-2">
-              {VACATION_SUB_TYPES.map((option) => {
-                const isActive = vacationSubType === option.key;
-                return (
-                  <AnimatedPressable
-                    key={option.key}
-                    className={cx(
-                      'rounded-full px-4 py-2',
-                      isActive ? 'bg-brand' : 'bg-elevated dark:bg-elevated-dark',
-                    )}
-                    disabled={isActive}
-                    onPress={() => setVacationSubType(option.key)}
-                  >
-                    <Text
-                      className={cx(
-                        'text-sm font-semibold',
-                        isActive ? 'text-black' : 'text-content dark:text-content-dark',
-                      )}
-                    >
-                      {option.label}
-                    </Text>
-                  </AnimatedPressable>
-                );
-              })}
-            </View>
-          </Reanimated.View>
-
-          {/* reason input */}
-          <Reanimated.View entering={enterPage(200)} className="mt-6">
-            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
-              사유
-            </Text>
-            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border px-4 py-3">
-              <TextInput
-                className={cx('text-content dark:text-content-dark w-full text-[15px]', {
-                  'h-12': Device.osName !== 'iOS',
-                  'h-8': Device.osName === 'iOS',
-                })}
-                numberOfLines={1}
-                placeholder="개인 사유"
-                placeholderTextColor={placeholderColor}
-                value={reason}
-                onChangeText={(value) => setReason(value)}
-              />
-            </View>
-          </Reanimated.View>
-
-          {/* calendar */}
-          <Reanimated.View entering={enterPage(260)} className="mt-6">
-            <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
-              기간
-            </Text>
-            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-3">
+          {/* period */}
+          <Reanimated.View entering={enterPage(120)}>
+            <SectionLabel>기간</SectionLabel>
+            <Card className="p-3">
+              <Text className="text-content dark:text-content-dark px-1 pb-2 text-[15px] font-bold" style={TABULAR}>
+                {rangeLabel}
+              </Text>
               <DateTimePicker
                 classNames={{
                   ...defaultClassNames,
-                  today: 'bg-elevated dark:bg-elevated-dark mx-[2px] rounded-full ',
+                  today: 'border border-brand dark:border-brand-dark mx-[2px] rounded-full',
                   today_label: 'text-content dark:text-content-dark',
                   selected: 'bg-brand mx-[2px] rounded-full',
-                  selected_label: 'text-black',
-                  range_fill: 'bg-elevated dark:bg-elevated-dark',
+                  selected_label: 'text-white',
+                  range_fill: 'bg-brand-subtle',
                   range_start: 'bg-brand mx-[2px] rounded-full',
-                  range_start_label: 'text-black',
+                  range_start_label: 'text-white',
                   range_end: 'bg-brand mx-[2px] rounded-full',
-                  range_end_label: 'text-black',
+                  range_end_label: 'text-white',
                   outside_label: 'text-muted dark:text-muted-dark',
-                  weekday_label: 'text-content dark:text-content-dark',
+                  weekday_label: 'text-muted dark:text-muted-dark',
                   day_label: 'text-content dark:text-content-dark',
                   year_selector_label: 'text-content dark:text-content-dark font-bold',
-                  month_selector_label: 'text-content dark:text-content-dark font-bold text-lg',
-                  button_next:
-                    'size-10 rounded-lg bg-elevated dark:bg-elevated-dark flex flex-row items-center justify-center',
-                  button_prev:
-                    'size-10 rounded-lg bg-elevated dark:bg-elevated-dark flex flex-row items-center justify-center',
+                  month_selector_label: 'text-content dark:text-content-dark font-bold text-base',
+                  button_next: 'size-9 rounded-lg bg-elevated dark:bg-elevated-dark items-center justify-center',
+                  button_prev: 'size-9 rounded-lg bg-elevated dark:bg-elevated-dark items-center justify-center',
                 }}
                 mode="range"
                 locale="ko"
@@ -341,26 +238,61 @@ export default function AddDayOff() {
                 disableYearPicker
                 disableMonthPicker
                 components={{
-                  IconNext: <FontAwesome5 name="angle-right" size={24} color={contentColor} />,
-                  IconPrev: <FontAwesome5 name="angle-left" size={24} color={contentColor} />,
+                  IconNext: (
+                    <Icon sf="chevron.right" fallback="›" size={14} weight="semibold" color={palette.content} />
+                  ),
+                  IconPrev: <Icon sf="chevron.left" fallback="‹" size={14} weight="semibold" color={palette.content} />,
                 }}
                 startDate={selectedDate.startDate}
                 endDate={selectedDate.endDate}
                 onChange={({ startDate, endDate }) =>
                   setSelectedDate({
                     startDate: dayjs(startDate as string).toDate(),
-                    endDate: dayjs(endDate as string).toDate(),
+                    // 시작일만 고른 상태에서는 종료일 = 시작일 (dayjs(undefined) 는 '지금'이 되므로 방지)
+                    endDate: dayjs((endDate ?? startDate) as string).toDate(),
                   })
                 }
               />
-            </View>
+            </Card>
           </Reanimated.View>
 
-          {/* submit */}
-          <Reanimated.View entering={enterPage(320)} className="mt-8">
-            <Button variant="primary" label="신청하기" onPress={handleCreateVacation} />
+          {/* reason */}
+          <Reanimated.View entering={enterPage(180)}>
+            <SectionLabel>사유</SectionLabel>
+            <Card className="px-4">
+              <TextInput
+                className="text-content dark:text-content-dark min-h-12 w-full text-[15px]"
+                numberOfLines={1}
+                placeholder="개인 사유"
+                placeholderTextColor={palette.muted}
+                value={reason}
+                onChangeText={(value) => setReason(value)}
+              />
+            </Card>
           </Reanimated.View>
+
+          {/* preview — 연차만 잔여일이 차감된다 */}
+          {vacationType === 'GENERAL' && (
+            <View className="bg-brand-subtle mt-4 rounded-2xl p-3.5">
+              <Text className="text-content dark:text-content-dark text-[13px]" style={TABULAR}>
+                {requestedDays}일 사용 → 신청 후 잔여{' '}
+                <Text
+                  className={`font-bold ${afterDays < 0 ? 'text-danger dark:text-danger-dark' : 'text-brand dark:text-brand-dark'}`}
+                >
+                  {afterDays}일
+                </Text>
+              </Text>
+              {afterDays < 0 && (
+                <Text className="text-danger dark:text-danger-dark mt-1 text-xs">잔여 연차가 부족해요</Text>
+              )}
+            </View>
+          )}
         </ScrollView>
+
+        {/* 하단 고정 CTA */}
+        <View className="pt-3 pb-28">
+          <Button label="신청하기" onPress={handleCreateVacation} />
+        </View>
       </View>
       <SelectCompLeaveEntriesModal
         show={showCompLeaveEntries}
