@@ -2,18 +2,15 @@ import { Text } from 'react-native';
 
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 
-type Variant = 'primary' | 'secondary' | 'outline';
+type Variant = 'primary' | 'secondary' | 'subtle';
 
 const VARIANT: Record<Variant, { box: string; text: string }> = {
-  primary: { box: 'bg-brand', text: 'text-black' },
+  primary: { box: 'bg-brand', text: 'text-white' },
   secondary: {
     box: 'bg-elevated dark:bg-elevated-dark',
     text: 'text-content dark:text-content-dark',
   },
-  outline: {
-    box: 'border border-border dark:border-border-dark',
-    text: 'text-content dark:text-content-dark',
-  },
+  subtle: { box: 'bg-brand-subtle', text: 'text-brand dark:text-brand-dark' },
 };
 
 export function Button({
@@ -33,11 +30,13 @@ export function Button({
 
   return (
     <AnimatedPressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
       onPress={disabled ? undefined : onPress}
-      className={`flex-row items-center justify-center gap-2 rounded-full px-5 py-3.5 ${v.box} ${disabled ? 'opacity-50' : ''}`}
+      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-xl px-4 py-3.5 ${v.box} ${disabled ? 'opacity-50' : ''}`}
     >
       {icon}
-      <Text className={`text-base font-extrabold ${v.text}`}>{label}</Text>
+      <Text className={`text-base font-semibold ${v.text}`}>{label}</Text>
     </AnimatedPressable>
   );
 }

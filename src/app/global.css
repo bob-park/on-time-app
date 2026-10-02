@@ -5,20 +5,28 @@
 @import 'nativewind/theme';
 
 @theme {
-  --color-base: #f7f7f8;
-  --color-base-dark: #000000;
+  --color-base: #f7f7fa;
+  --color-base-dark: #0b0b10;
   --color-surface: #ffffff;
-  --color-surface-dark: #181818;
-  --color-elevated: #f0f0f2;
-  --color-elevated-dark: #232323;
-  --color-border: #e6e6ea;
-  --color-border-dark: #282828;
-  --color-content: #15171c;
-  --color-content-dark: #ffffff;
-  --color-muted: #8a8f99;
-  --color-muted-dark: rgba(255, 255, 255, 0.5);
-  --color-brand: #1ed760;
-  --color-brand-border: #1db954;
+  --color-surface-dark: #17171f;
+  --color-elevated: #f0f0f5;
+  --color-elevated-dark: #22222c;
+  --color-border: #dedee5;
+  --color-border-dark: #26262f;
+  --color-content: #101114;
+  --color-content-dark: #f2f2f7;
+  --color-muted: #9497a9;
+  --color-muted-dark: #9497a9;
+  --color-brand: #7132f5;
+  --color-brand-dark: #855bfb;
+  --color-brand-deep: #5b1ecf;
+  --color-brand-subtle: rgba(133, 91, 251, 0.16);
+  --color-success: #149e61;
+  --color-success-strong: #026b3f;
+  --color-success-subtle: rgba(20, 158, 97, 0.16);
+  --color-neutral-strong: #484b5e;
+  --color-neutral-subtle: rgba(104, 107, 130, 0.12);
   --color-danger: #e0455a;
-  --color-danger-dark: #f3727f;
+  --color-danger-dark: #ff9aa8;
+  --color-danger-subtle: rgba(224, 69, 90, 0.12);
 }
