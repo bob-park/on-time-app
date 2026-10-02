@@ -268,6 +268,7 @@ export default function Schedule() {
       <Reanimated.View entering={enterHero(100)} className="mt-2 px-4">
         <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-[20px] border pt-3 pb-2">
           <View className="h-[88px]">
+            {/* @ts-expect-error RN 0.88 AnimatedProps 타입에서 children 누락 — Task 8 에서 PagerView 제거 */}
             <AnimatedPagerView
               {...rest}
               className="h-full"
@@ -277,13 +278,13 @@ export default function Schedule() {
               layoutDirection="ltr"
               pageMargin={3}
               orientation="horizontal"
-              onPageScrollStateChanged={(e) => {
+              onPageScrollStateChanged={(e: { nativeEvent: { pageScrollState: string } }) => {
                 if (e.nativeEvent.pageScrollState !== 'idle') return;
                 ref.current?.setPageWithoutAnimation(1);
                 if (changePageRef.current === 0) handlePrevWeeks();
                 if (changePageRef.current === 2) handleNextWeeks();
               }}
-              onPageSelected={(e) => {
+              onPageSelected={(e: { nativeEvent: { position: number } }) => {
                 changePageRef.current = e.nativeEvent.position;
               }}
             >

@@ -9,11 +9,11 @@ related:
 
 # Tech Stack & Requirements
 
-> Expo SDK 56 + React Native 0.85 + React 19.2, TypeScript ~6.0 strict. expo-router ~56 + NativeWind v5(Tailwind 4) + TanStack Query v5 + ky + zustand v5 + i18next + dayjs. Yarn 4, Node ≥ 24.
+> Expo SDK 58 (beta) + React Native 0.88 (RC) + React 19.3, TypeScript ~6.0 strict. expo-router ~58 + NativeWind v5(Tailwind 4) + TanStack Query v5 + ky + zustand v5 + i18next + dayjs. Yarn 4, Node ≥ 24.
 
-- **Framework:** Expo SDK 56, React Native 0.85, React 19.2
+- **Framework:** Expo SDK 58 (beta), React Native 0.88 (RC), React 19.3
 - **Language:** TypeScript ~6.0 (`strict: true`)
-- **Routing:** expo-router ~56 (file-based, typed routes)
+- **Routing:** expo-router ~58 (file-based, typed routes)
 - **Styling:** NativeWind v5 (Tailwind CSS v4)
 - **Server state:** `@tanstack/react-query` v5
 - **HTTP:** `ky`

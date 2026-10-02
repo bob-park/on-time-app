@@ -151,7 +151,7 @@ const CompLeaveEntry = ({
             <Text
               className="text-content dark:text-content-dark w-full text-base font-semibold"
               numberOfLines={2}
-              lineBreakMode="tail"
+              ellipsizeMode="tail"
             >
               {entry.contents}
             </Text>

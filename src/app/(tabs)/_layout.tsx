@@ -28,7 +28,7 @@ export default function TabLayout() {
         options={{
           title: '오늘',
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={size} color={color} />
+            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={size} color={color as string} />
           ),
         }}
       />
@@ -37,7 +37,7 @@ export default function TabLayout() {
         options={{
           title: '일정',
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={size} color={color} />
+            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={size} color={color as string} />
           ),
         }}
       />
@@ -46,7 +46,11 @@ export default function TabLayout() {
         options={{
           title: '할일',
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'checkmark-circle' : 'checkmark-circle-outline'} size={size} color={color} />
+            <Ionicons
+              name={focused ? 'checkmark-circle' : 'checkmark-circle-outline'}
+              size={size}
+              color={color as string}
+            />
           ),
         }}
       />
@@ -55,7 +59,7 @@ export default function TabLayout() {
         options={{
           title: '더보기',
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name={focused ? 'apps' : 'apps-outline'} size={size} color={color} />
+            <Ionicons name={focused ? 'apps' : 'apps-outline'} size={size} color={color as string} />
           ),
         }}
       />
