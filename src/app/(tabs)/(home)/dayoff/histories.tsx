@@ -148,7 +148,7 @@ export default function DayoffHistoriesPage() {
             <Text className="text-content dark:text-content-dark text-[40px] leading-none font-bold" style={TABULAR}>
               {animatedTotal}
             </Text>
-            <Text className="text-muted dark:text-muted-dark text-base font-semibold">일</Text>
+            <Text className="text-muted dark:text-muted-dark text-[16px] font-semibold">일</Text>
           </View>
         </View>
         <Text className="text-muted dark:text-muted-dark text-xs" style={TABULAR}>

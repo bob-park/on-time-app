@@ -36,7 +36,7 @@ export function Button({
       className={`min-h-12 flex-row items-center justify-center gap-2 rounded-xl px-4 py-3.5 ${v.box} ${disabled ? 'opacity-50' : ''}`}
     >
       {icon}
-      <Text className={`text-base font-semibold ${v.text}`}>{label}</Text>
+      <Text className={`text-[16px] font-semibold ${v.text}`}>{label}</Text>
     </AnimatedPressable>
   );
 }

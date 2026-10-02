@@ -8,7 +8,7 @@ export default function Callback() {
   return (
     <View className="bg-base dark:bg-base-dark flex size-full flex-col items-center justify-center gap-4">
       <ActivityIndicator size="large" color={palette.brand} />
-      <Text className="text-muted dark:text-muted-dark text-base">로그인 처리 중...</Text>
+      <Text className="text-muted dark:text-muted-dark text-[16px]">로그인 처리 중...</Text>
     </View>
   );
 }

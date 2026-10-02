@@ -70,7 +70,7 @@ export default function LoginPage() {
         <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
         <Text className="text-brand dark:text-brand-dark text-4xl font-bold tracking-tight">On Time</Text>
-        <Text className="text-muted dark:text-muted-dark text-base">시간을 지키는 가장 쉬운 방법</Text>
+        <Text className="text-muted dark:text-muted-dark text-[16px]">시간을 지키는 가장 쉬운 방법</Text>
       </View>
 
       <View className="w-[80%]">

@@ -222,7 +222,7 @@ function HeroDone({ today }: { today?: AttendanceRecord }) {
         <Text className="text-4xl font-bold tracking-tight text-white" style={TABULAR}>
           {clockInTime?.format('HH:mm')}
         </Text>
-        <Text className="text-base text-white/75">→</Text>
+        <Text className="text-[16px] text-white/75">→</Text>
         <Text className="text-4xl font-bold tracking-tight text-white" style={TABULAR}>
           {clockOutTime?.format('HH:mm')}
         </Text>

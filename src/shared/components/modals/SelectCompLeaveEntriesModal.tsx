@@ -148,7 +148,7 @@ const CompLeaveEntry = ({
         <View className="flex-1">
           <View className="flex flex-col items-center gap-2">
             <Text
-              className="text-content dark:text-content-dark w-full text-base font-semibold"
+              className="text-content dark:text-content-dark w-full text-[16px] font-semibold"
               numberOfLines={2}
               ellipsizeMode="tail"
             >

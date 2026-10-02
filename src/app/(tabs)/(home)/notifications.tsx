@@ -67,7 +67,7 @@ const NoMessage = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-muted dark:text-muted-dark text-base font-semibold">새 알림이 없어요</Text>
+        <Text className="text-muted dark:text-muted-dark text-[16px] font-semibold">새 알림이 없어요</Text>
       </View>
     </View>
   );
