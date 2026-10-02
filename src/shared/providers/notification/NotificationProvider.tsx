@@ -25,14 +25,14 @@ const toastConfig: ToastConfig = {
   selectedToast: ({ text1, text2 }) => (
     <View className="mt-4 w-full px-5">
       <View
-        className="flex w-full flex-col items-center gap-1 rounded-2xl border-[1px] border-gray-100 bg-gray-50 px-8 py-4 dark:border-gray-800 dark:bg-gray-950"
-        style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowOffset: { width: 2, height: 4 } }}
+        className="bg-surface dark:bg-surface-dark border-border dark:border-border-dark flex w-full flex-col items-center gap-1 rounded-2xl border px-5 py-4"
+        style={{ boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.08)' }}
       >
         <View className="w-full">
-          <Text className="text-base font-bold dark:text-white">{text1}</Text>
+          <Text className="text-content dark:text-content-dark text-[15px] font-bold">{text1}</Text>
         </View>
         <View className="w-full">
-          <Text className="text-sm text-gray-500 dark:text-gray-500">{text2}</Text>
+          <Text className="text-muted dark:text-muted-dark text-sm">{text2}</Text>
         </View>
       </View>
     </View>

@@ -4,8 +4,5 @@ export { Card } from './Card';
 export { ChoiceChip } from './ChoiceChip';
 export { ListGroup, ListItem } from './ListGroup';
 export { PALETTE, type Palette, usePalette } from './palette';
-export { ProgressBar } from './ProgressBar';
 export { QuickAction } from './QuickAction';
-export { SectionHeader } from './SectionHeader';
 export { Segmented } from './Segmented';
-export { StatusPill } from './StatusPill';

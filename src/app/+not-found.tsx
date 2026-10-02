@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <View className="bg-base dark:bg-base-dark flex size-full flex-col items-center justify-center gap-6 p-10">
       <View className="flex flex-col items-center justify-center gap-2">
-        <Text className="text-content dark:text-content-dark text-6xl font-extrabold">404</Text>
+        <Text className="text-content dark:text-content-dark text-6xl font-bold tracking-tight">404</Text>
         <Text className="text-muted dark:text-muted-dark text-base">페이지를 찾을 수 없습니다</Text>
       </View>
 
