@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 
-import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import '@/app/global.css';
+import { usePalette } from '@/shared/components/ui';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
 import AuthProvider, { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import I18nProvider from '@/shared/providers/i18n/I18nProvider';
@@ -21,15 +21,13 @@ const RootStackLayout = () => {
   const { isLoggedIn } = useContext(AuthContext);
 
   // hooks
-  const colorScheme = useColorScheme();
+  const palette = usePalette();
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#000000' : '#f7f7f8',
-        },
+        contentStyle: { backgroundColor: palette.base },
       }}
     >
       <Stack.Protected guard={isLoggedIn}>
