@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { ActivityIndicator, Alert, Linking, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, Text, View } from 'react-native';
 
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 
 import { endWorkActivity, startWorkActivity } from '@/domain/attendances/liveActivity';
+import { type LocationStatus, getLocationStatus } from '@/domain/attendances/locationStatus';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
 import { Icon } from '@/shared/components/Icon';
@@ -24,8 +25,6 @@ const WORK_TYPES: { key: AttendanceWorkType; label: string; sf: string; fallback
   { key: 'HOME', label: '재택', sf: 'house', fallback: '🏠' },
 ];
 
-type LocationStatus = 'checking' | 'valid' | 'invalid' | 'denied';
-
 const LOCATION_STATUS: Record<LocationStatus, { title: string; box: string; text: string }> = {
   checking: {
     title: '위치를 확인하는 중...',
@@ -35,6 +34,11 @@ const LOCATION_STATUS: Record<LocationStatus, { title: string; box: string; text
   valid: { title: '위치 확인됨', box: 'bg-success-subtle', text: 'text-success-strong dark:text-success' },
   invalid: { title: '근무지 반경 밖이에요', box: 'bg-danger-subtle', text: 'text-danger dark:text-danger-dark' },
   denied: { title: '위치 권한이 필요해요', box: 'bg-danger-subtle', text: 'text-danger dark:text-danger-dark' },
+  failed: {
+    title: '위치를 가져오지 못했어요 · 눌러서 다시 시도',
+    box: 'bg-danger-subtle',
+    text: 'text-danger dark:text-danger-dark',
+  },
 };
 
 function parseWorkType(workType: AttendanceWorkType) {
@@ -64,6 +68,7 @@ export default function Attendance() {
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number }>();
   const [invalidLocation, setInvalidLocation] = useState<boolean>(false);
   const [permissionDenied, setPermissionDenied] = useState<boolean>(false);
+  const [locationFailed, setLocationFailed] = useState<boolean>(false);
   const [currentAddress, setCurrentAddress] = useState<string>();
 
   // queries
@@ -165,7 +170,18 @@ export default function Attendance() {
       return;
     }
 
-    const location = await Location.getCurrentPositionAsync({});
+    setLocationFailed(false);
+
+    let location: Location.LocationObject;
+    try {
+      location = await Location.getCurrentPositionAsync({});
+    } catch (err) {
+      // 위치 서비스 꺼짐 / 타임아웃 — '확인 중'에 멈추지 않고 재시도할 수 있게 한다.
+      console.error('[Attendance] getCurrentPosition failed', err);
+      setLocationFailed(true);
+      return;
+    }
+
     Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude }).then(
       (addresses) => {
         for (const address of addresses) {
@@ -188,13 +204,12 @@ export default function Attendance() {
   const isAfterClockOut = !!today?.clockOutTime;
   const isBusy = isClockInLoading || isClockOutLoading;
 
-  const status: LocationStatus = permissionDenied
-    ? 'denied'
-    : !currentLocation
-      ? 'checking'
-      : invalidLocation
-        ? 'invalid'
-        : 'valid';
+  const status: LocationStatus = getLocationStatus({
+    permissionDenied,
+    failed: locationFailed,
+    hasLocation: !!currentLocation,
+    invalid: invalidLocation,
+  });
   const statusStyle = LOCATION_STATUS[status];
   const canSubmit = status === 'valid' && !isBusy && !isAfterClockOut;
 
@@ -243,7 +258,12 @@ export default function Attendance() {
       )}
 
       {/* location status */}
-      <View className={`mt-4 flex-row items-center gap-3 rounded-2xl p-3.5 ${statusStyle.box}`}>
+      <Pressable
+        accessibilityRole={status === 'failed' ? 'button' : undefined}
+        disabled={status !== 'failed'}
+        onPress={handleGetCurrentLocation}
+        className={`mt-4 flex-row items-center gap-3 rounded-2xl p-3.5 ${statusStyle.box}`}
+      >
         {status === 'checking' ? (
           <ActivityIndicator size="small" color={palette.muted} />
         ) : (
@@ -262,7 +282,7 @@ export default function Attendance() {
             </Text>
           ) : null}
         </View>
-      </View>
+      </Pressable>
 
       {/* time info */}
       {!isBeforeClockIn && (
