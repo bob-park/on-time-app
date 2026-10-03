@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
@@ -46,6 +46,14 @@ export default function MoreIndex() {
         .duration((dayjs().startOf('day').unix() - dayjs(employment.effectiveDate).unix()) * 1_000)
         .format('Y년 M개월')
     : '';
+
+  // handle
+  const handleLogout = () => {
+    Alert.alert('로그아웃할까요?', '다시 로그인해야 출퇴근을 기록할 수 있어요.', [
+      { text: '취소', style: 'cancel' },
+      { text: '로그아웃', style: 'destructive', onPress: () => onLogout() },
+    ]);
+  };
 
   return (
     <ScrollView
@@ -98,7 +106,7 @@ export default function MoreIndex() {
           accessibilityRole="button"
           hitSlop={12}
           className="min-h-11 justify-center px-4"
-          onPress={() => onLogout()}
+          onPress={handleLogout}
         >
           <Text className="text-danger dark:text-danger-dark text-[15px] font-semibold">로그아웃</Text>
         </Pressable>
