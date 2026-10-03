@@ -2,12 +2,11 @@ import { useContext } from 'react';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import '@/app/global.css';
-import { usePalette } from '@/shared/components/ui';
 import AnimateAppLoader from '@/shared/loader/app/AnimateAppLoader';
+import { AuthGuardStack } from '@/shared/navigation/AuthGuardStack';
 import AuthProvider, { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import I18nProvider from '@/shared/providers/i18n/I18nProvider';
 import NotificationProvider from '@/shared/providers/notification/NotificationProvider';
@@ -20,25 +19,7 @@ const RootStackLayout = () => {
   // context
   const { isLoggedIn } = useContext(AuthContext);
 
-  // hooks
-  const palette = usePalette();
-
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: palette.base },
-      }}
-    >
-      <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="(tabs)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" />
-        <Stack.Screen name="callback" />
-      </Stack.Protected>
-    </Stack>
-  );
+  return <AuthGuardStack isLoggedIn={isLoggedIn} />;
 };
 
 export default function RootLayout() {
