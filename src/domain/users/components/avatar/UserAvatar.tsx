@@ -16,7 +16,7 @@ export default function UserAvatar({ src, size = 'base', username }: Readonly<Us
 
   return (
     <View
-      className={cx('flex flex-col items-center justify-center rounded-2xl bg-black dark:bg-gray-300', {
+      className={cx('bg-brand-subtle flex flex-col items-center justify-center rounded-full', {
         'size-12': size === 'xs',
         'size-16': size === 'sm',
         'size-24': size === 'base',
@@ -26,14 +26,14 @@ export default function UserAvatar({ src, size = 'base', username }: Readonly<Us
     >
       {src && !isError ? (
         <Image
-          className="size-full rounded-2xl"
+          className="size-full rounded-full"
           source={{ uri: src }}
           alt="user-avatar"
           onError={() => setIsError(true)}
         />
       ) : (
         <Text
-          className={cx('font-extrabold text-white dark:text-black', {
+          className={cx('text-brand dark:text-brand-dark font-bold', {
             'text-xl': size === 'xs',
             'text-2xl': size === 'sm',
             'text-5xl': size === 'base',

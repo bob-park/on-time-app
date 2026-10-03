@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-10-03
+
+### Added
+- 홈 빠른 실행(휴가 신청 · 보상휴가 · 휴가 내역 · 알림)과 하단 고정 출근/퇴근 버튼: 앱을 열면 한 번의 탭으로 출퇴근
+- 휴가 신청 시 잔여 연차 세그먼트와 "신청 후 잔여" 미리보기(주말 제외, 반차 0.5일)
+- 공용 UI 컴포넌트 `Segmented` / `ChoiceChip` / `ListGroup·ListItem` / `QuickAction` / `Badge`, native prop 용 `usePalette()`
+- 로그아웃 확인 알림
+- 로그아웃 시 OAuth2 end session(`/connect/logout`) 호출 후 로그인 화면으로 이동 (template-expo-app 과 동일)
+
+### Changed
+- 프레임워크 업그레이드: Expo SDK 56 → 57 → 58(beta), React Native 0.88(RC), React 19.3, `react-native-css` 3.1.0-rc.0
+- NativeTabs import 경로를 `expo-router/native-tabs` 로 변경
+- 전체 UI를 Kraken 디자인 토큰(퍼플 `#7132f5`, 12px 버튼 · 16px 카드)으로 개편, 라이트/다크 모드 토큰 정비
+- 탭을 오늘 · 일정 · 더보기 3개로 정리 (빈 "할일" 탭 제거)
+- 출퇴근 입력을 바텀시트(formSheet)로 전환하고 위치 상태(확인 중/확인됨/반경 밖/권한 필요/실패)를 카드로 표시
+- 일정을 월 달력 + 내/동료 일정 세그먼트로 개편
+- 휴가 내역을 세그먼트 필터와 종류 배지로 개편, 더보기를 프로필 카드 + 설정 그룹으로 정리
+- 장난스러운 오류 문구를 명확한 안내 문구로 교체
+
+### Fixed
+- 로그인 직후 `/(tabs)/_layout.ios` 로 이동해 404 가 뜨던 문제 (`Stack.Protected` 에 `redirectTo` 명시)
+- 보상휴가가 아닌 휴가 신청에 보상휴가 항목이 함께 전송되던 문제
+- 위치 조회 실패 시 출퇴근 화면이 "확인 중" 에 멈추던 문제
+- `base` 색 토큰과 충돌해 `text-base` 글자 크기(16px)가 적용되지 않던 문제
+
 ## [1.2.0] - 2026-07-02
 
 ### Changed

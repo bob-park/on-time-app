@@ -69,8 +69,8 @@ export default function LoginPage() {
       <View className="flex flex-col items-center justify-center gap-2">
         <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
-        <Text className="text-brand text-4xl font-extrabold">On Time</Text>
-        <Text className="text-muted dark:text-muted-dark text-base">시간을 지키는 가장 쉬운 방법</Text>
+        <Text className="text-brand dark:text-brand-dark text-4xl font-bold tracking-tight">On Time</Text>
+        <Text className="text-muted dark:text-muted-dark text-[16px]">시간을 지키는 가장 쉬운 방법</Text>
       </View>
 
       <View className="w-[80%]">
@@ -82,9 +82,9 @@ export default function LoginPage() {
           }}
           icon={
             isLoggingIn ? (
-              <ActivityIndicator size="small" color="#000000" />
+              <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <MaterialIcons name="login" size={20} color="#000000" />
+              <MaterialIcons name="login" size={20} color="#ffffff" />
             )
           }
         />

@@ -1,35 +1,45 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { ActivityIndicator, Alert, Linking, Modal, Text, TouchableOpacity, View } from 'react-native';
-import Reanimated from 'react-native-reanimated';
+import { ActivityIndicator, Alert, Linking, Pressable, Text, View } from 'react-native';
 
-import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 
-import { Entypo, FontAwesome, FontAwesome6, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-
-import SplashLottie from '@/assets/lotties/splash-lottie.json';
-import WalkLottie from '@/assets/lotties/walk.json';
-import WorkingLottie from '@/assets/lotties/working-logo.json';
 import { endWorkActivity, startWorkActivity } from '@/domain/attendances/liveActivity';
+import { type LocationStatus, getLocationStatus } from '@/domain/attendances/locationStatus';
 import { useAttendanceLocations } from '@/domain/attendances/queries/attendanceGps';
 import { useClockIn, useClockOut, useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
-import Loading from '@/shared/components/loading/Loading';
-import { enterHero, enterPage } from '@/shared/components/motion/entering';
-import { Button, Card, StatusPill } from '@/shared/components/ui';
+import { Icon } from '@/shared/components/Icon';
+import { Button, ChoiceChip, usePalette } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { NotificationContext } from '@/shared/providers/notification/NotificationProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 import { isSameMarginOfError } from '@/utils/dataUtils';
-import { getDaysOfWeek, round } from '@/utils/parse';
+import { round } from '@/utils/parse';
 
-import cx from 'classnames';
-import LottieView from 'lottie-react-native';
-
-const WEEKEND_DAYS = [0, 6];
 const TABULAR = { fontVariant: ['tabular-nums' as const] };
+
+const WORK_TYPES: { key: AttendanceWorkType; label: string; sf: string; fallback: string }[] = [
+  { key: 'OFFICE', label: '사무실', sf: 'building.2', fallback: '🏢' },
+  { key: 'OUTSIDE', label: '외근', sf: 'car', fallback: '🚗' },
+  { key: 'HOME', label: '재택', sf: 'house', fallback: '🏠' },
+];
+
+const LOCATION_STATUS: Record<LocationStatus, { title: string; box: string; text: string }> = {
+  checking: {
+    title: '위치를 확인하는 중...',
+    box: 'bg-elevated dark:bg-elevated-dark',
+    text: 'text-muted dark:text-muted-dark',
+  },
+  valid: { title: '위치 확인됨', box: 'bg-success-subtle', text: 'text-success-strong dark:text-success' },
+  invalid: { title: '근무지 반경 밖이에요', box: 'bg-danger-subtle', text: 'text-danger dark:text-danger-dark' },
+  denied: { title: '위치 권한이 필요해요', box: 'bg-danger-subtle', text: 'text-danger dark:text-danger-dark' },
+  failed: {
+    title: '위치를 가져오지 못했어요 · 눌러서 다시 시도',
+    box: 'bg-danger-subtle',
+    text: 'text-danger dark:text-danger-dark',
+  },
+};
 
 function parseWorkType(workType: AttendanceWorkType) {
   switch (workType) {
@@ -44,56 +54,21 @@ function parseWorkType(workType: AttendanceWorkType) {
   }
 }
 
-const InvalidLocationModal = ({
-  show,
-  address,
-  onClose,
-}: Readonly<{ show: boolean; address?: string; onClose: () => void }>) => {
-  return (
-    <Modal visible={show} animationType="fade" transparent onRequestClose={onClose}>
-      <BlurView className="relative flex h-screen w-screen flex-col items-center justify-center" tint="dark">
-        {/* outside */}
-        <TouchableOpacity className="absolute top-0 left-0 h-screen w-screen" activeOpacity={1} onPress={onClose} />
-
-        {/* message */}
-        <View
-          className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark w-80 rounded-3xl border p-5"
-          style={{
-            shadowColor: '#000000',
-            shadowOpacity: 0.15,
-            shadowOffset: { width: 0, height: 8 },
-            shadowRadius: 16,
-          }}
-        >
-          {/* header */}
-          <StatusPill label="잘못된 위치" tone="danger" />
-
-          {/* message */}
-          <Text className="text-content dark:text-content-dark mt-4 text-lg font-bold">사무실 아닌디??</Text>
-          <Text className="text-muted dark:text-muted-dark mt-1 text-sm">
-            현재 위치가 등록된 근무지와 달라요. 위치를 다시 확인해 주세요.
-          </Text>
-
-          {/* action */}
-          <View className="mt-6 self-end">
-            <Button variant="secondary" label="닫기" onPress={onClose} />
-          </View>
-        </View>
-      </BlurView>
-    </Modal>
-  );
-};
-
 export default function Attendance() {
   // context
-  const { theme } = useContext(ThemeContext);
   const { showToast } = useContext(NotificationContext);
 
+  // hooks
+  const router = useRouter();
+  const palette = usePalette();
+
   // state
+  const [now, setNow] = useState(() => dayjs());
   const [workType, setWorkType] = useState<AttendanceWorkType>('OFFICE');
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number }>();
-  const [showInvalidModal, setShowInalidModal] = useState<boolean>(false);
   const [invalidLocation, setInvalidLocation] = useState<boolean>(false);
+  const [permissionDenied, setPermissionDenied] = useState<boolean>(false);
+  const [locationFailed, setLocationFailed] = useState<boolean>(false);
   const [currentAddress, setCurrentAddress] = useState<string>();
 
   // queries
@@ -102,6 +77,7 @@ export default function Attendance() {
   const { clockIn, isLoading: isClockInLoading } = useClockIn({
     onSuccess: (data) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      router.back();
 
       showToast({
         title: '출근 완료',
@@ -121,6 +97,7 @@ export default function Attendance() {
   const { clockOut, isLoading: isClockOutLoading } = useClockOut({
     onSuccess: (data) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      router.back();
 
       showToast({
         title: '퇴근 완료',
@@ -132,10 +109,12 @@ export default function Attendance() {
     },
   });
 
-  // hooks
-  const router = useRouter();
-
   // useEffect
+  useEffect(() => {
+    const intervalId = setInterval(() => setNow(dayjs()), 10_000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   useEffect(() => {
     handleGetCurrentLocation();
   }, []);
@@ -178,37 +157,31 @@ export default function Attendance() {
     };
   }, [workType, currentLocation, locations]);
 
-  useEffect(() => {
-    invalidLocation && setShowInalidModal(true);
-  }, [invalidLocation]);
-
   // handle
   const handleGetCurrentLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
-      Alert.alert('Location permission not granted.', 'Please grant location permissions.', [
-        {
-          text: 'Open Settings',
-          onPress: async () => {
-            await Linking.openSettings();
-          },
-        },
-        {
-          text: 'Cancel',
-        },
+      setPermissionDenied(true);
+      Alert.alert('위치 권한이 필요해요', '출퇴근 기록을 위해 설정에서 위치 권한을 허용해 주세요.', [
+        { text: '설정 열기', onPress: () => Linking.openSettings() },
+        { text: '취소' },
       ]);
-
-      try {
-        await Location.getBackgroundPermissionsAsync();
-      } catch (error) {
-        console.error(error);
-        return;
-      }
       return;
     }
 
-    const location = await Location.getCurrentPositionAsync({});
+    setLocationFailed(false);
+
+    let location: Location.LocationObject;
+    try {
+      location = await Location.getCurrentPositionAsync({});
+    } catch (err) {
+      // 위치 서비스 꺼짐 / 타임아웃 — '확인 중'에 멈추지 않고 재시도할 수 있게 한다.
+      console.error('[Attendance] getCurrentPosition failed', err);
+      setLocationFailed(true);
+      return;
+    }
+
     Location.reverseGeocodeAsync({ latitude: location.coords.latitude, longitude: location.coords.longitude }).then(
       (addresses) => {
         for (const address of addresses) {
@@ -216,9 +189,7 @@ export default function Attendance() {
         }
       },
     );
-    setTimeout(() => {
-      setCurrentLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
-    }, 1_000);
+    setCurrentLocation({ latitude: location.coords.latitude, longitude: location.coords.longitude });
   };
 
   const handleClockIn = () => {
@@ -229,202 +200,116 @@ export default function Attendance() {
     today && currentLocation && clockOut({ ...currentLocation, attendanceRecordId: today.id });
   };
 
-  if (!currentLocation) {
-    return <Loading />;
-  }
-
-  // icon color tokens (mode-safe)
-  const brandColor = '#1ed760';
-  const dangerColor = theme === 'light' ? '#e0455a' : '#f3727f';
-  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
-
-  const weekdayColor =
-    dayjs().day() === 0
-      ? 'text-danger dark:text-danger-dark'
-      : dayjs().day() === 6
-        ? 'text-blue-500 dark:text-blue-300'
-        : 'text-muted dark:text-muted-dark';
-
   const isBeforeClockIn = !today?.clockInTime;
   const isAfterClockOut = !!today?.clockOutTime;
+  const isBusy = isClockInLoading || isClockOutLoading;
 
-  const WORK_TYPES: { key: AttendanceWorkType; label: string; icon: (active: boolean) => React.ReactNode }[] = [
-    {
-      key: 'OFFICE',
-      label: '사무실',
-      icon: (active) => (
-        <MaterialCommunityIcons name="office-building-outline" size={18} color={active ? '#000000' : contentColor} />
-      ),
-    },
-    {
-      key: 'OUTSIDE',
-      label: '외근',
-      icon: (active) => <FontAwesome name="car" size={18} color={active ? '#000000' : contentColor} />,
-    },
-    {
-      key: 'HOME',
-      label: '재택근무',
-      icon: (active) => <Ionicons name="home-sharp" size={18} color={active ? '#000000' : contentColor} />,
-    },
-  ];
+  const status: LocationStatus = getLocationStatus({
+    permissionDenied,
+    failed: locationFailed,
+    hasLocation: !!currentLocation,
+    invalid: invalidLocation,
+  });
+  const statusStyle = LOCATION_STATUS[status];
+  const canSubmit = status === 'valid' && !isBusy && !isAfterClockOut;
+
+  const title = isBeforeClockIn ? '출근하기' : isAfterClockOut ? '근무 완료' : '퇴근하기';
 
   return (
-    <>
-      <View className="bg-base dark:bg-base-dark flex-1">
-        {/* header — 다른 서브페이지와 동일 패턴 */}
-        <View className="relative mb-2 flex flex-row items-center justify-center">
-          <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-            <Entypo name="chevron-left" size={30} color={contentColor} />
-          </TouchableOpacity>
-          <Text className="text-content dark:text-content-dark text-xl font-bold">
-            {isBeforeClockIn ? '출근' : isAfterClockOut ? '근무 완료' : '퇴근'}
-          </Text>
-        </View>
-
-        {/* today — 숫자가 주인공 */}
-        <Reanimated.View entering={enterHero(40)} className="mt-2">
-          <Text className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wider uppercase">오늘</Text>
-          <View className="mt-1 flex flex-row items-baseline gap-2">
-            <Text className="text-content dark:text-content-dark text-[32px] leading-none font-bold" style={TABULAR}>
-              {dayjs().format('M월 D일')}
-            </Text>
-            <Text className={cx('text-lg font-semibold', weekdayColor)}>{getDaysOfWeek(dayjs().day())}</Text>
-          </View>
-        </Reanimated.View>
-
-        {/* select work type — pill segment group */}
-        <Reanimated.View entering={enterPage(140)} className="mt-8">
-          <Text className="text-muted dark:text-muted-dark mb-3 text-xs font-bold tracking-wider uppercase">
-            근무 위치
-          </Text>
-          <View className="flex flex-row items-center gap-2">
-            {WORK_TYPES.map((option) => {
-              const isActive = workType === option.key;
-              const disabled = today?.status !== 'WAITING';
-
-              return (
-                <TouchableOpacity
-                  key={option.key}
-                  className={cx(
-                    'h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-full',
-                    isActive ? 'bg-brand' : 'bg-elevated dark:bg-elevated-dark',
-                    disabled && !isActive && 'opacity-50',
-                  )}
-                  disabled={isActive || disabled}
-                  onPress={() => setWorkType(option.key)}
-                >
-                  {option.icon(isActive)}
-                  <Text
-                    className={cx('text-sm font-bold', {
-                      'text-black': isActive,
-                      'text-content dark:text-content-dark': !isActive,
-                    })}
-                  >
-                    {option.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </Reanimated.View>
-
-        {/* GPS / location status */}
-        <Reanimated.View entering={enterPage(180)} className="mt-4">
-          <Card className={invalidLocation ? 'border-danger dark:border-danger-dark' : 'border-brand'}>
-            <View className="flex-row items-center gap-3">
-              <View className="bg-elevated dark:bg-elevated-dark size-10 items-center justify-center rounded-full">
-                <Ionicons name="location" size={20} color={invalidLocation ? dangerColor : brandColor} />
-              </View>
-              <View className="flex-1">
-                <StatusPill
-                  label={invalidLocation ? '위치 확인 필요' : '위치 확인됨'}
-                  tone={invalidLocation ? 'danger' : 'brand'}
-                />
-                <Text className="text-content dark:text-content-dark mt-1.5 text-sm font-semibold" numberOfLines={1}>
-                  {currentAddress ?? '위치를 확인하는 중...'}
-                </Text>
-              </View>
-            </View>
-          </Card>
-        </Reanimated.View>
-
-        {/* animation + time info */}
-        <Reanimated.View entering={enterPage(220)} className="mt-6 flex-1">
-          {/* Lottie */}
-          <View className="items-center">
-            {isBeforeClockIn ? (
-              <LottieView style={{ width: 160, height: 160 }} source={SplashLottie} autoPlay loop />
-            ) : isAfterClockOut ? (
-              <LottieView style={{ width: 160, height: 160 }} source={WalkLottie} autoPlay loop />
-            ) : (
-              <LottieView style={{ width: 160, height: 160 }} source={WorkingLottie} autoPlay loop />
-            )}
-          </View>
-
-          {/* time info — 라벨 ↔ 값 정렬 */}
-          {!isBeforeClockIn && (
-            <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark mt-2 overflow-hidden rounded-3xl border">
-              <TimeInfoRow label="출근 시간" value={dayjs(today?.clockInTime).format('YYYY.M.D · A hh:mm')} />
-              <View className="border-border dark:border-border-dark ml-4 border-b" />
-              <TimeInfoRow label="목표 퇴근" value={dayjs(today?.leaveWorkAt).format('YYYY.M.D · A hh:mm')} />
-              {isAfterClockOut && (
-                <>
-                  <View className="border-border dark:border-border-dark ml-4 border-b" />
-                  <TimeInfoRow label="퇴근 시간" value={dayjs(today?.clockOutTime).format('YYYY.M.D · A hh:mm')} />
-                </>
-              )}
-            </View>
-          )}
-        </Reanimated.View>
-
-        {/* CTA — 썸-존 하단 배치, 전체 폭 */}
-        <Reanimated.View entering={enterPage(320)} className="pt-4 pb-28">
-          {isBeforeClockIn ? (
-            <Button
-              variant="primary"
-              label="출근하기"
-              disabled={isClockInLoading || invalidLocation || !currentLocation}
-              onPress={handleClockIn}
-              icon={
-                isClockInLoading ? (
-                  <ActivityIndicator size="small" color="#000000" />
-                ) : (
-                  <MaterialCommunityIcons name="video-input-antenna" size={20} color="#000000" />
-                )
-              }
-            />
-          ) : (
-            <Button
-              variant="primary"
-              label={isAfterClockOut ? '퇴근' : '퇴근하기'}
-              disabled={isClockOutLoading || !currentLocation || invalidLocation || isAfterClockOut}
-              onPress={handleClockOut}
-              icon={
-                isClockOutLoading ? (
-                  <ActivityIndicator size="small" color="#000000" />
-                ) : isAfterClockOut ? (
-                  <FontAwesome6 name="dragon" size={20} color="#000000" />
-                ) : (
-                  <Ionicons name="bus-outline" size={20} color="#000000" />
-                )
-              }
-            />
-          )}
-        </Reanimated.View>
+    <View className="flex-1 pb-8">
+      {/* header */}
+      <View className="flex-row items-center justify-between">
+        <Text className="text-content dark:text-content-dark text-lg font-bold">{title}</Text>
+        <Text className="text-muted dark:text-muted-dark text-xs">{now.format('M월 D일 dddd')}</Text>
       </View>
-      <InvalidLocationModal
-        show={showInvalidModal}
-        address={currentAddress}
-        onClose={() => setShowInalidModal(false)}
-      />
-    </>
+      <Text
+        className="text-content dark:text-content-dark mt-3 text-[40px] leading-none font-bold tracking-tighter"
+        style={TABULAR}
+      >
+        {now.format('HH:mm')}
+      </Text>
+
+      {/* work type */}
+      {isBeforeClockIn && (
+        <>
+          <Text className="text-muted dark:text-muted-dark mt-6 mb-2 text-[11px] font-semibold tracking-wider">
+            근무 형태
+          </Text>
+          <View className="flex-row gap-2">
+            {WORK_TYPES.map((option) => (
+              <ChoiceChip
+                key={option.key}
+                label={option.label}
+                selected={workType === option.key}
+                disabled={today?.status !== 'WAITING'}
+                icon={
+                  <Icon
+                    sf={option.sf}
+                    fallback={option.fallback}
+                    size={15}
+                    color={workType === option.key ? palette.brand : palette.content}
+                  />
+                }
+                onPress={() => setWorkType(option.key)}
+              />
+            ))}
+          </View>
+        </>
+      )}
+
+      {/* location status */}
+      <Pressable
+        accessibilityRole={status === 'failed' ? 'button' : undefined}
+        disabled={status !== 'failed'}
+        onPress={handleGetCurrentLocation}
+        className={`mt-4 flex-row items-center gap-3 rounded-2xl p-3.5 ${statusStyle.box}`}
+      >
+        {status === 'checking' ? (
+          <ActivityIndicator size="small" color={palette.muted} />
+        ) : (
+          <Icon
+            sf="location.fill"
+            fallback="📍"
+            size={18}
+            color={status === 'valid' ? palette.success : palette.danger}
+          />
+        )}
+        <View className="flex-1">
+          <Text className={`text-[13px] font-bold ${statusStyle.text}`}>{statusStyle.title}</Text>
+          {currentAddress ? (
+            <Text className="text-muted dark:text-muted-dark mt-0.5 text-xs" numberOfLines={1}>
+              {currentAddress}
+            </Text>
+          ) : null}
+        </View>
+      </Pressable>
+
+      {/* time info */}
+      {!isBeforeClockIn && (
+        <View className="mt-4 gap-2">
+          <TimeInfoRow label="출근 시간" value={today?.clockInTime ? dayjs(today.clockInTime).format('HH:mm') : '-'} />
+          <TimeInfoRow label="목표 퇴근" value={today?.leaveWorkAt ? dayjs(today.leaveWorkAt).format('HH:mm') : '-'} />
+          {isAfterClockOut && <TimeInfoRow label="퇴근 시간" value={dayjs(today?.clockOutTime).format('HH:mm')} />}
+        </View>
+      )}
+
+      {/* CTA */}
+      <View className="mt-auto pt-4">
+        <Button
+          label={isAfterClockOut ? '퇴근 완료' : title}
+          disabled={!canSubmit}
+          onPress={isBeforeClockIn ? handleClockIn : handleClockOut}
+          icon={isBusy ? <ActivityIndicator size="small" color="#ffffff" /> : undefined}
+        />
+      </View>
+    </View>
   );
 }
 
 function TimeInfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <View className="flex-row items-center justify-between px-4 py-3.5">
-      <Text className="text-muted dark:text-muted-dark text-sm font-semibold">{label}</Text>
+    <View className="flex-row items-center justify-between">
+      <Text className="text-muted dark:text-muted-dark text-sm">{label}</Text>
       <Text className="text-content dark:text-content-dark text-sm font-bold" style={TABULAR}>
         {value}
       </Text>

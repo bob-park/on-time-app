@@ -1,16 +1,14 @@
-import { useContext } from 'react';
-
-import { View, useColorScheme } from 'react-native';
+import { View } from 'react-native';
 
 import { Stack } from 'expo-router';
 
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
+import { usePalette } from '@/shared/components/ui';
 
 export default function MoreLayout() {
-  const colorScheme = useColorScheme();
+  const palette = usePalette();
 
   return (
-    <View className="flex size-full bg-gray-50 dark:bg-gray-950">
+    <View className="bg-base dark:bg-base-dark flex size-full">
       <Stack
         screenOptions={{
           headerShown: false,
@@ -19,7 +17,7 @@ export default function MoreLayout() {
             paddingRight: 16,
             paddingTop: 68,
             paddingBottom: 12,
-            backgroundColor: colorScheme === 'light' ? '#f9fafb' : '#030712',
+            backgroundColor: palette.base,
           },
         }}
       />

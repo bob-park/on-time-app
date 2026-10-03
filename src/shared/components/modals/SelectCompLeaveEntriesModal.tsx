@@ -6,10 +6,9 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import NoDataLottie from '@/assets/lotties/no-data.json';
 import { useUserCompLeaveEntries } from '@/domain/users/queries/usersCompLeaveEntries';
-import { Button } from '@/shared/components/ui';
+import { Button, usePalette } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
 import { AuthContext } from '@/shared/providers/auth/AuthProvider';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import cx from 'classnames';
@@ -21,7 +20,7 @@ const NoData = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-muted dark:text-muted-dark text-lg font-extrabold">보상 휴가가 없어요..</Text>
+        <Text className="text-muted dark:text-muted-dark text-lg font-extrabold">사용할 수 있는 보상휴가가 없어요</Text>
       </View>
     </View>
   );
@@ -40,7 +39,7 @@ export default function SelectCompLeaveEntriesModal({
 }: Readonly<SelectCompLeaveEntriesModalProps>) {
   // context
   const { userinfo: userDetail } = useContext(AuthContext);
-  const { theme } = useContext(ThemeContext);
+  const palette = usePalette();
 
   // state
   const [selectedEntries, setSelectedEntries] = useState<UserCompLeaveEntry[]>([]);
@@ -49,7 +48,7 @@ export default function SelectCompLeaveEntriesModal({
   const { compLeaveEntries } = useUserCompLeaveEntries({ userUniqueId: userDetail?.sub });
 
   // mode-safe raw colors
-  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
+  const contentColor = palette.content;
 
   // handle
   const handleSelect = () => {
@@ -127,7 +126,7 @@ const CompLeaveEntry = ({
   onToggle?: (id: number) => void;
 }>) => {
   // context
-  const { theme } = useContext(ThemeContext);
+  const palette = usePalette();
 
   // handle
   const handleToggle = () => {
@@ -139,19 +138,19 @@ const CompLeaveEntry = ({
       <TouchableOpacity
         className={cx('flex w-full flex-row items-start gap-2 rounded-2xl border px-4 py-4', {
           'border-border bg-surface dark:border-border-dark dark:bg-surface-dark': !selected,
-          'border-brand bg-surface dark:bg-surface-dark': selected,
+          'border-brand dark:border-brand-dark bg-surface dark:bg-surface-dark': selected,
         })}
         onPress={handleToggle}
       >
         <View className="mt-2 w-12 flex-none">
-          <Feather name="calendar" size={24} color="#1ed760" />
+          <Feather name="calendar" size={24} color={palette.brand} />
         </View>
         <View className="flex-1">
           <View className="flex flex-col items-center gap-2">
             <Text
-              className="text-content dark:text-content-dark w-full text-base font-semibold"
+              className="text-content dark:text-content-dark w-full text-[16px] font-semibold"
               numberOfLines={2}
-              lineBreakMode="tail"
+              ellipsizeMode="tail"
             >
               {entry.contents}
             </Text>
@@ -177,7 +176,7 @@ const CompLeaveEntry = ({
           <MaterialCommunityIcons
             name={selected ? 'checkbox-marked' : 'checkbox-blank-outline'}
             size={24}
-            color={selected ? '#1ed760' : theme === 'light' ? '#8a8f99' : 'rgba(255,255,255,0.5)'}
+            color={selected ? palette.brand : palette.muted}
           />
         </View>
       </TouchableOpacity>

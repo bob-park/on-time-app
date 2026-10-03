@@ -34,14 +34,14 @@ function AnimatedSplashScreen({ children }: Readonly<{ children: React.ReactNode
         children
       ) : (
         <Animated.View
-          className={cx('flex size-full flex-col items-center justify-center bg-white dark:bg-black')}
+          className={cx('bg-base dark:bg-base-dark flex size-full flex-col items-center justify-center')}
           style={{ opacity: animation }}
           pointerEvents="none"
         >
           <LottieView style={{ width: 150, height: 150 }} source={SplashLottie} autoPlay loop />
 
           <View className="">
-            <Text className="text-4xl font-bold text-blue-500 dark:text-blue-300">On Time</Text>
+            <Text className="text-brand dark:text-brand-dark text-4xl font-bold tracking-tight">On Time</Text>
           </View>
         </Animated.View>
       )}

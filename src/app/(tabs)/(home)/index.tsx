@@ -1,500 +1,72 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
-import { Animated, RefreshControl, ScrollView, Text, View } from 'react-native';
-import Reanimated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-
+import { HomeHero, type RemainingTime } from '@/domain/attendances/components/HomeHero';
 import { syncWorkActivity, updateWorkActivity } from '@/domain/attendances/liveActivity';
 import { useTodayAttendance } from '@/domain/attendances/queries/attendanceRecord';
+import { OVERTIME_GRACE_MINUTES, getHomeCta, getWorkState } from '@/domain/attendances/workState';
+import { useVacations } from '@/domain/documents/queries/vacations';
 import { useNotificationHistories } from '@/domain/notification/queries/userNotification';
-import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
+import { useUserLeaveEntry } from '@/domain/users/queries/users';
+import { Icon } from '@/shared/components/Icon';
 import { enterHero, enterPage } from '@/shared/components/motion/entering';
-import { Button, ProgressBar, StatTile, StatusPill } from '@/shared/components/ui';
+import { Button, QuickAction, usePalette } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
-import { isIncludeTime } from '@/utils/dataUtils';
-import { getDaysOfWeek, getDuration, parseTimeFormat } from '@/utils/parse';
+import { AuthContext } from '@/shared/providers/auth/AuthProvider';
 import { TimeCode } from '@/utils/timecode/TimeCode';
 
-const ONE_HOUR = 3_600;
 const WEEKEND_DAYS = [0, 6];
-const TABULAR = { fontVariant: ['tabular-nums' as const] };
-// '초과근무' 상태는 목표 퇴근시각을 지난 즉시가 아니라 30분을 초과한 시점부터 진입한다.
-const OVERTIME_GRACE_MINUTES = 30;
-
-type WorkState = 'before' | 'working' | 'overtime' | 'done';
-
-function getWorkState(today: any): WorkState {
-  if (!today?.clockInTime) return 'before';
-  if (today?.clockOutTime) return 'done';
-  if (today?.leaveWorkAt && dayjs(today.leaveWorkAt).add(OVERTIME_GRACE_MINUTES, 'minute').unix() - dayjs().unix() < 0)
-    return 'overtime';
-  return 'working';
-}
-
-// Hero Card - State A: 출근 전
-function HeroBeforeWork({ today }: { today: any }) {
-  const router = useRouter();
-
-  const targetLeave = today?.leaveWorkAt ? dayjs(today.leaveWorkAt).format('HH:mm') : '18:00';
-
-  return (
-    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-5">
-      <StatusPill label="출근 전" tone="muted" />
-
-      <Text className="text-muted dark:text-muted-dark mt-4 text-sm">아직 출근 전이에요</Text>
-      <Text className="text-content dark:text-content-dark mt-1 text-3xl font-extrabold">오늘도 화이팅!</Text>
-
-      {/* times — secondary */}
-      <View className="mt-6 flex-row gap-8">
-        <View className="gap-1">
-          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
-            예정 출근
-          </Text>
-          <Text className="text-content dark:text-content-dark text-base font-bold" style={TABULAR}>
-            09:00
-          </Text>
-        </View>
-        <View className="gap-1">
-          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
-            목표 퇴근
-          </Text>
-          <Text className="text-content dark:text-content-dark text-base font-bold" style={TABULAR}>
-            {targetLeave}
-          </Text>
-        </View>
-      </View>
-
-      {/* CTA */}
-      <View className="mt-6">
-        <Button label="출근 입력" onPress={() => router.push('./attendance')} />
-      </View>
-    </View>
-  );
-}
-
-// Hero Card - Weekend: 주말 (출근 가능)
-function HeroWeekend() {
-  const router = useRouter();
-
-  return (
-    <View className="border-border bg-surface dark:border-border-dark dark:bg-surface-dark rounded-3xl border p-5">
-      <StatusPill label="주말" tone="muted" />
-
-      <Text className="text-muted dark:text-muted-dark mt-4 text-sm">오늘은 주말이에요</Text>
-      <Text className="text-content dark:text-content-dark mt-1 text-3xl font-extrabold">푹 쉬세요</Text>
-
-      <Text className="text-muted dark:text-muted-dark mt-6 text-[13px] leading-relaxed">
-        출근이 필요하면{'\n'}아래 버튼을 눌러주세요
-      </Text>
-
-      {/* CTA */}
-      <View className="mt-6">
-        <Button label="출근 입력" onPress={() => router.push('./attendance')} />
-      </View>
-    </View>
-  );
-}
-
-// Hero Card - State B: 근무 중
-function HeroWorking({
-  today,
-  remainingTime,
-}: {
-  today: any;
-  remainingTime: { isOvertime: boolean; time: TimeCode | false };
-}) {
-  const router = useRouter();
-
-  const clockInTime = today?.clockInTime ? dayjs(today.clockInTime) : null;
-  const leaveWorkAt = today?.leaveWorkAt ? dayjs(today.leaveWorkAt) : null;
-
-  const progress = useMemo(() => {
-    if (!clockInTime || !leaveWorkAt) return 0;
-    const total = leaveWorkAt.unix() - clockInTime.unix();
-    const elapsed = dayjs().unix() - clockInTime.unix();
-    return Math.min(Math.max((elapsed / total) * 100, 0), 100);
-  }, [clockInTime, leaveWorkAt, remainingTime]);
-
-  // smoothly animate the progress bar width instead of snapping on every tick
-  const progressSv = useSharedValue(0);
-  useEffect(() => {
-    progressSv.value = withTiming(progress, { duration: 600, easing: Easing.bezier(0.25, 1, 0.5, 1) });
-  }, [progress, progressSv]);
-  const progressStyle = useAnimatedStyle(() => ({ width: `${progressSv.value}%` }));
-
-  // subtle breathing pulse on the "working" status dot
-  const pulse = useSharedValue(1);
-  useEffect(() => {
-    pulse.value = withRepeat(
-      withSequence(
-        withTiming(0.6, { duration: 900, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 900, easing: Easing.inOut(Easing.ease) }),
-      ),
-      -1,
-      false,
-    );
-  }, [pulse]);
-  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
-
-  const remainingLabel = remainingTime.time
-    ? `${remainingTime.time.formatHours.padStart(2, '0')}:${remainingTime.time.formatMinutes.padStart(2, '0')}`
-    : '';
-
-  return (
-    <View className="border-brand bg-surface dark:bg-surface-dark rounded-3xl border p-5">
-      {/* status pill — animated pulse dot (근무중) */}
-      <View className="bg-elevated dark:bg-elevated-dark flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1">
-        <Reanimated.View className="bg-brand size-2 rounded-full" style={pulseStyle} />
-        <Text className="text-brand text-xs font-bold">근무중</Text>
-      </View>
-
-      {/* hero — 남은시간 숫자가 주인공 */}
-      <View className="mt-4 flex-row items-end justify-between">
-        <View>
-          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
-            남은 시간
-          </Text>
-          <Text className="text-brand mt-1 text-6xl leading-none font-extrabold" style={TABULAR}>
-            {remainingLabel}
-          </Text>
-        </View>
-        <View className="items-end">
-          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
-            목표 퇴근
-          </Text>
-          <Text className="text-content dark:text-content-dark mt-1 text-lg font-bold" style={TABULAR}>
-            {leaveWorkAt?.format('HH:mm')}
-          </Text>
-        </View>
-      </View>
-
-      {/* progress — width animated smoothly across ticks (styled like ProgressBar) */}
-      <View className="mt-5">
-        <View className="bg-elevated dark:bg-elevated-dark h-1.5 overflow-hidden rounded-full">
-          <Reanimated.View className="bg-brand h-full rounded-full" style={progressStyle} />
-        </View>
-        <View className="mt-2 flex-row justify-between">
-          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
-            {clockInTime?.format('HH:mm')} 출근
-          </Text>
-          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
-            {Math.round(progress)}% 완료
-          </Text>
-        </View>
-      </View>
-
-      {/* CTA */}
-      <View className="mt-5">
-        <Button label="퇴근 입력" onPress={() => router.push('./attendance')} />
-      </View>
-    </View>
-  );
-}
-
-// Hero Card - State B Overtime: 초과근무
-function HeroOvertime({
-  today,
-  remainingTime,
-}: {
-  today: any;
-  remainingTime: { isOvertime: boolean; time: TimeCode | false };
-}) {
-  const router = useRouter();
-
-  const clockInTime = today?.clockInTime ? dayjs(today.clockInTime) : null;
-  const leaveWorkAt = today?.leaveWorkAt ? dayjs(today.leaveWorkAt) : null;
-
-  const overtimeLabel = remainingTime.time
-    ? `+${remainingTime.time.formatHours.padStart(2, '0')}:${remainingTime.time.formatMinutes.padStart(2, '0')}`
-    : '';
-
-  return (
-    <View className="border-danger bg-surface dark:border-danger-dark dark:bg-surface-dark rounded-3xl border p-5">
-      <StatusPill label="초과" tone="danger" />
-
-      {/* hero — 초과시간 숫자가 주인공 */}
-      <View className="mt-4 flex-row items-end justify-between">
-        <View>
-          <Text className="text-danger dark:text-danger-dark text-[11px] font-semibold tracking-wider uppercase">
-            초과 근무
-          </Text>
-          <Text className="text-danger dark:text-danger-dark mt-1 text-6xl leading-none font-extrabold" style={TABULAR}>
-            {overtimeLabel}
-          </Text>
-        </View>
-        <View className="items-end">
-          <Text className="text-muted dark:text-muted-dark text-[11px] font-semibold tracking-wider uppercase">
-            목표 퇴근
-          </Text>
-          <Text className="text-content dark:text-content-dark mt-1 text-lg font-bold" style={TABULAR}>
-            {leaveWorkAt?.format('HH:mm')}
-          </Text>
-        </View>
-      </View>
-
-      {/* progress — overflow (100%, danger) */}
-      <View className="mt-5">
-        <ProgressBar progress={100} tone="danger" />
-        <View className="mt-2 flex-row justify-between">
-          <Text className="text-muted dark:text-muted-dark text-[11px]" style={TABULAR}>
-            {clockInTime?.format('HH:mm')} 출근
-          </Text>
-          <Text className="text-danger dark:text-danger-dark text-[11px] font-semibold" style={TABULAR}>
-            {leaveWorkAt?.format('HH:mm')} 초과
-          </Text>
-        </View>
-      </View>
-
-      {/* CTA */}
-      <View className="mt-5">
-        <Button label="퇴근 입력" onPress={() => router.push('./attendance')} />
-      </View>
-    </View>
-  );
-}
-
-// Hero Card - State C: 퇴근 후
-function HeroDone({ today }: { today: any }) {
-  const clockInTime = today?.clockInTime ? dayjs(today.clockInTime) : null;
-  const clockOutTime = today?.clockOutTime ? dayjs(today.clockOutTime) : null;
-  const leaveWorkAt = today?.leaveWorkAt ? dayjs(today.leaveWorkAt) : null;
-
-  const isOvertime = !!(
-    clockOutTime &&
-    leaveWorkAt &&
-    clockOutTime.unix() > leaveWorkAt.add(OVERTIME_GRACE_MINUTES, 'minute').unix()
-  );
-  const overtimeSec = isOvertime ? clockOutTime!.unix() - leaveWorkAt!.unix() : 0;
-  const overtimeText = isOvertime ? new TimeCode(overtimeSec) : null;
-
-  const workDurations = today?.clockInTime && today?.clockOutTime && getDuration(today.clockInTime, today.clockOutTime);
-  const durationText = workDurations
-    ? parseTimeFormat(
-        workDurations -
-          (workDurations > ONE_HOUR * 8 ||
-          isIncludeTime(
-            {
-              from: today?.clockInTime || dayjs(today?.workingDate).hour(0).toDate(),
-              to: today?.clockOutTime || dayjs(today?.workingDate).hour(0).toDate(),
-            },
-            dayjs(today?.workingDate).hour(12).toDate(),
-          )
-            ? ONE_HOUR
-            : 0),
-      )
-    : '';
-
-  return (
-    <View
-      className={`bg-surface dark:bg-surface-dark rounded-3xl border p-5 ${isOvertime ? 'border-danger dark:border-danger-dark' : 'border-border dark:border-border-dark'}`}
-    >
-      <StatusPill label={isOvertime ? '초과' : '완료'} tone={isOvertime ? 'danger' : 'brand'} />
-
-      <Text className="text-muted dark:text-muted-dark mt-4 text-sm font-semibold">퇴근 완료</Text>
-
-      {/* times — 숫자가 주인공 */}
-      <View className="mt-2 flex-row items-baseline gap-3">
-        <Text className="text-content dark:text-content-dark text-4xl font-extrabold" style={TABULAR}>
-          {clockInTime?.format('HH:mm')}
-        </Text>
-        <Text className="text-muted dark:text-muted-dark text-base">→</Text>
-        <Text
-          className={`text-4xl font-extrabold ${isOvertime ? 'text-danger dark:text-danger-dark' : 'text-brand'}`}
-          style={TABULAR}
-        >
-          {clockOutTime?.format('HH:mm')}
-        </Text>
-      </View>
-
-      {/* progress — 완료 (100%) */}
-      <View className="mt-5">
-        <ProgressBar progress={100} tone={isOvertime ? 'danger' : 'brand'} />
-      </View>
-
-      <View className="mt-3 flex-row items-center gap-2">
-        <Text className="text-muted dark:text-muted-dark text-[13px]">총 근무 {durationText}</Text>
-        {overtimeText && (
-          <Text className="text-danger dark:text-danger-dark text-[13px] font-semibold" style={TABULAR}>
-            +{overtimeText.formatHours.padStart(2, '0')}:{overtimeText.formatMinutes.padStart(2, '0')} 초과
-          </Text>
-        )}
-      </View>
-    </View>
-  );
-}
-
-// Primary Action — 큰 카드 (휴가 관련 자주 쓰는 것)
-function PrimaryActionCard({
-  icon,
-  iconBg,
-  label,
-  sub,
-  onPress,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  label: string;
-  sub: string;
-  onPress?: () => void;
-}) {
-  return (
-    <AnimatedPressable
-      className="flex-1 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 }}
-      onPress={onPress}
-    >
-      <View className="size-10 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg }}>
-        {icon}
-      </View>
-      <Text className="mt-3 text-sm font-bold text-gray-900 dark:text-white">{label}</Text>
-      <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{sub}</Text>
-    </AnimatedPressable>
-  );
-}
-
-// Secondary Action — 리스트 row
-function SecondaryActionRow({
-  icon,
-  iconBg,
-  label,
-  sub,
-  onPress,
-}: {
-  icon: React.ReactNode;
-  iconBg: string;
-  label: string;
-  sub: string;
-  onPress?: () => void;
-}) {
-  return (
-    <AnimatedPressable className="flex-row items-center gap-3 px-4 py-3.5" onPress={onPress} scaleTo={0.98}>
-      <View className="size-9 items-center justify-center rounded-xl" style={{ backgroundColor: iconBg }}>
-        {icon}
-      </View>
-      <View className="flex-1">
-        <Text className="text-[15px] font-semibold text-gray-900 dark:text-white">{label}</Text>
-        <Text className="text-xs text-gray-500 dark:text-gray-400">{sub}</Text>
-      </View>
-      <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-    </AnimatedPressable>
-  );
-}
-
-// Skeleton shimmer block
-function SkeletonBlock({
-  width,
-  height,
-  rounded = 8,
-}: {
-  width: number | `${number}%`;
-  height: number;
-  rounded?: number;
-}) {
-  const opacity = useRef(new Animated.Value(0.3)).current;
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
-      ]),
-    );
-    animation.start();
-    return () => animation.stop();
-  }, []);
-
-  return (
-    <Animated.View className="bg-gray-200 dark:bg-gray-700" style={{ width, height, borderRadius: rounded, opacity }} />
-  );
-}
-
-// Skeleton for Hero Card area
-function HeroSkeleton() {
-  return (
-    <View className="rounded-[20px] bg-gray-100 p-5 dark:bg-gray-800" style={{ minHeight: 200 }}>
-      <SkeletonBlock width={80} height={24} rounded={12} />
-      <View className="mt-4">
-        <SkeletonBlock width={160} height={16} />
-      </View>
-      <View className="mt-2">
-        <SkeletonBlock width={200} height={28} rounded={6} />
-      </View>
-      <View className="mt-5 flex-row gap-4">
-        <View>
-          <SkeletonBlock width={60} height={12} />
-          <View className="mt-1">
-            <SkeletonBlock width={90} height={16} />
-          </View>
-        </View>
-        <View>
-          <SkeletonBlock width={60} height={12} />
-          <View className="mt-1">
-            <SkeletonBlock width={90} height={16} />
-          </View>
-        </View>
-      </View>
-      <View className="mt-5">
-        <SkeletonBlock width="100%" height={48} rounded={16} />
-      </View>
-    </View>
-  );
-}
-
-// Skeleton for Primary Action Card
-function PrimaryActionCardSkeleton() {
-  return (
-    <View
-      className="flex-1 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4 }}
-    >
-      <SkeletonBlock width={40} height={40} rounded={12} />
-      <View className="mt-3">
-        <SkeletonBlock width={64} height={14} />
-      </View>
-      <View className="mt-1">
-        <SkeletonBlock width={88} height={12} />
-      </View>
-    </View>
-  );
-}
 
 export default function HomeIndex() {
-  const { theme } = useContext(ThemeContext);
+  // context
+  const { userinfo } = useContext(AuthContext);
+
+  // hooks
   const router = useRouter();
+  const palette = usePalette();
 
+  // queries
   const { today, isLoading, reloadToday } = useTodayAttendance();
-  const { pages } = useNotificationHistories({ page: 0, size: 25 });
-  const notifications = pages.reduce(
-    (current, value) => current.concat(value.content),
-    [] as UserNotificationHistory[],
-  );
-
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await reloadToday();
-    setRefreshing(false);
-  }, [reloadToday]);
-
-  const [remainingTime, setRemainingTime] = useState<{ isOvertime: boolean; time: TimeCode | false }>({
-    isOvertime: false,
-    time: false,
+  const { leaveEntry } = useUserLeaveEntry({ uniqueId: userinfo?.sub, year: dayjs().year() });
+  // 휴가 내역 화면과 같은 파라미터 → 같은 query cache 를 공유한다.
+  const { vacations } = useVacations({
+    userUniqueId: userinfo?.sub,
+    startDateFrom: dayjs().startOf('year').toDate(),
+    endDateFrom: dayjs().endOf('year').toDate(),
+    status: 'APPROVED',
+    page: 0,
+    size: 1000,
   });
+  // ponytail: 첫 페이지(25건) 기준 미읽음 수. 정확한 수가 필요하면 서버 count API 추가.
+  const { pages } = useNotificationHistories({ page: 0, size: 25 });
+  const unreadCount = pages.reduce((count, page) => count + page.content.filter((n) => !n.isRead).length, 0);
 
+  // state
+  const [refreshing, setRefreshing] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<RemainingTime>({ isOvertime: false, time: false });
+
+  // useEffect
   useEffect(() => {
-    calculateRemainingTime();
-    const intervalId = setInterval(() => calculateRemainingTime(), 1_000);
+    const calculate = () => {
+      if (!today?.leaveWorkAt) {
+        setRemainingTime({ isOvertime: false, time: false });
+        return;
+      }
+
+      // 남은 시간(양수) = 목표까지, 음수 = 목표 초과. 초과근무는 30분 유예 후 진입.
+      const remainingSec = dayjs(today.leaveWorkAt).unix() - dayjs().unix();
+      const isOvertime = -remainingSec > OVERTIME_GRACE_MINUTES * 60;
+
+      // 초과근무면 목표 대비 초과분을, 그 외에는 목표까지 남은 시간을 0에서 클램프한다.
+      setRemainingTime({ isOvertime, time: new TimeCode(isOvertime ? -remainingSec : Math.max(0, remainingSec)) });
+    };
+
+    calculate();
+    const intervalId = setInterval(calculate, 1_000);
     return () => clearInterval(intervalId);
   }, [today]);
 
@@ -503,9 +75,7 @@ export default function HomeIndex() {
     syncWorkActivity(today).catch((err) => console.error('[LiveActivity] sync failed', err));
   }, [today]);
 
-  // 근무 중일 때만 앱 포그라운드에서 분 단위로 Live Activity 라벨을 갱신한다.
-  // (백그라운드/잠금화면에서는 마지막 값이 그대로 유지되며, 진짜 분단위 백그라운드
-  //  갱신은 push[enablePushNotifications]가 필요 — 후속 과제. iOS 외 no-op)
+  // 근무 중일 때만 앱 포그라운드에서 분 단위로 Live Activity 라벨을 갱신한다. (iOS 외 no-op)
   useEffect(() => {
     const isWorking = !!today?.clockInTime && !today?.clockOutTime;
     if (!isWorking) return;
@@ -524,137 +94,89 @@ export default function HomeIndex() {
     return () => clearInterval(intervalId);
   }, [today]);
 
-  const calculateRemainingTime = () => {
-    if (!today?.leaveWorkAt) {
-      setRemainingTime({ isOvertime: false, time: false });
-      return;
-    }
-
-    // 남은 시간(양수) = 목표까지, 음수 = 목표 초과. 초과근무는 30분 유예 후 진입.
-    const remainingSec = dayjs(today.leaveWorkAt).unix() - dayjs().unix();
-    const isOvertime = -remainingSec > OVERTIME_GRACE_MINUTES * 60;
-
-    setRemainingTime({
-      isOvertime,
-      // 초과근무면 목표 대비 초과분(30분+)을, 그 외에는 목표까지 남은 시간을 0에서 클램프해
-      // [목표, 목표+30분] 구간에 '남은 시간'이 잘못 커 보이지 않게 한다.
-      time: new TimeCode(isOvertime ? -remainingSec : Math.max(0, remainingSec)),
-    });
-  };
+  // handle
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await reloadToday();
+    setRefreshing(false);
+  }, [reloadToday]);
 
   const workState = getWorkState(today);
   const isWeekend = WEEKEND_DAYS.includes(dayjs().day());
+  const cta = getHomeCta(workState, isLoading && !today);
+
+  const leaveSub = leaveEntry ? `연차 ${leaveEntry.totalLeaveDays - leaveEntry.usedLeaveDays}일` : '연차 -';
+  const compSub = leaveEntry ? `${leaveEntry.totalCompLeaveDays - leaveEntry.usedCompLeaveDays}일 사용 가능` : '-';
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{ paddingBottom: 48 }}
-      showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      {/* Page Header */}
-      <Reanimated.View entering={enterPage(0)} className="flex-row items-center justify-between px-4 pb-1">
-        <View>
-          <Text className="text-xs font-semibold tracking-wider text-gray-400 uppercase dark:text-gray-500">
-            {dayjs().format('YYYY.M.D')} · {getDaysOfWeek(dayjs().day())}
+    <View className="flex-1">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 24 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={palette.muted} />}
+      >
+        {/* header */}
+        <Reanimated.View entering={enterPage(0)}>
+          <Text className="text-muted dark:text-muted-dark text-xs font-semibold">
+            {dayjs().format('M월 D일 dddd')}
           </Text>
-          <Text className="mt-1 text-[28px] leading-none font-bold text-gray-900 dark:text-white">오늘</Text>
-        </View>
-        <AnimatedPressable
-          className="size-10 items-center justify-center rounded-full bg-white dark:bg-gray-800"
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 }}
-          onPress={() => router.push('./notifications')}
-        >
-          <Ionicons name="notifications-outline" size={20} color={theme === 'light' ? '#1C1C1E' : '#FFFFFF'} />
-          {notifications.some((n) => !n.isRead) && (
-            <View className="absolute top-0 right-0 size-2.5 rounded-full bg-red-500" />
-          )}
-        </AnimatedPressable>
-      </Reanimated.View>
+          <Text className="text-content dark:text-content-dark mt-0.5 text-[28px] font-bold tracking-tight">오늘</Text>
+        </Reanimated.View>
 
-      {/* Hero Card */}
-      <Reanimated.View entering={enterHero(80)} className="mt-5 px-4">
-        {isLoading && !today ? (
-          <HeroSkeleton />
-        ) : isWeekend && workState === 'before' ? (
-          <HeroWeekend />
-        ) : (
-          <>
-            {workState === 'before' && <HeroBeforeWork today={today} />}
-            {workState === 'working' && <HeroWorking today={today} remainingTime={remainingTime} />}
-            {workState === 'overtime' && <HeroOvertime today={today} remainingTime={remainingTime} />}
-            {workState === 'done' && <HeroDone today={today} />}
-          </>
-        )}
-      </Reanimated.View>
-
-      {/* Stat tiles — 이번주 근무시간 / 남은 연차 */}
-      <Reanimated.View entering={enterPage(140)} className="mt-4 px-4">
-        <View className="flex-row gap-3">
-          <StatTile label="이번주 근무시간" value="--" />
-          <StatTile label="남은 연차" value="--" accent />
-        </View>
-      </Reanimated.View>
-
-      {/* Primary actions — 자주 쓰는 휴가 바로가기 2개 */}
-      <Reanimated.View entering={enterPage(180)} className="mt-8 px-4">
-        <Text className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">휴가</Text>
-        <View className="flex-row gap-3">
-          {isLoading && !today ? (
-            <>
-              <PrimaryActionCardSkeleton />
-              <PrimaryActionCardSkeleton />
-            </>
-          ) : (
-            <>
-              <PrimaryActionCard
-                icon={<MaterialCommunityIcons name="calendar-plus" size={20} color="#1A7A3A" />}
-                iconBg="#E8F8F0"
-                label="휴가 신청"
-                sub="연차·반차 신청"
-                onPress={() => router.push('./dayoff/add')}
-              />
-              <PrimaryActionCard
-                icon={<MaterialCommunityIcons name="file-document-outline" size={20} color="#7A00B0" />}
-                iconBg="#FEE8FF"
-                label="휴가 내역"
-                sub="사용·잔여 내역"
-                onPress={() => router.push('./dayoff/histories')}
-              />
-            </>
-          )}
-        </View>
-      </Reanimated.View>
-
-      {/* Secondary actions — 덜 자주 쓰는 건 리스트로 (리듬 변화) */}
-      <Reanimated.View entering={enterPage(260)} className="mt-6 px-4">
-        <Text className="mb-2 text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500">
-          바로가기
-        </Text>
-        <View
-          className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900"
-          style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.06,
-            shadowRadius: 4,
-          }}
-        >
-          <SecondaryActionRow
-            icon={<MaterialCommunityIcons name="clock-outline" size={18} color="#0048B0" />}
-            iconBg="#E5F0FF"
-            label="근무 확인"
-            sub="이번 달 현황"
+        {/* hero */}
+        <Reanimated.View entering={enterHero(80)} className="mt-4">
+          <HomeHero
+            today={today}
+            isLoading={isLoading}
+            workState={workState}
+            isWeekend={isWeekend}
+            remainingTime={remainingTime}
           />
-          <View className="ml-[60px] border-b border-gray-100 dark:border-gray-800" />
-          <SecondaryActionRow
-            icon={<MaterialIcons name="person-outline" size={18} color="#48484A" />}
-            iconBg="#F2F2F7"
-            label="내 정보"
-            sub="프로필·설정"
-          />
+        </Reanimated.View>
+
+        {/* quick actions */}
+        <Reanimated.View entering={enterPage(160)} className="mt-6">
+          <Text className="text-muted dark:text-muted-dark mb-2 text-[11px] font-semibold tracking-wider">
+            빠른 실행
+          </Text>
+          <View className="flex-row gap-3">
+            <QuickAction
+              icon={<Icon sf="airplane" fallback="✈" size={17} color={palette.brand} />}
+              label="휴가 신청"
+              sub={leaveSub}
+              onPress={() => router.push('./dayoff/add')}
+            />
+            <QuickAction
+              icon={<Icon sf="gift" fallback="🎁" size={17} color={palette.brand} />}
+              label="보상휴가"
+              sub={compSub}
+              onPress={() => router.push({ pathname: '/(tabs)/(home)/dayoff/add', params: { type: 'COMPENSATORY' } })}
+            />
+          </View>
+          <View className="mt-3 flex-row gap-3">
+            <QuickAction
+              icon={<Icon sf="list.bullet.rectangle" fallback="☰" size={17} color={palette.brand} />}
+              label="휴가 내역"
+              sub={`올해 ${vacations.length}건`}
+              onPress={() => router.push('./dayoff/histories')}
+            />
+            <QuickAction
+              icon={<Icon sf="bell" fallback="🔔" size={17} color={palette.brand} />}
+              label="알림"
+              sub={unreadCount > 0 ? `읽지 않음 ${unreadCount}개` : '새 알림 없음'}
+              onPress={() => router.push('./notifications')}
+            />
+          </View>
+        </Reanimated.View>
+      </ScrollView>
+
+      {/* 하단 고정 CTA — 탭바 위 엄지 영역 */}
+      {cta && (
+        <View className="pt-3 pb-28">
+          <Button label={cta} onPress={() => router.push('./attendance')} />
         </View>
-      </Reanimated.View>
-    </ScrollView>
+      )}
+    </View>
   );
 }

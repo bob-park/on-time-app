@@ -25,16 +25,16 @@ function SkeletonBlock({
   }, []);
 
   return (
-    <Animated.View className="bg-gray-200 dark:bg-gray-700" style={{ width, height, borderRadius: rounded, opacity }} />
+    <Animated.View
+      className="bg-elevated dark:bg-elevated-dark"
+      style={{ width, height, borderRadius: rounded, opacity }}
+    />
   );
 }
 
 function MyScheduleSkeleton() {
   return (
-    <View
-      className="flex-row items-center gap-3 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3 }}
-    >
+    <View className="bg-surface dark:bg-surface-dark flex-row items-center gap-3 rounded-2xl p-4">
       <SkeletonBlock width={48} height={48} rounded={14} />
       <View className="flex-1 gap-2">
         <SkeletonBlock width={100} height={16} rounded={6} />
@@ -46,10 +46,7 @@ function MyScheduleSkeleton() {
 
 function ColleagueSkeleton() {
   return (
-    <View
-      className="flex-row items-center gap-3 rounded-2xl bg-white p-4 dark:bg-gray-900"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3 }}
-    >
+    <View className="bg-surface dark:bg-surface-dark flex-row items-center gap-3 rounded-2xl p-4">
       <SkeletonBlock width={44} height={44} rounded={22} />
       <View className="flex-1 gap-2">
         <SkeletonBlock width={80} height={14} rounded={6} />

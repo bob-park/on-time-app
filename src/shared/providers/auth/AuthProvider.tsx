@@ -11,6 +11,7 @@ import dayjs from '@/shared/dayjs';
 import { useStore } from '@/shared/store/rootStore';
 import delay from '@/utils/delay';
 
+const KEY_ID_TOKEN = 'idToken';
 const KEY_ACCESS_TOKEN = 'accessToken';
 const KEY_REFRESH_TOKEN = 'refreshToken';
 const KEY_EXPIRED_AT = 'expiredAt';
@@ -20,6 +21,8 @@ WebBrowser.maybeCompleteAuthSession();
 
 export const clientId = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_ID || '';
 export const clientSecret = process.env.EXPO_PUBLIC_AUTHORIZATION_CLIENT_SECRET || '';
+
+const END_SESSION_ENDPOINT = `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/connect/logout`;
 
 export const discovery = {
   authorizationEndpoint: `${process.env.EXPO_PUBLIC_AUTHORIZATION_SERVER}/oauth2/authorize`,
@@ -52,6 +55,7 @@ export const AuthContext = createContext<AuthContextProps>({
 export default function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   // state
   const [expiredAt, setExpiredAt] = useState<Date>();
+  const [idToken, setIdToken] = useState<string>();
   const [accessToken, setAccessToken] = useState<string>('');
   const [refreshToken, setRefreshToken] = useState<string>();
 
@@ -121,22 +125,34 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
       await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId });
     }
 
-    Promise.all([
-      SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
-        if (data && userinfo) {
-          await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId: data });
-        }
+    const postLogoutRedirectUri = makeRedirectUri({
+      scheme: 'ontime',
+      path: 'login',
+    });
 
-        SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);
-      }),
-      SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN),
-      SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
-      SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
-    ]).then(() => {
-      loggedOut();
-      setAccessToken('');
-      setRefreshToken(undefined);
-      setExpiredAt(undefined);
+    const endSessionUrl = `${END_SESSION_ENDPOINT}?id_token_hint=${idToken}&post_logout_redirect_uri=${postLogoutRedirectUri}`;
+
+    // 인증 서버 세션을 끝낸 뒤(브라우저 세션 종료) 로컬 토큰을 지운다.
+    await WebBrowser.openAuthSessionAsync(endSessionUrl, postLogoutRedirectUri).then(async () => {
+      await Promise.all([
+        SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
+          if (data && userinfo) {
+            await deleteUserNotificationProvider({ userUniqueId: userinfo.sub, userProviderId: data });
+          }
+
+          SecureStore.deleteItemAsync(KEY_USER_PROVIDER_ID);
+        }),
+        SecureStore.deleteItemAsync(KEY_ID_TOKEN),
+        SecureStore.deleteItemAsync(KEY_ACCESS_TOKEN),
+        SecureStore.deleteItemAsync(KEY_REFRESH_TOKEN),
+        SecureStore.deleteItemAsync(KEY_EXPIRED_AT),
+      ]).then(() => {
+        loggedOut();
+        setIdToken(undefined);
+        setAccessToken('');
+        setRefreshToken(undefined);
+        setExpiredAt(undefined);
+      });
     });
   };
 
@@ -167,6 +183,13 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
         return dayjs(data).toDate();
       }),
+      SecureStore.getItemAsync(KEY_ID_TOKEN).then((data) => {
+        if (!data) {
+          return;
+        }
+
+        return data;
+      }),
       SecureStore.getItemAsync(KEY_ACCESS_TOKEN).then((data) => {
         if (!data) {
           return;
@@ -181,8 +204,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
 
         return data;
       }),
-    ]).then(([expiredAt, accessToken, refreshToken]) => {
+    ]).then(([expiredAt, idToken, accessToken, refreshToken]) => {
       setExpiredAt(expiredAt);
+      setIdToken(idToken);
       setAccessToken(accessToken || '');
       setRefreshToken(refreshToken);
     });
@@ -192,10 +216,12 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     const unixtimestamp = (token.expiresIn || 0) + token.issuedAt;
 
     Promise.all([
+      SecureStore.setItemAsync(KEY_ID_TOKEN, token.idToken || ''),
       SecureStore.setItemAsync(KEY_ACCESS_TOKEN, token.accessToken),
       SecureStore.setItemAsync(KEY_REFRESH_TOKEN, token.refreshToken || ''),
       SecureStore.setItemAsync(KEY_EXPIRED_AT, dayjs.unix(unixtimestamp).toISOString()),
     ]).then(async () => {
+      setIdToken(token.idToken);
       setAccessToken(token.accessToken);
       setRefreshToken(token.refreshToken);
       setExpiredAt(dayjs.unix(unixtimestamp).toDate());

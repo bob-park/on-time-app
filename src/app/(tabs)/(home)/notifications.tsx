@@ -1,5 +1,3 @@
-import { useContext } from 'react';
-
 import { Text, TouchableOpacity, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 
@@ -10,8 +8,8 @@ import { useNotificationHistories, useReadNotification } from '@/domain/notifica
 import { Icon } from '@/shared/components/Icon';
 import { AnimatedPressable } from '@/shared/components/motion/AnimatedPressable';
 import { enterListItem, enterPage } from '@/shared/components/motion/entering';
+import { usePalette } from '@/shared/components/ui';
 import dayjs from '@/shared/dayjs';
-import { ThemeContext } from '@/shared/providers/theme/ThemeProvider';
 
 import { FlashList } from '@shopify/flash-list';
 import LottieView from 'lottie-react-native';
@@ -22,11 +20,13 @@ const MessageItem = ({
   message,
   onRead,
 }: Readonly<{ message: UserNotificationHistory; onRead: (id: string) => void }>) => {
+  const palette = usePalette();
+
   return (
     <View className="mt-3 px-1">
       <AnimatedPressable
-        className={`bg-surface dark:bg-surface-dark flex flex-row items-start gap-3 rounded-3xl border px-4 py-4 ${
-          message.isRead ? 'border-border dark:border-border-dark opacity-60' : 'border-brand'
+        className={`bg-surface dark:bg-surface-dark flex flex-row items-start gap-3 rounded-2xl border px-4 py-4 ${
+          message.isRead ? 'border-border dark:border-border-dark opacity-60' : 'border-brand dark:border-brand-dark'
         }`}
         disabled={message.isRead}
         scaleTo={0.99}
@@ -35,7 +35,7 @@ const MessageItem = ({
         {/* icon container */}
         <View className="relative flex-none">
           <View className="bg-elevated dark:bg-elevated-dark size-9 items-center justify-center rounded-xl">
-            <Icon sf="bell" fallback="🔔" size={18} color="#1ed760" />
+            <Icon sf="bell" fallback="🔔" size={18} color={palette.brand} />
           </View>
 
           {/* unread dot */}
@@ -67,7 +67,7 @@ const NoMessage = () => {
       <LottieView style={{ width: 150, height: 150 }} source={NoDataLottie} autoPlay loop />
 
       <View className="items-center justify-center">
-        <Text className="text-muted dark:text-muted-dark text-base font-semibold">새로운 소식이 없나봐요.</Text>
+        <Text className="text-muted dark:text-muted-dark text-[16px] font-semibold">새 알림이 없어요</Text>
       </View>
     </View>
   );
@@ -75,7 +75,7 @@ const NoMessage = () => {
 
 export default function NotificationsPage() {
   // context
-  const { theme } = useContext(ThemeContext);
+  const palette = usePalette();
 
   // hooks
   const router = useRouter();
@@ -99,21 +99,20 @@ export default function NotificationsPage() {
 
   const allRead = notifications.length === 0 || notifications.every((n) => n.isRead);
 
-  // mode-safe raw colors
-  const contentColor = theme === 'light' ? '#15171c' : '#ffffff';
-
   return (
     <View className="bg-base dark:bg-base-dark flex size-full flex-col">
       {/* header */}
       <Reanimated.View entering={enterPage(0)} className="relative mb-2 flex flex-row items-center justify-center">
         <TouchableOpacity className="absolute left-0 items-center justify-center" onPress={() => router.back()}>
-          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={contentColor} />
+          <Icon sf="chevron.left" fallback="‹" size={24} weight="semibold" color={palette.content} />
         </TouchableOpacity>
 
         <Text className="text-content dark:text-content-dark text-xl font-bold">알림</Text>
 
         <TouchableOpacity className="absolute right-0" disabled={allRead} onPress={handleAllRead}>
-          <Text className={`text-[14px] font-semibold ${allRead ? 'text-muted dark:text-muted-dark' : 'text-brand'}`}>
+          <Text
+            className={`text-[14px] font-semibold ${allRead ? 'text-muted dark:text-muted-dark' : 'text-brand dark:text-brand-dark'}`}
+          >
             모두 읽기
           </Text>
         </TouchableOpacity>

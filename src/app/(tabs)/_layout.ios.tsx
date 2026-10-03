@@ -1,46 +1,37 @@
-import { useColorScheme } from 'react-native';
+import { NativeTabs } from 'expo-router/native-tabs';
 
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { usePalette } from '@/shared/components/ui';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  const isDark = colorScheme === 'dark';
+  const palette = usePalette();
 
   return (
     <NativeTabs
       backBehavior="history"
-      tintColor="#1ed760"
-      iconColor={isDark ? 'rgba(255,255,255,0.5)' : '#8a8f99'}
+      tintColor={palette.brand}
+      iconColor={palette.muted}
       labelStyle={{
         default: { fontSize: 10 },
-        selected: { fontSize: 10, fontWeight: '900' },
+        selected: { fontSize: 10, fontWeight: '700' },
       }}
     >
       <NativeTabs.Trigger name="(home)">
         <NativeTabs.Trigger.Icon
-          sf={{ default: 'menubar.rectangle', selected: 'menubar.dock.rectangle' }}
+          sf={{ default: 'square.grid.2x2', selected: 'square.grid.2x2.fill' }}
           drawable="custom_android_drawable"
         />
         <NativeTabs.Trigger.Label>오늘</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="schedule">
         <NativeTabs.Trigger.Icon
-          sf={{ default: 'calendar', selected: 'calendar.and.person' }}
+          sf={{ default: 'calendar', selected: 'calendar' }}
           drawable="custom_android_drawable"
         />
         <NativeTabs.Trigger.Label>일정</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="todo">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: 'checkmark.circle', selected: 'checkmark.circle.fill' }}
-          drawable="custom_android_drawable"
-        />
-        <NativeTabs.Trigger.Label>할일</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(more)">
         <NativeTabs.Trigger.Icon
-          sf={{ default: 'circle.grid.2x2', selected: 'circle.grid.2x2.fill' }}
+          sf={{ default: 'ellipsis.circle', selected: 'ellipsis.circle.fill' }}
           drawable="custom_android_drawable"
         />
         <NativeTabs.Trigger.Label>더보기</NativeTabs.Trigger.Label>
