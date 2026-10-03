@@ -78,7 +78,9 @@ export default function LoginPage() {
           label={isLoggingIn ? '로그인 중' : '로그인'}
           disabled={isLoggingIn}
           onPress={() => {
-            promptAsync();
+            // 비공개(ephemeral) 세션: iOS 의 "로그인하려고 합니다" 확인 창이 뜨지 않고,
+            // 브라우저에 로그인 쿠키를 남기지 않아 로그아웃 후에는 항상 다시 인증한다.
+            promptAsync({ preferEphemeralSession: true });
           }}
           icon={
             isLoggingIn ? (
