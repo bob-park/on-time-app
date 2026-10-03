@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-10-03
+
+### Changed
+- 로그인·로그아웃 인증 화면을 비공개(ephemeral) 세션으로 열어 iOS 의 "…을(를) 사용하여 로그인하려고 합니다" 확인 창을 제거. 브라우저에 로그인 쿠키가 남지 않아 로그아웃 후에는 항상 다시 인증
+
 ## [1.3.0] - 2026-10-03
 
 ### Added
