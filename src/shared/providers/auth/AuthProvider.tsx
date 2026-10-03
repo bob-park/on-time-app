@@ -133,7 +133,9 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     const endSessionUrl = `${END_SESSION_ENDPOINT}?id_token_hint=${idToken}&post_logout_redirect_uri=${postLogoutRedirectUri}`;
 
     // 인증 서버 세션을 끝낸 뒤(브라우저 세션 종료) 로컬 토큰을 지운다.
-    await WebBrowser.openAuthSessionAsync(endSessionUrl, postLogoutRedirectUri).then(async () => {
+    await WebBrowser.openAuthSessionAsync(endSessionUrl, postLogoutRedirectUri, {
+      preferEphemeralSession: true,
+    }).then(async () => {
       await Promise.all([
         SecureStore.getItemAsync(KEY_USER_PROVIDER_ID).then(async (data) => {
           if (data && userinfo) {
