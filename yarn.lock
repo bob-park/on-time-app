@@ -7398,7 +7398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-widgets@npm:~58.0.11":
+"expo-widgets@npm:58.0.11":
   version: 58.0.11
   resolution: "expo-widgets@npm:58.0.11"
   dependencies:
@@ -7409,6 +7409,20 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/82018807cdeda6e2815365597b5f7ff9ab8fd28e4d9575562015cafed0d417520fc2bd27b0ab9bbb22487878c6d85491353f4e528c51c1adf1fafb351412f7dd
+  languageName: node
+  linkType: hard
+
+"expo-widgets@patch:expo-widgets@npm%3A58.0.11#~/.yarn/patches/expo-widgets-npm-58.0.11-d6fe0bdf42.patch":
+  version: 58.0.11
+  resolution: "expo-widgets@patch:expo-widgets@npm%3A58.0.11#~/.yarn/patches/expo-widgets-npm-58.0.11-d6fe0bdf42.patch::version=58.0.11&hash=257e1d"
+  dependencies:
+    "@expo/plist": "npm:^0.10.1"
+    "@expo/ui": "npm:~58.0.11"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/35ac076ee18a783db72df38e835dd3de25577fc235b16a31b45c3645cd7985ae074a0adac7fd16e186b45ac360fb6469d33bf8101156899954c884d3e44ac2f7
   languageName: node
   linkType: hard
 
@@ -10780,7 +10794,7 @@ __metadata:
     expo-symbols: "npm:~58.0.3"
     expo-system-ui: "npm:~58.0.5"
     expo-web-browser: "npm:~58.0.4"
-    expo-widgets: "npm:~58.0.11"
+    expo-widgets: "patch:expo-widgets@npm%3A58.0.11#~/.yarn/patches/expo-widgets-npm-58.0.11-d6fe0bdf42.patch"
     i18next: "npm:^26.3.3"
     immer: "npm:^11.1.8"
     jest: "npm:^29.2.1"

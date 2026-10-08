@@ -31,16 +31,12 @@ export async function startWorkActivity(input: WorkActivityInput): Promise<void>
   const factory = getFactory();
   if (!factory) return;
 
-  const props = computeWorkActivityProps(input, new Date());
-  const [active] = factory.getInstances();
+  // Avoid stacking duplicate activities: clear any existing one before starting.
+  // An existing instance may be one iOS already ended (8h limit) that can't be
+  // updated anymore, so end-then-start instead of updating in place.
+  await endWorkActivity();
 
-  // Avoid stacking duplicate activities: update the existing one if present.
-  if (active) {
-    await active.update(props);
-    return;
-  }
-
-  factory.start(props);
+  factory.start(computeWorkActivityProps(input, new Date()));
 }
 
 export async function updateWorkActivity(input: WorkActivityInput): Promise<void> {
