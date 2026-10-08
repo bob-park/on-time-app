@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2026-10-08
+
+### Fixed
+- 근무가 8시간을 넘기면 퇴근해도 Live Activity 가 잠금화면에 남던 문제. iOS 가 8시간 후 자동 종료한(ended) Activity 도 조회되도록 `expo-widgets` 를 패치(`yarn patch`)해 퇴근 시 즉시 제거하고, 출근 시에는 기존 Activity 를 종료한 뒤 새로 시작
+
 ## [1.3.1] - 2026-10-03
 
 ### Changed
