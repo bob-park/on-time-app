@@ -110,7 +110,7 @@ export default function AuthProvider({ children }: Readonly<{ children: React.Re
     }
 
     const intervalId = setInterval(() => {
-      if (dayjs(expiredAt).subtract(10, 'minute').isBefore(dayjs())) {
+      if (dayjs(expiredAt).subtract(1, 'minute').isBefore(dayjs())) {
         refreshToken && handleRefreshAccessToken(refreshToken);
       }
     }, 1_000);
